@@ -1,0 +1,3168 @@
+[
+  {
+    "id": "eco_m_rare_earth",
+    "cat": "economy",
+    "tier": "major",
+    "title": "關鍵礦物斷供",
+    "rate": 0.4,
+    "cond": [
+      [
+        "tech",
+        ">=",
+        60
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "tech",
+        "k": 0.8
+      }
+    ],
+    "loc": [
+      "新竹市",
+      "新竹縣",
+      "台中市",
+      "台南市",
+      "高雄市"
+    ],
+    "desc": "某礦物出口大國以國安為由，無預警管制稀土與關鍵金屬出口，全球價格一週內翻倍。{county}的晶圓廠與磁材工廠庫存只夠撐三個月，生產線排程被迫全部重排。",
+    "options": [
+      {
+        "text": "高價搶購現貨",
+        "result": "產線保住，暴漲的成本壓垮毛利",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -6,
+          "tech": -1,
+          "wealth": -1
+        },
+        "local": {
+          "wealth": -2
+        },
+        "over": {
+          "days": 365,
+          "effects": {
+            "gdp": 2
+          }
+        }
+      },
+      {
+        "text": "回收與替代材料計畫",
+        "result": "短期陣痛，十年後少一分受制於人",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -4,
+          "tech": 3
+        },
+        "policy": [
+          {
+            "stat": "tech",
+            "shift": 5,
+            "days": 2920
+          }
+        ]
+      },
+      {
+        "text": "減產停線硬撐",
+        "result": "產能縮水，客戶另尋來源",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "gdp": -8,
+          "stability": -3,
+          "trust": -2,
+          "tech": -2
+        },
+        "local": {
+          "wealth": -8,
+          "stability": -4
+        }
+      },
+      {
+        "text": "聯合多國共同採購",
+        "result": "友好國家組成採購聯盟分攤風險",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "intl",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "intl": 4,
+          "gdp": -3,
+          "tech": 1
+        },
+        "policy": [
+          {
+            "stat": "intl",
+            "shift": 3,
+            "days": 1825
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "eco_m_chokepoint",
+    "cat": "economy",
+    "tier": "major",
+    "title": "全球航運要道受阻",
+    "rate": 0.35,
+    "loc": "world",
+    "desc": "一艘巨型貨輪在全球最繁忙的運河擱淺，數百艘船隻排隊等候，海運運價一夜飆漲三倍。台灣的出口貨櫃堆滿碼頭，進口原料與零件的交期全數延後。",
+    "options": [
+      {
+        "text": "緊急包機空運關鍵零件",
+        "result": "關鍵訂單保住，運費吃掉利潤",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -4,
+          "wealth": -1,
+          "trust": 2,
+          "tech": 1
+        }
+      },
+      {
+        "text": "動用戰略儲備穩物價",
+        "result": "民生物價穩住，儲備見底得慢慢補",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -3,
+          "stability": 2,
+          "trust": 1,
+          "wealth": 1
+        },
+        "over": {
+          "days": 365,
+          "effects": {
+            "gdp": -2
+          }
+        }
+      },
+      {
+        "text": "供應鏈全面延誤",
+        "result": "工廠待料停工，出口衰退一季",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "gdp": -7,
+          "wealth": -3,
+          "stability": -2,
+          "trust": -1
+        }
+      },
+      {
+        "text": "押注航運與造船",
+        "result": "擴建港口船隊，景氣回來時大賺",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "tech",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "gdp": -3,
+          "intl": 1
+        },
+        "over": {
+          "days": 1095,
+          "effects": {
+            "gdp": 5,
+            "tech": 1
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_m_bank_run",
+    "cat": "economy",
+    "tier": "major",
+    "title": "數位擠兌風暴",
+    "rate": 0.4,
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        2
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "trust",
+        "k": -1
+      }
+    ],
+    "loc": [
+      "台北市",
+      "新北市",
+      "台中市",
+      "高雄市",
+      "桃園市"
+    ],
+    "desc": "一則關於{county}某銀行流動性吃緊的貼文深夜瘋傳，天亮前已有數百億存款透過手機轉走。這家銀行撐不過中午，恐慌開始蔓延到其他金融機構。",
+    "options": [
+      {
+        "text": "全額保障所有存款",
+        "result": "恐慌止住，國庫承擔巨額擔保",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "gdp": -6,
+          "trust": 4,
+          "stability": 3,
+          "wealth": 1
+        },
+        "policy": [
+          {
+            "stat": "gdp",
+            "shift": -2,
+            "days": 1095
+          }
+        ]
+      },
+      {
+        "text": "讓銀行倒閉清算",
+        "result": "存戶受創，市場從此學會風險",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "wealth": -6,
+          "stability": -5,
+          "trust": -3,
+          "gdp": -3
+        },
+        "local": {
+          "wealth": -8,
+          "stability": -6
+        },
+        "over": {
+          "days": 720,
+          "effects": {
+            "gdp": 3,
+            "trust": 1
+          }
+        }
+      },
+      {
+        "text": "安排同業緊急併購",
+        "result": "一夜談成併購，存戶無感轉移",
+        "weight": 2,
+        "effects": {
+          "gdp": -3,
+          "wealth": -1,
+          "trust": 1,
+          "stability": 1
+        },
+        "local": {
+          "wealth": -3
+        }
+      },
+      {
+        "text": "限制每日提款額度",
+        "result": "擠兌暫停，排隊人龍與怒火不停",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "stability",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "stability": -5,
+          "trust": -4,
+          "wealth": -2,
+          "gdp": -1
+        },
+        "local": {
+          "stability": -10
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_m_swf_scandal",
+    "cat": "economy",
+    "tier": "major",
+    "title": "主權基金弊案",
+    "rate": 0.35,
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        4
+      ],
+      [
+        "gdp",
+        ">=",
+        50
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "trust",
+        "k": -1
+      }
+    ],
+    "loc": [
+      "台北市"
+    ],
+    "desc": "外媒踢爆國家主權基金有數百億資金透過離岸公司流向不明帳戶，部分投資案與高層親友有關。國際評等機構發出警告，街頭開始出現要求徹查的集會。",
+    "options": [
+      {
+        "text": "獨立特偵徹查公開",
+        "result": "數名高層起訴，國際信心慢慢回來",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "trust": 5,
+          "intl": 2,
+          "gdp": -3,
+          "stability": -2
+        },
+        "over": {
+          "days": 720,
+          "effects": {
+            "gdp": 2
+          }
+        }
+      },
+      {
+        "text": "高層請辭止血",
+        "result": "人走了，錢沒回來，疑問還在",
+        "weight": 2,
+        "effects": {
+          "trust": -2,
+          "stability": 1,
+          "gdp": -1
+        }
+      },
+      {
+        "text": "淡化為個案處理",
+        "result": "國際評等下修，資金悄悄外流",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -6,
+          "intl": -4,
+          "gdp": -2,
+          "stability": -3
+        },
+        "policy": [
+          {
+            "stat": "trust",
+            "shift": -3,
+            "days": 1460
+          }
+        ]
+      },
+      {
+        "text": "基金改制獨立監管",
+        "result": "透明制度上路，短期投資報酬下滑",
+        "weight": 1,
+        "effects": {
+          "trust": 3,
+          "gdp": -2,
+          "wealth": -2
+        },
+        "policy": [
+          {
+            "stat": "trust",
+            "shift": 4,
+            "days": 2920
+          },
+          {
+            "stat": "gdp",
+            "shift": 3,
+            "days": 2920
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "eco_m_fab_accident",
+    "cat": "economy",
+    "tier": "major",
+    "title": "晶圓廠重大事故",
+    "rate": 0.4,
+    "mods": [
+      {
+        "stat": "tech",
+        "k": 0.8
+      }
+    ],
+    "loc": [
+      "新竹市",
+      "新竹縣",
+      "台中市",
+      "台南市",
+      "高雄市"
+    ],
+    "desc": "{county}一座先進製程晶圓廠深夜發生化學品外洩與火警，數十名員工送醫，廠區全面停機。全球客戶的交期一夕打亂，國際媒體追問台灣晶片供應的脆弱性。",
+    "options": [
+      {
+        "text": "全面停工安檢",
+        "result": "安檢三個月，產能受損但信心回穩",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "tech": -4,
+          "gdp": -5,
+          "trust": 3,
+          "stability": 1
+        },
+        "local": {
+          "wealth": -6
+        },
+        "over": {
+          "days": 540,
+          "effects": {
+            "tech": 3,
+            "gdp": 2
+          }
+        }
+      },
+      {
+        "text": "火速復工搶產能",
+        "result": "一週復工，工會與鄰里質疑安全",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -2,
+          "tech": -1,
+          "trust": -3,
+          "stability": -2
+        },
+        "local": {
+          "stability": -6
+        },
+        "follow": [
+          {
+            "id": "eco_m_fab_relapse",
+            "delay": 120,
+            "chance": 0.4
+          }
+        ]
+      },
+      {
+        "text": "國際客戶大舉轉單",
+        "result": "訂單流向他國，產業聲譽受創",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "tech",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "tech": -6,
+          "gdp": -6,
+          "intl": -3
+        },
+        "local": {
+          "wealth": -10,
+          "stability": -3
+        }
+      },
+      {
+        "text": "藉機升級新一代廠房",
+        "result": "舊廠除役、新廠動工，產業再升級",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -7,
+          "tech": 2
+        },
+        "local": {
+          "wealth": -3
+        },
+        "over": {
+          "days": 900,
+          "effects": {
+            "gdp": 4,
+            "tech": 3
+          }
+        },
+        "policy": [
+          {
+            "stat": "tech",
+            "shift": 4,
+            "days": 2920
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pub_m_youth_jobless",
+    "cat": "public",
+    "tier": "major",
+    "title": "青年失業潮",
+    "rate": 0.45,
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        2
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "wealth",
+        "k": -1
+      },
+      {
+        "stat": "gdp",
+        "k": -0.8
+      }
+    ],
+    "loc": [
+      "台北市",
+      "新北市",
+      "台中市",
+      "台南市",
+      "高雄市",
+      "桃園市"
+    ],
+    "desc": "青年失業率連續三季攀升到兩位數，{county}的大學畢業生擠滿就業博覽會卻找不到正職。社群上「躺平」成為流行語，街頭開始出現以青年為主的集會。",
+    "options": [
+      {
+        "text": "大規模青年就業方案",
+        "result": "政府補貼職缺，財政吃緊但街頭安靜",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "gdp": -5,
+          "wealth": 2,
+          "stability": 3,
+          "trust": 2,
+          "demo": 1
+        },
+        "over": {
+          "days": 720,
+          "effects": {
+            "gdp": 2
+          }
+        },
+        "policy": [
+          {
+            "stat": "demo",
+            "shift": 2,
+            "days": 1825
+          }
+        ]
+      },
+      {
+        "text": "鬆綁勞動法規促聘用",
+        "result": "職缺變多，但多半是低薪約聘",
+        "weight": 1.5,
+        "effects": {
+          "gdp": 2,
+          "wealth": -3,
+          "stability": -2,
+          "trust": -1
+        },
+        "policy": [
+          {
+            "stat": "gdp",
+            "shift": 2,
+            "days": 1825
+          },
+          {
+            "stat": "stability",
+            "shift": -2,
+            "days": 1095
+          }
+        ]
+      },
+      {
+        "text": "鼓勵海外就業與留學",
+        "result": "人才出走，匯款回流，島嶼變安靜",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": -0.5
+          }
+        ],
+        "effects": {
+          "demo": -4,
+          "intl": 2,
+          "wealth": 1,
+          "stability": 1
+        },
+        "policy": [
+          {
+            "stat": "demo",
+            "shift": -3,
+            "days": 2920
+          }
+        ]
+      },
+      {
+        "text": "青年抗爭升級",
+        "result": "連日集會與衝突，政府威信受創",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1.2
+          }
+        ],
+        "effects": {
+          "stability": -6,
+          "trust": -5,
+          "gdp": -2
+        },
+        "local": {
+          "stability": -10
+        }
+      }
+    ]
+  },
+  {
+    "id": "pub_m_birth_emergency",
+    "cat": "public",
+    "tier": "major",
+    "title": "人口緊急狀態",
+    "rate": 0.5,
+    "cond": [
+      [
+        "demo",
+        "<",
+        35
+      ],
+      [
+        "elapsed",
+        ">=",
+        5
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "demo",
+        "k": -1.5
+      }
+    ],
+    "loc": [
+      "台北市"
+    ],
+    "desc": "全年新生兒跌破歷史新低，多所小學因招不到學生而關閉，政府宣布進入「人口緊急狀態」。各界要求端出前所未有的對策，但沒有人知道錢要從哪裡來。",
+    "options": [
+      {
+        "text": "育兒津貼與托育大加碼",
+        "result": "生育率止跌回升，財政長期承壓",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "gdp": -6,
+          "demo": 4,
+          "trust": 2,
+          "wealth": 1
+        },
+        "policy": [
+          {
+            "stat": "demo",
+            "shift": 6,
+            "days": 3650
+          },
+          {
+            "stat": "gdp",
+            "shift": -3,
+            "days": 2920
+          }
+        ]
+      },
+      {
+        "text": "大幅開放移民與歸化",
+        "result": "人口止跌，社會磨合期衝突增加",
+        "weight": 1.5,
+        "effects": {
+          "demo": 5,
+          "gdp": 2,
+          "stability": -4,
+          "trust": -2
+        },
+        "policy": [
+          {
+            "stat": "demo",
+            "shift": 5,
+            "days": 3650
+          },
+          {
+            "stat": "stability",
+            "shift": -2,
+            "days": 1825
+          }
+        ]
+      },
+      {
+        "text": "延後退休與延長工時",
+        "result": "勞動力撐住，中高齡怒火難平",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "wealth",
+            "k": -0.5
+          }
+        ],
+        "effects": {
+          "gdp": 3,
+          "stability": -5,
+          "trust": -3,
+          "wealth": -2
+        },
+        "policy": [
+          {
+            "stat": "gdp",
+            "shift": 3,
+            "days": 2920
+          }
+        ]
+      },
+      {
+        "text": "宣示多於行動",
+        "result": "記者會開完，數字繼續往下掉",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -4,
+          "demo": -2
+        },
+        "policy": [
+          {
+            "stat": "demo",
+            "shift": -2,
+            "days": 1825
+          }
+        ],
+        "over": {
+          "days": 730,
+          "effects": {
+            "trust": -2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "pub_m_boat_wave",
+    "cat": "public",
+    "tier": "major",
+    "title": "海上難民潮",
+    "rate": 0.3,
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        1
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "intl",
+        "k": 0.5
+      }
+    ],
+    "loc": [
+      "屏東縣",
+      "台東縣",
+      "澎湖縣",
+      "宜蘭縣",
+      "花蓮縣"
+    ],
+    "desc": "遠方一場內戰與連年歉收，讓數千名難民搭上破舊漁船漂流而來，{county}外海一週內攔到數十艘。收容中心爆滿，人道與治安的爭論在國會與街頭同時上演。",
+    "options": [
+      {
+        "text": "人道收容並分批安置",
+        "result": "國際讚許，地方承擔安置壓力",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "intl",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "intl": 5,
+          "gdp": -3,
+          "stability": -3,
+          "demo": 1
+        },
+        "local": {
+          "stability": -6,
+          "wealth": -2
+        },
+        "policy": [
+          {
+            "stat": "intl",
+            "shift": 3,
+            "days": 1825
+          }
+        ]
+      },
+      {
+        "text": "海上攔阻並遣返",
+        "result": "邊境守住，國際人權團體嚴厲批評",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "stability",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "intl": -5,
+          "stability": 1,
+          "trust": -1,
+          "defense": 1
+        },
+        "local": {
+          "stability": -2
+        }
+      },
+      {
+        "text": "轉交國際組織安置",
+        "result": "多國分攤，台灣出錢出船不出地",
+        "weight": 1.5,
+        "effects": {
+          "intl": 2,
+          "gdp": -2
+        },
+        "local": {
+          "stability": -1
+        }
+      },
+      {
+        "text": "中央地方互踢皮球",
+        "result": "收容所失序，地方怒吼中央失職",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "stability": -4,
+          "trust": -4,
+          "intl": -2
+        },
+        "local": {
+          "stability": -10,
+          "wealth": -4
+        }
+      }
+    ]
+  },
+  {
+    "id": "pub_m_data_breach",
+    "cat": "public",
+    "tier": "major",
+    "title": "全民個資外洩",
+    "rate": 0.4,
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        1
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "tech",
+        "k": -0.5
+      },
+      {
+        "stat": "trust",
+        "k": -0.5
+      }
+    ],
+    "loc": [
+      "台北市"
+    ],
+    "desc": "來源不明的駭客組織宣稱取得全國戶政與健保資料庫，並公開數萬筆樣本證明所言不假。詐騙電話一夜暴增，民眾湧向戶政事務所要求換證，政府網站全面當機。",
+    "options": [
+      {
+        "text": "全面換發數位身分識別",
+        "result": "全國換證兩年，詐騙潮逐漸退去",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -5,
+          "trust": 3,
+          "tech": 2,
+          "stability": -1
+        },
+        "over": {
+          "days": 720,
+          "effects": {
+            "stability": 2
+          }
+        }
+      },
+      {
+        "text": "追究廠商與主管官員",
+        "result": "數人下台，系統漏洞還在",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "trust": 1,
+          "stability": -1,
+          "gdp": -1
+        }
+      },
+      {
+        "text": "淡化處理低調修補",
+        "result": "詐騙案件飆升，民眾自認被拋棄",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -7,
+          "stability": -4,
+          "wealth": -2
+        },
+        "policy": [
+          {
+            "stat": "trust",
+            "shift": -3,
+            "days": 1460
+          }
+        ]
+      },
+      {
+        "text": "成立資安專責機關",
+        "result": "預算龐大，數位防線從此有人看守",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "tech",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "gdp": -3,
+          "tech": 3,
+          "trust": 2,
+          "defense": 2
+        },
+        "policy": [
+          {
+            "stat": "tech",
+            "shift": 3,
+            "days": 2920
+          },
+          {
+            "stat": "trust",
+            "shift": 2,
+            "days": 1825
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pub_m_ai_displacement",
+    "cat": "public",
+    "tier": "major",
+    "title": "AI 大規模取代工作",
+    "rate": 0.4,
+    "cond": [
+      [
+        "tech",
+        ">=",
+        75
+      ],
+      [
+        "elapsed",
+        ">=",
+        4
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "tech",
+        "k": 1
+      }
+    ],
+    "loc": [
+      "台北市",
+      "新北市",
+      "桃園市",
+      "台中市",
+      "台南市",
+      "高雄市"
+    ],
+    "desc": "新一代人工智慧在一年內接手客服、會計、翻譯與大半的行政工作，{county}的辦公大樓空了三成。企業獲利創新高，失業給付申請也創新高，兩條曲線同時往上。",
+    "options": [
+      {
+        "text": "試辦全民基本收入",
+        "result": "失業焦慮緩解，財政進入未知領域",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "wealth",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "gdp": -7,
+          "wealth": 4,
+          "stability": 3,
+          "trust": 1
+        },
+        "policy": [
+          {
+            "stat": "gdp",
+            "shift": -3,
+            "days": 2920
+          },
+          {
+            "stat": "stability",
+            "shift": 3,
+            "days": 2920
+          }
+        ]
+      },
+      {
+        "text": "大規模轉職培訓",
+        "result": "轉職潮三年才見效，中年族群最辛苦",
+        "weight": 2,
+        "effects": {
+          "gdp": -4,
+          "tech": 2,
+          "wealth": -1,
+          "stability": -1
+        },
+        "over": {
+          "days": 1080,
+          "effects": {
+            "wealth": 3,
+            "stability": 2
+          }
+        },
+        "policy": [
+          {
+            "stat": "tech",
+            "shift": 3,
+            "days": 2920
+          }
+        ]
+      },
+      {
+        "text": "課徵自動化稅補貼就業",
+        "result": "企業抱怨出走，稅收撐住社會安全網",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "stability",
+            "k": -0.5
+          }
+        ],
+        "effects": {
+          "gdp": -3,
+          "tech": -3,
+          "wealth": 2,
+          "stability": 1
+        },
+        "policy": [
+          {
+            "stat": "tech",
+            "shift": -2,
+            "days": 1825
+          },
+          {
+            "stat": "wealth",
+            "shift": 2,
+            "days": 1825
+          }
+        ]
+      },
+      {
+        "text": "放任市場自行調整",
+        "result": "科技飛躍，貧富差距擴大到街頭",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "tech": 4,
+          "gdp": 3,
+          "wealth": -5,
+          "stability": -5
+        },
+        "policy": [
+          {
+            "stat": "stability",
+            "shift": -3,
+            "days": 1460
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dis_m_nuclear_accident",
+    "cat": "disaster",
+    "tier": "major",
+    "title": "核燃料池冷卻危機",
+    "rate": 0.25,
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        1
+      ]
+    ],
+    "loc": [
+      "新北市",
+      "屏東縣"
+    ],
+    "desc": "{county}一座除役中的核電廠，用過核燃料池在強震後冷卻系統異常，池水溫度持續上升，廠區輻射讀數一度超過警戒值。周邊居民開始自主撤離，全國超市出現搶購人潮。",
+    "options": [
+      {
+        "text": "擴大疏散並全面檢修",
+        "result": "周邊居民暫時遷離，風險迅速受控",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "stability": -5,
+          "gdp": -4,
+          "trust": 2
+        },
+        "local": {
+          "stability": -12,
+          "wealth": -10
+        },
+        "over": {
+          "days": 1080,
+          "effects": {
+            "stability": 3
+          }
+        }
+      },
+      {
+        "text": "邀國際專家進駐",
+        "result": "透明處置獲肯定，善後費用天價",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "intl",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "intl": 4,
+          "trust": 1,
+          "gdp": -5,
+          "stability": -3
+        },
+        "local": {
+          "stability": -8,
+          "wealth": -6
+        },
+        "over": {
+          "days": 720,
+          "effects": {
+            "stability": 2
+          }
+        }
+      },
+      {
+        "text": "加速移往乾式貯存",
+        "result": "燃料移出水池，地方抗議設施選址",
+        "weight": 1.5,
+        "effects": {
+          "stability": -2,
+          "gdp": -3,
+          "trust": -1
+        },
+        "local": {
+          "stability": -6,
+          "wealth": -4
+        },
+        "over": {
+          "days": 1095,
+          "effects": {
+            "stability": 2
+          }
+        }
+      },
+      {
+        "text": "延遲公布輻射資訊",
+        "result": "真相曝光後，政府信用一夕崩盤",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1.2
+          }
+        ],
+        "effects": {
+          "trust": -8,
+          "stability": -6,
+          "intl": -3,
+          "gdp": -3
+        },
+        "local": {
+          "stability": -12,
+          "wealth": -8
+        },
+        "over": {
+          "days": 730,
+          "effects": {
+            "trust": -3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_m_megadrought",
+    "cat": "disaster",
+    "tier": "major",
+    "title": "百年大旱",
+    "rate": 0.35,
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        2
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "elapsed",
+        "k": 0.6
+      }
+    ],
+    "loc": [
+      "新竹縣",
+      "苗栗縣",
+      "台中市",
+      "彰化縣",
+      "雲林縣",
+      "嘉義縣",
+      "台南市",
+      "高雄市"
+    ],
+    "desc": "連續十八個月幾乎無雨，{county}的水庫見底、河床龜裂。科技廠每天的載水車排到省道上，農民卻被通知整季停灌。工業與農業第一次在同一條水管的兩端對峙。",
+    "options": [
+      {
+        "text": "優先供水科技業",
+        "result": "晶片產線不停，稻田休耕農民抗議",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "tech",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": 1,
+          "tech": 1,
+          "stability": -4,
+          "trust": -3
+        },
+        "local": {
+          "stability": -8,
+          "wealth": -6
+        }
+      },
+      {
+        "text": "優先保障農業與民生",
+        "result": "田地保住，工廠減產外資觀望",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -6,
+          "tech": -2,
+          "stability": 1,
+          "trust": 1
+        },
+        "local": {
+          "stability": -3,
+          "wealth": -3
+        }
+      },
+      {
+        "text": "全面分區輪流供水",
+        "result": "大家一起忍，誰都不滿意但撐過去",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -4,
+          "wealth": -2,
+          "stability": -2,
+          "trust": 1
+        },
+        "local": {
+          "stability": -4
+        }
+      },
+      {
+        "text": "海淡與再生水大投資",
+        "result": "十年後不再看天吃飯，眼前帳單驚人",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "gdp": -5,
+          "tech": 2
+        },
+        "local": {
+          "wealth": -4
+        },
+        "over": {
+          "days": 1080,
+          "effects": {
+            "gdp": 3
+          }
+        },
+        "policy": [
+          {
+            "stat": "stability",
+            "shift": 2,
+            "days": 2920
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dis_m_volcano",
+    "cat": "disaster",
+    "tier": "major",
+    "title": "大屯火山群警戒",
+    "rate": 0.2,
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        1
+      ]
+    ],
+    "loc": [
+      "台北市",
+      "新北市"
+    ],
+    "desc": "大屯火山群數週內地震密集，噴氣孔溫度飆升，地下岩漿庫的活動跡象明確，警戒升至最高級。學者說可能明天噴，也可能三百年後才噴；{county}數百萬人在等一個答案。",
+    "options": [
+      {
+        "text": "大台北預防性疏散",
+        "result": "百萬人撤離，火山沉默，經濟付出代價",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "gdp": -7,
+          "stability": -5,
+          "trust": 2
+        },
+        "local": {
+          "stability": -12,
+          "wealth": -8
+        },
+        "over": {
+          "days": 365,
+          "effects": {
+            "stability": 3
+          }
+        }
+      },
+      {
+        "text": "密切監測暫不疏散",
+        "result": "日常照舊，所有人都在等下一次地震",
+        "weight": 2,
+        "effects": {
+          "stability": -3,
+          "trust": -1
+        },
+        "local": {
+          "stability": -8
+        },
+        "follow": [
+          {
+            "id": "dis_m_volcano_erupt",
+            "delay": 200,
+            "chance": 0.3
+          }
+        ]
+      },
+      {
+        "text": "國際火山專家會診",
+        "result": "多國儀器進駐，數據公開安撫人心",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "intl",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "intl": 2,
+          "tech": 1,
+          "gdp": -2,
+          "stability": -2
+        },
+        "local": {
+          "stability": -6
+        }
+      },
+      {
+        "text": "恐慌搶購與出走潮",
+        "result": "房價重挫，首都圈人口外移",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1.2
+          }
+        ],
+        "effects": {
+          "stability": -7,
+          "wealth": -3,
+          "gdp": -3,
+          "trust": -4
+        },
+        "local": {
+          "stability": -12,
+          "wealth": -10
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_m_solar_storm",
+    "cat": "disaster",
+    "tier": "major",
+    "title": "超級太陽風暴",
+    "rate": 0.25,
+    "mods": [
+      {
+        "stat": "elapsed",
+        "k": 0.3
+      }
+    ],
+    "loc": "world",
+    "desc": "百年一遇的太陽風暴擊中地球，多國電網的變壓器燒毀，衛星定位與通訊中斷。台灣北部電網連鎖跳脫，三分之一家戶無電可用，備援變壓器全球缺貨。",
+    "options": [
+      {
+        "text": "全島分區輪流供電",
+        "result": "燈輪流亮，工廠輪流停，撐到設備到貨",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "gdp": -6,
+          "stability": -3,
+          "trust": 1,
+          "tech": -2
+        },
+        "over": {
+          "days": 365,
+          "effects": {
+            "gdp": 2
+          }
+        }
+      },
+      {
+        "text": "軍民合力搶修電網",
+        "result": "工兵與電力公司日夜搶修，提前恢復",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "defense",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "defense": 2,
+          "gdp": -5,
+          "stability": -2,
+          "trust": 2
+        }
+      },
+      {
+        "text": "停電延燒數週",
+        "result": "冷鏈斷裂、醫院備援耗盡，民怨沸騰",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "tech",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "gdp": -9,
+          "wealth": -4,
+          "stability": -6,
+          "trust": -5,
+          "tech": -3
+        }
+      },
+      {
+        "text": "啟動電網韌性十年計畫",
+        "result": "眼前多停幾天電，換來往後的免疫力",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "gdp": -7,
+          "stability": -2,
+          "tech": 2
+        },
+        "policy": [
+          {
+            "stat": "tech",
+            "shift": 4,
+            "days": 3650
+          },
+          {
+            "stat": "stability",
+            "shift": 2,
+            "days": 2920
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "int_m_games_bid",
+    "cat": "intl",
+    "tier": "major",
+    "title": "申辦國際運動會",
+    "rate": 0.35,
+    "cond": [
+      [
+        "gdp",
+        ">=",
+        55
+      ],
+      [
+        "intl",
+        ">=",
+        40
+      ],
+      [
+        "elapsed",
+        ">=",
+        2
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "intl",
+        "k": 0.8
+      }
+    ],
+    "loc": [
+      "台北市",
+      "台中市",
+      "高雄市",
+      "台南市",
+      "桃園市"
+    ],
+    "desc": "國際運動總會釋出下一屆大型綜合運動會的申辦機會，{county}與中央研議聯合申辦。支持者說這是讓世界看見台灣的門票，反對者說那是一張十年也還不完的帳單。",
+    "options": [
+      {
+        "text": "傾全國之力申辦",
+        "result": "申辦成功，場館與鐵路同步開工",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -6,
+          "intl": 5,
+          "stability": 2
+        },
+        "local": {
+          "wealth": 6,
+          "stability": 2
+        },
+        "over": {
+          "days": 1460,
+          "effects": {
+            "gdp": 3
+          }
+        },
+        "policy": [
+          {
+            "stat": "intl",
+            "shift": 4,
+            "days": 2920
+          }
+        ]
+      },
+      {
+        "text": "節約版申辦方案",
+        "result": "沿用舊場館低調申辦，機會打了折",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -3,
+          "intl": 3
+        },
+        "local": {
+          "wealth": 3
+        }
+      },
+      {
+        "text": "評估後放棄申辦",
+        "result": "省下預算，國際舞台讓給別人",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "intl": -2,
+          "trust": -1,
+          "stability": 1,
+          "gdp": 1
+        }
+      },
+      {
+        "text": "申辦失利",
+        "result": "砸錢遊說卻落選，審計報告難看",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "intl",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "gdp": -2,
+          "intl": -1,
+          "trust": -2
+        },
+        "local": {
+          "wealth": -2,
+          "stability": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "int_m_ally_turmoil",
+    "cat": "intl",
+    "tier": "major",
+    "title": "主要盟友陷入動盪",
+    "rate": 0.3,
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        2
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "intl",
+        "k": 0.5
+      }
+    ],
+    "loc": "world",
+    "desc": "最重要的安全夥伴國爆發嚴重憲政危機，街頭連月衝突，對外承諾全部暫停審查。軍售交付延宕，聯合演習取消，台灣突然得獨自面對原本有人一起扛的問題。",
+    "options": [
+      {
+        "text": "加速國防自主",
+        "result": "自製比率提升，預算排擠民生",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "defense",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "defense": 5,
+          "gdp": -5,
+          "intl": -1,
+          "wealth": -1
+        },
+        "policy": [
+          {
+            "stat": "defense",
+            "shift": 4,
+            "days": 2920
+          }
+        ]
+      },
+      {
+        "text": "分散結盟對象",
+        "result": "多邊合作開花，每段關係都淺一點",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "intl",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "intl": 3,
+          "gdp": -2,
+          "defense": 1
+        },
+        "policy": [
+          {
+            "stat": "intl",
+            "shift": 3,
+            "days": 1825
+          }
+        ]
+      },
+      {
+        "text": "靜觀其變",
+        "result": "等盟友回神，窗口期白白流失",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "intl",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "intl": -3,
+          "defense": -2,
+          "stability": -1
+        }
+      },
+      {
+        "text": "加碼投資表態挺盟友",
+        "result": "押注盟友復原，國內質疑倒貼",
+        "weight": 1,
+        "effects": {
+          "gdp": -4,
+          "intl": 2,
+          "defense": 2,
+          "trust": -2
+        }
+      }
+    ]
+  },
+  {
+    "id": "int_m_trade_bloc",
+    "cat": "intl",
+    "tier": "major",
+    "title": "新貿易集團成形",
+    "rate": 0.35,
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        3
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "gdp",
+        "k": 0.5
+      }
+    ],
+    "loc": "world",
+    "desc": "十餘國簽署新的區域貿易協定，涵蓋全球四成貿易量，關稅與資料流通規則全部重寫。台灣不在首批名單，出口商估算三年內將流失一成訂單，各方都在問：要不要敲門？",
+    "options": [
+      {
+        "text": "全力申請加入新集團",
+        "result": "遞件申請，對岸施壓，友邦遊說",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "tension",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "intl": 4,
+          "gdp": -2,
+          "tension": 3,
+          "dep": -3
+        },
+        "over": {
+          "days": 1095,
+          "effects": {
+            "gdp": 4
+          }
+        }
+      },
+      {
+        "text": "深化既有單一市場連結",
+        "result": "轉向最大鄰近市場，訂單回穩依賴加深",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "dep",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "gdp": 3,
+          "intl": -2,
+          "tension": -3,
+          "dep": 3
+        },
+        "over": {
+          "days": 1095,
+          "effects": {
+            "gdp": 1
+          }
+        }
+      },
+      {
+        "text": "逐一談雙邊協定",
+        "result": "一國一國談，慢但不必選邊",
+        "weight": 2,
+        "effects": {
+          "gdp": 1,
+          "intl": 1
+        },
+        "over": {
+          "days": 1095,
+          "effects": {
+            "gdp": 2
+          }
+        }
+      },
+      {
+        "text": "被排除在外",
+        "result": "訂單流失，產業被迫外移",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "gdp": -5,
+          "intl": -3,
+          "tech": -1
+        },
+        "over": {
+          "days": 720,
+          "effects": {
+            "gdp": -2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "pol_m_voting_age",
+    "cat": "politics",
+    "tier": "major",
+    "title": "投票年齡公投",
+    "rate": 0.35,
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        2
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "gap",
+        "k": 0.6
+      }
+    ],
+    "loc": [
+      "台北市"
+    ],
+    "desc": "一項將投票年齡下修的修憲案交付公民複決，校園與長照機構成了最熱的拉票現場。年輕人說這是遲來的平等，長輩說還太早；投票日當天，全國都在算門檻會不會過。",
+    "options": [
+      {
+        "text": "複決通過",
+        "result": "投票年齡下修，政府更貼近年輕世代",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "demo",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "trust": 2,
+          "stability": -2,
+          "demo": 1,
+          "govToPop": 0.1
+        },
+        "policy": [
+          {
+            "stat": "trust",
+            "shift": 2,
+            "days": 1825
+          }
+        ]
+      },
+      {
+        "text": "複決未達門檻",
+        "result": "票數不足，年輕世代失望但未放棄",
+        "weight": 1.2,
+        "mods": [
+          {
+            "stat": "demo",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "trust": -2,
+          "stability": -1
+        }
+      },
+      {
+        "text": "複決否決",
+        "result": "世代對立浮上檯面",
+        "weight": 0.8,
+        "mods": [
+          {
+            "stat": "gap",
+            "k": 0.6
+          }
+        ],
+        "effects": {
+          "stability": -3,
+          "trust": -1
+        },
+        "policy": [
+          {
+            "stat": "stability",
+            "shift": -2,
+            "days": 1095
+          }
+        ]
+      },
+      {
+        "text": "通過但配套延宕",
+        "result": "法律過了，選務與教育配套慢三年",
+        "weight": 1,
+        "effects": {
+          "trust": -1,
+          "stability": 1,
+          "govToPop": 0.05
+        }
+      }
+    ]
+  },
+  {
+    "id": "pol_m_shutdown",
+    "cat": "politics",
+    "tier": "major",
+    "title": "政府停擺危機",
+    "rate": 0.4,
+    "cond": [
+      [
+        "trust",
+        "<",
+        50
+      ],
+      [
+        "elapsed",
+        ">=",
+        1
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "trust",
+        "k": -1
+      },
+      {
+        "stat": "gap",
+        "k": 0.6
+      }
+    ],
+    "loc": [
+      "台北市"
+    ],
+    "desc": "總預算案在國會卡關超過法定期限，政府依法只能支付基本開支：公園關閉、補助停發、數十萬公務員無薪待命。朝野在鏡頭前互指對方綁架國家，排隊領救濟的人越來越多。",
+    "options": [
+      {
+        "text": "朝野達成臨時協議",
+        "result": "停擺三週結束，爭議全留到下一年",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "trust": 2,
+          "stability": 2,
+          "gdp": -2
+        }
+      },
+      {
+        "text": "釋憲劃定權力界線",
+        "result": "法院出手解套，政治溫度稍降",
+        "weight": 1,
+        "effects": {
+          "trust": 3,
+          "stability": 1,
+          "gdp": -3
+        },
+        "policy": [
+          {
+            "stat": "trust",
+            "shift": 2,
+            "days": 1460
+          }
+        ]
+      },
+      {
+        "text": "停擺拖過兩個月",
+        "result": "經濟受創，公務員上街，評等下修",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          },
+          {
+            "stat": "stability",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "trust": -7,
+          "stability": -5,
+          "gdp": -5,
+          "wealth": -2,
+          "intl": -2
+        },
+        "over": {
+          "days": 180,
+          "effects": {
+            "gdp": -2,
+            "trust": -3
+          }
+        }
+      },
+      {
+        "text": "行政部門緊急撥款",
+        "result": "政府運作恢復，越權爭議埋下伏筆",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "gap",
+            "k": 0.6
+          }
+        ],
+        "effects": {
+          "gdp": -1,
+          "stability": 1,
+          "trust": -3
+        },
+        "over": {
+          "days": 730,
+          "effects": {
+            "trust": -2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "pol_m_east_rail",
+    "cat": "politics",
+    "tier": "major",
+    "title": "環島高鐵世紀工程",
+    "rate": 0.4,
+    "cond": [
+      [
+        "gdp",
+        ">=",
+        50
+      ],
+      [
+        "elapsed",
+        ">=",
+        2
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "gdp",
+        "k": 0.8
+      }
+    ],
+    "loc": [
+      "花蓮縣",
+      "台東縣",
+      "宜蘭縣"
+    ],
+    "desc": "貫穿中央山脈、串起東西部的環島高速鐵路方案送進國會，預算是史上最大的公共工程。{county}居民期待一小時到首都，環保團體與財政學者則問：這條路到底為誰而建？",
+    "options": [
+      {
+        "text": "全額舉債全線興建",
+        "result": "世紀工程動工，債務與期待一起累積",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -8,
+          "trust": 1,
+          "stability": 1
+        },
+        "local": {
+          "wealth": 10,
+          "stability": 4
+        },
+        "over": {
+          "days": 2190,
+          "effects": {
+            "gdp": 5
+          }
+        },
+        "policy": [
+          {
+            "stat": "gdp",
+            "shift": 3,
+            "days": 3650
+          }
+        ],
+        "follow": [
+          {
+            "id": "pol_m_rail_overrun",
+            "delay": 900,
+            "chance": 0.5
+          }
+        ]
+      },
+      {
+        "text": "民間參與分期興建",
+        "result": "先建一段看看，財務風險轉給民間",
+        "weight": 2,
+        "effects": {
+          "gdp": -4
+        },
+        "local": {
+          "wealth": 5,
+          "stability": 2
+        },
+        "over": {
+          "days": 1460,
+          "effects": {
+            "gdp": 2
+          }
+        },
+        "follow": [
+          {
+            "id": "pol_m_rail_overrun",
+            "delay": 700,
+            "chance": 0.35
+          }
+        ]
+      },
+      {
+        "text": "改為升級既有鐵路",
+        "result": "務實方案，東部人覺得又被放棄一次",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -2,
+          "trust": -1
+        },
+        "local": {
+          "wealth": 3,
+          "stability": -2
+        }
+      },
+      {
+        "text": "環評與爭議卡關停擺",
+        "result": "吵了三年，一寸鐵軌都沒鋪",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -3,
+          "stability": -2
+        },
+        "local": {
+          "stability": -5,
+          "wealth": -2
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_m_currency_panic",
+    "cat": "economy",
+    "tier": "major",
+    "title": "匯率崩跌恐慌",
+    "rate": 0.3,
+    "cond": [
+      [
+        "gdp",
+        "<",
+        50
+      ],
+      [
+        "elapsed",
+        ">=",
+        2
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "gdp",
+        "k": -1
+      }
+    ],
+    "loc": [
+      "台北市"
+    ],
+    "desc": "國際資金連續撤出，台幣一週內重挫一成，進口能源與糧食價格應聲上漲。換匯人潮排到銀行門外，網路上流傳著各種「最後一天」的謠言。",
+    "options": [
+      {
+        "text": "央行大舉進場護盤",
+        "result": "匯率穩住，外匯存底大幅縮水",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "stability": 3,
+          "gdp": -3
+        },
+        "policy": [
+          {
+            "stat": "gdp",
+            "shift": -2,
+            "days": 1095
+          }
+        ]
+      },
+      {
+        "text": "放手讓匯率自由貶",
+        "result": "出口受惠，民生物價痛苦一年",
+        "weight": 1.5,
+        "effects": {
+          "gdp": 2,
+          "wealth": -5,
+          "stability": -3
+        },
+        "over": {
+          "days": 730,
+          "effects": {
+            "wealth": 2
+          }
+        }
+      },
+      {
+        "text": "實施臨時資本管制",
+        "result": "資金止血，外資評等下修",
+        "weight": 1,
+        "effects": {
+          "stability": 2,
+          "intl": -4,
+          "gdp": -2
+        }
+      },
+      {
+        "text": "謠言失控引發搶購",
+        "result": "超市貨架一空，信心跌到谷底",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "stability": -6,
+          "trust": -4,
+          "wealth": -2
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_m_heat_dome",
+    "cat": "disaster",
+    "tier": "major",
+    "title": "熱穹頂籠罩全島",
+    "rate": 0.3,
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        3
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "elapsed",
+        "k": 0.8
+      }
+    ],
+    "loc": [
+      "台北市",
+      "台中市",
+      "台南市",
+      "高雄市",
+      "嘉義縣",
+      "屏東縣",
+      "彰化縣",
+      "雲林縣"
+    ],
+    "desc": "高壓脊盤據不散，{county}連續十天測得 40 度以上高溫，用電屢創新高，田裡作物枯萎，急診室擠滿熱傷害的長者。氣象學者說，這可能是往後夏天的常態。",
+    "options": [
+      {
+        "text": "分區輪流限電保醫療",
+        "result": "醫院撐住，工業區停工一週",
+        "weight": 1.5,
+        "effects": {
+          "stability": 1,
+          "gdp": -4
+        },
+        "local": {
+          "wealth": -5
+        }
+      },
+      {
+        "text": "全面開放避暑中心",
+        "result": "公共空間成了全民冷氣房",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "trust": 3,
+          "gdp": -2
+        },
+        "over": {
+          "days": 730,
+          "effects": {
+            "demo": 1
+          }
+        }
+      },
+      {
+        "text": "緊急採購燃料硬撐",
+        "result": "不限電，燃料帳單與空汙暴增",
+        "weight": 1.2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "gdp": -3,
+          "intl": -2,
+          "stability": 2
+        }
+      },
+      {
+        "text": "應變失當釀悲劇",
+        "result": "多起熱死案例震驚社會",
+        "weight": 0.8,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1.2
+          }
+        ],
+        "effects": {
+          "stability": -6,
+          "trust": -6
+        },
+        "local": {
+          "stability": -10
+        }
+      }
+    ]
+  },
+  {
+    "id": "int_m_humanitarian",
+    "cat": "intl",
+    "tier": "major",
+    "title": "國際人道任務邀請",
+    "rate": 0.25,
+    "cond": [
+      [
+        "intl",
+        ">=",
+        50
+      ],
+      [
+        "elapsed",
+        ">=",
+        1
+      ]
+    ],
+    "loc": "world",
+    "desc": "遠方國家發生規模 7.8 強震，城市大片倒塌。國際救援協調中心點名台灣的搜救犬隊與野戰醫院，問我們能不能在 48 小時內出發。",
+    "options": [
+      {
+        "text": "全力派出搜救醫療隊",
+        "result": "救出生還者的畫面傳遍全球",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "intl",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "intl": 6,
+          "trust": 2,
+          "gdp": -2
+        },
+        "policy": [
+          {
+            "stat": "intl",
+            "shift": 3,
+            "days": 1460
+          }
+        ]
+      },
+      {
+        "text": "捐款物資不派人力",
+        "result": "低調參與，國際反應平淡",
+        "weight": 1.2,
+        "effects": {
+          "intl": 2,
+          "gdp": -1
+        }
+      },
+      {
+        "text": "結合民間團體出動",
+        "result": "宗教與公益團體搶第一線，全民動員",
+        "weight": 1.5,
+        "effects": {
+          "intl": 4,
+          "stability": 2,
+          "gdp": -1
+        }
+      },
+      {
+        "text": "程序卡關錯過黃金期",
+        "result": "隊伍在機場待命三天，國際失望",
+        "weight": 0.8,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "intl": -3,
+          "trust": -3
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_m_crop_blight",
+    "cat": "disaster",
+    "tier": "major",
+    "title": "農作物全球疫病",
+    "rate": 0.28,
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        2
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "elapsed",
+        "k": 0.5
+      }
+    ],
+    "loc": [
+      "雲林縣",
+      "彰化縣",
+      "嘉義縣",
+      "台南市",
+      "屏東縣"
+    ],
+    "desc": "一種新型真菌病害在三大洲的稻麥產區同時爆發，國際穀價一個月翻倍，多國宣布限制糧食出口。{county}的田間也發現疑似病株，賣場開始出現限購告示。",
+    "options": [
+      {
+        "text": "開倉釋出公糧儲備",
+        "result": "米價穩住，倉庫存量見底",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "stability": 3,
+          "gdp": -2
+        },
+        "over": {
+          "days": 730,
+          "effects": {
+            "stability": -1
+          }
+        }
+      },
+      {
+        "text": "補貼轉作抗病雜糧",
+        "result": "農地翻新，三年後自給率回升",
+        "weight": 1.3,
+        "effects": {
+          "gdp": -3,
+          "tech": 1
+        },
+        "local": {
+          "wealth": 4
+        },
+        "over": {
+          "days": 1095,
+          "effects": {
+            "stability": 2,
+            "wealth": 1
+          }
+        }
+      },
+      {
+        "text": "高價向國際搶購",
+        "result": "糧食到手，被批評推高窮國糧價",
+        "weight": 1.2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "gdp": -4,
+          "intl": -3,
+          "stability": 2
+        }
+      },
+      {
+        "text": "病害蔓延本土田區",
+        "result": "整片稻田燒毀，農村一片愁雲",
+        "weight": 0.9,
+        "mods": [
+          {
+            "stat": "tech",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "stability": -5,
+          "wealth": -3,
+          "gdp": -2
+        },
+        "local": {
+          "wealth": -10,
+          "stability": -8
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_m_sea_retreat",
+    "cat": "disaster",
+    "tier": "major",
+    "title": "海平面上升整村遷移",
+    "rate": 0.25,
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        6
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "elapsed",
+        "k": 1
+      }
+    ],
+    "loc": [
+      "雲林縣",
+      "彰化縣",
+      "嘉義縣",
+      "台南市",
+      "屏東縣",
+      "宜蘭縣"
+    ],
+    "desc": "連續三年的大潮與地層下陷，讓{county}沿海一座漁村每逢滿潮就泡在海水裡。學者評估堤防已追不上海面，村民開會到深夜：留下，還是整村搬走？",
+    "options": [
+      {
+        "text": "政府主導整村遷移",
+        "result": "新社區落成，老廟與漁港留在原地",
+        "weight": 1.4,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 0.6
+          }
+        ],
+        "effects": {
+          "gdp": -3,
+          "trust": 1
+        },
+        "local": {
+          "stability": -6,
+          "wealth": 6
+        },
+        "over": {
+          "days": 1460,
+          "effects": {
+            "stability": 2
+          }
+        }
+      },
+      {
+        "text": "加高海堤就地守護",
+        "result": "暫時守住家園，維護費年年加碼",
+        "weight": 1.4,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 0.6
+          }
+        ],
+        "effects": {
+          "gdp": -4,
+          "stability": 2
+        },
+        "local": {
+          "stability": 4
+        },
+        "policy": [
+          {
+            "stat": "gdp",
+            "shift": -1,
+            "days": 1825
+          }
+        ]
+      },
+      {
+        "text": "發放補償自主搬遷",
+        "result": "年輕人先走，留下的多是長者",
+        "weight": 1.2,
+        "effects": {
+          "gdp": -2,
+          "wealth": -1
+        },
+        "local": {
+          "wealth": 3,
+          "stability": -4
+        }
+      },
+      {
+        "text": "拖到颱風來襲才撤",
+        "result": "海水倒灌整村，緊急撤離狼狽收場",
+        "weight": 0.8,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "stability": -4,
+          "trust": -5
+        },
+        "local": {
+          "stability": -12,
+          "wealth": -8
+        }
+      }
+    ]
+  },
+  {
+    "id": "int_m_arbitration",
+    "cat": "intl",
+    "tier": "major",
+    "title": "國際法庭對台裁決",
+    "rate": 0.22,
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        2
+      ]
+    ],
+    "loc": "world",
+    "desc": "一家外國能源集團不滿台灣中途修改離岸風電合約，向國際投資仲裁庭提告。歷時四年，仲裁庭今天裁定台灣須賠償鉅額損失，各國投資人都在觀望台灣怎麼回應。",
+    "options": [
+      {
+        "text": "依裁決如數賠償",
+        "result": "國庫失血，守約形象獲國際好評",
+        "weight": 1.4,
+        "mods": [
+          {
+            "stat": "intl",
+            "k": 0.6
+          }
+        ],
+        "effects": {
+          "gdp": -4,
+          "intl": 4
+        },
+        "policy": [
+          {
+            "stat": "intl",
+            "shift": 2,
+            "days": 1460
+          }
+        ]
+      },
+      {
+        "text": "提出撤銷申請",
+        "result": "官司再拖三年，外資暫緩新案",
+        "weight": 1.3,
+        "effects": {
+          "gdp": -1,
+          "intl": -2
+        },
+        "over": {
+          "days": 1095,
+          "effects": {
+            "gdp": -2
+          }
+        }
+      },
+      {
+        "text": "協商以新合約抵償",
+        "result": "雙方各退一步，風場繼續動工",
+        "weight": 1.3,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "gdp": -1,
+          "intl": 2,
+          "tech": 1
+        }
+      },
+      {
+        "text": "拒絕執行裁決",
+        "result": "海外資產遭申請扣押，評等下修",
+        "weight": 0.8,
+        "mods": [
+          {
+            "stat": "intl",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "intl": -6,
+          "gdp": -3,
+          "stability": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "pub_m_registry_down",
+    "cat": "public",
+    "tier": "major",
+    "title": "戶政系統大當機",
+    "rate": 0.25,
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        1
+      ]
+    ],
+    "loc": "random",
+    "desc": "全國戶政系統升級新版後全面當機，出生、結婚、死亡登記與換證通通停擺。{county}戶政事務所外排起長龍，新生兒報不了戶口，房屋過戶與銀行開戶也跟著卡住。",
+    "options": [
+      {
+        "text": "回退舊系統再說",
+        "result": "三天恢復服務，新系統計畫延宕",
+        "weight": 1.5,
+        "effects": {
+          "trust": -1,
+          "tech": -1,
+          "stability": 1
+        }
+      },
+      {
+        "text": "人工紙本暫代作業",
+        "result": "公務員加班手寫，民眾體諒多於抱怨",
+        "weight": 1.3,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 0.6
+          }
+        ],
+        "effects": {
+          "trust": 2,
+          "gdp": -1
+        }
+      },
+      {
+        "text": "緊急召集本土工程團隊",
+        "result": "一週內修復，資訊人才一戰成名",
+        "weight": 1.2,
+        "mods": [
+          {
+            "stat": "tech",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "tech": 2,
+          "trust": 1,
+          "gdp": -1
+        }
+      },
+      {
+        "text": "停擺拖了整整一個月",
+        "result": "各部會互踢皮球，行政信用重挫",
+        "weight": 0.8,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -6,
+          "stability": -3,
+          "gdp": -2
+        },
+        "over": {
+          "days": 730,
+          "effects": {
+            "trust": -2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_m_fab_relapse",
+    "cat": "economy",
+    "tier": "general",
+    "chainOnly": true,
+    "title": "復工後二度事故",
+    "rate": 1,
+    "loc": [
+      "新竹市",
+      "新竹縣",
+      "台中市",
+      "台南市",
+      "高雄市"
+    ],
+    "desc": "復工不到半年，{county}同一座廠房再度傳出氣體外洩，這次有員工重傷。檢調搜索廠區，國際客戶要求第三方稽核，輿論質疑當初是否復工太急。",
+    "options": [
+      {
+        "text": "勒令停工並重罰",
+        "result": "產線再停，社會相信這次是玩真的",
+        "weight": 1.5,
+        "effects": {
+          "trust": 2,
+          "tech": -3,
+          "gdp": -3
+        },
+        "local": {
+          "wealth": -5,
+          "stability": -2
+        }
+      },
+      {
+        "text": "引進第三方稽核",
+        "result": "國際稽核進駐，客戶勉強留下",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "intl",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "intl": 2,
+          "tech": -1,
+          "gdp": -2
+        }
+      },
+      {
+        "text": "廠方與政府相互卸責",
+        "result": "沒有人負責，員工與鄰里走上街頭",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -4,
+          "stability": -3,
+          "tech": -2
+        },
+        "local": {
+          "stability": -6
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_m_volcano_erupt",
+    "cat": "disaster",
+    "tier": "general",
+    "chainOnly": true,
+    "title": "火山小規模噴發",
+    "rate": 1,
+    "loc": [
+      "台北市",
+      "新北市"
+    ],
+    "desc": "清晨，大屯火山群一處噴氣孔噴出灰柱，火山灰覆蓋{county}北側，機場關閉三天。沒有岩漿流出，但所有人都明白：它醒了。",
+    "options": [
+      {
+        "text": "緊急疏散山腳聚落",
+        "result": "數萬人撤離，灰落完後慢慢回家",
+        "weight": 2,
+        "effects": {
+          "stability": -3,
+          "gdp": -3,
+          "trust": 2
+        },
+        "local": {
+          "stability": -8,
+          "wealth": -5
+        }
+      },
+      {
+        "text": "劃設永久禁建區",
+        "result": "山腳土地不再開發，居民領補償搬遷",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -2,
+          "trust": 1,
+          "wealth": -1
+        },
+        "local": {
+          "wealth": -6
+        },
+        "policy": [
+          {
+            "stat": "stability",
+            "shift": 2,
+            "days": 1825
+          }
+        ]
+      },
+      {
+        "text": "火山灰癱瘓首都圈",
+        "result": "交通與供水停擺一週，怨聲四起",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "stability",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "gdp": -5,
+          "stability": -5,
+          "trust": -3
+        },
+        "local": {
+          "stability": -12,
+          "wealth": -6
+        }
+      }
+    ]
+  },
+  {
+    "id": "pol_m_rail_overrun",
+    "cat": "politics",
+    "tier": "general",
+    "chainOnly": true,
+    "title": "工程預算暴增",
+    "rate": 1,
+    "loc": [
+      "花蓮縣",
+      "台東縣",
+      "宜蘭縣"
+    ],
+    "desc": "開工不到三年，{county}段隧道連遇斷層與湧水，工程預算暴增五成、完工日期延後六年。監察機關介入調查，「錢坑」成了這條鐵路的新名字。",
+    "options": [
+      {
+        "text": "追加預算繼續蓋",
+        "result": "咬牙追加，工程照進度慢慢推",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "gdp": -4,
+          "trust": -2
+        },
+        "local": {
+          "wealth": 2
+        }
+      },
+      {
+        "text": "縮減規模分段通車",
+        "result": "先通一段，其餘無限期「研議中」",
+        "weight": 1.5,
+        "effects": {
+          "trust": -1,
+          "gdp": -1
+        },
+        "local": {
+          "wealth": -3,
+          "stability": -1
+        }
+      },
+      {
+        "text": "無限期停工",
+        "result": "隧道口封起來，成了最貴的紀念碑",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -4,
+          "gdp": -2,
+          "stability": -1
+        },
+        "local": {
+          "stability": -6,
+          "wealth": -5
+        }
+      }
+    ]
+  }
+]

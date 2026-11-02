@@ -16,6 +16,7 @@ import { sfx } from './audio/sfx';
 import { entriesOn, entriesOnSync, loadMonth, KIND_LABEL, type HistoryKind } from './data/history';
 import { optionPreview, lastingNote } from './ui/preview';
 import { addRecord, loadRecords } from './ui/records';
+import { buildEnding, saveEnding, loadEndings, endingShotHtml, endingGridHtml, type EndingRecord } from './ui/ending';
 import { renderShareCard, shareOrDownload } from './ui/share';
 import { randomCode, normalizeCode, codeToSeed } from './sim/seed';
 import { animateDetails } from './ui/collapse';
@@ -934,34 +935,27 @@ function showEnding(end: Ending) {
   const intervened = e.s.interventions;
   // 平行世界：同一個種子全程順其自然，量化玩家這一局造成的差別
   const base = Engine.baseline(ALL_EVENTS, COUNTIES, e.s, end.day);
-  const diff = end.score - base.score;
   const ms = MILESTONE_LIST.filter(m => e.s.achieved.includes(m.id));
   const rank = addRecord({
     score: end.score, title: end.title, years: +years, seed: e.s.seed, code: e.s.code, survived: end.survived,
     at: new Date().toISOString(), milestones: ms.length,
   });
-  card.innerHTML = `
-    <div class="end-kicker">${end.survived ? '守護之路・' : '終局・'}${shortDate(end.day)}・第 ${years} 年</div>
-    <div class="end-title">${esc(end.title)}</div>
-    <img class="end-img" src="${BASE}assets/endings/${end.id}.webp" alt="" onerror="this.remove()">
-    <p class="end-text">${esc(end.text)}</p>
-    <div class="parallel">在無人干預的平行世界裡，這座島${base.ended && base.ended.day <= end.day && base.ended.id !== 'timeup'
-      ? `走向了「${esc(base.ended.title)}」`
-      : '同樣走到了這一天'}，守護指數 <b>${base.score}</b>。你的出手讓結果${diff > 0 ? `好了 <b class="up">${diff}</b> 分` : diff < 0 ? `差了 <b class="down">${-diff}</b> 分` : '幾乎沒有差別'}。</div>
-    <div class="end-grid">
-      <div>守護指數<b>${end.score}</b></div>
-      <div>平行世界<b>${base.score}</b></div>
-      <div>守護年數<b>${years}</b></div>
-      <div>出手干預<b>${intervened} 次</b></div>
-      ${rank ? `<div>本機紀錄<b>第 ${rank} 名</b></div>` : ''}
-      ${STAT_ORDER.map(k => `<div>${STAT_META[k].label}<b>${STAT_META[k].lean ? describeLean(e.s.stats[k]) : Math.round(e.s.stats[k])}</b></div>`).join('')}
-    </div>
-    ${ms.length ? `<div class="end-ms">🏅 ${ms.map(m => esc(m.title)).join('、')}</div>` : ''}
-    ${eggsThisGame(e).length ? `<div class="end-eggs">✦ 本局奇遇：${eggsThisGame(e).map(d => `${esc(d.title.replaceAll('{county}', ''))}<small>${'★'.repeat(d.egg!.stars)}</small>`).join('、')}</div>` : ''}
-    <canvas id="endChart"></canvas>
-    <div class="chart-keys"></div>
-    <p class="chart-note">實線為你的這一局，虛線為無人干預的平行世界</p>
-    <div class="menu-btns"><button class="btn primary" id="eShare">分享結果</button><button class="btn" id="eNew">再守護一次</button><button class="btn" id="eView">回到地圖</button></div>`;
+  const kicker = `${end.survived ? '守護之路' : '終局'}・${shortDate(end.day)}・第 ${years} 年`;
+  const rec = buildEnding({
+    s: e.s, end, baseline: base, kicker, milestones: ms.map(m => m.title),
+    eggs: eggsThisGame(e).map(d => ({ title: d.title.replaceAll('{county}', ''), stars: d.egg!.stars })),
+  });
+  saveEnding(rec);
+  card.innerHTML = `${endingShotHtml(rec, BASE)}
+    <div class="menu-btns"><button class="btn primary" id="eShare">分享結果</button><button class="btn" id="eNew">再守護一次</button><button class="btn" id="eView">回到地圖</button></div>
+    <details class="end-more"><summary>完整數據與走勢圖</summary>
+      ${endingGridHtml(rec, rank ? `<div>本機紀錄<b>第 ${rank} 名</b></div>` : '')}
+      <canvas id="endChart"></canvas>
+      <div class="chart-keys"></div>
+      <p class="chart-note">實線為你的這一局，虛線為無人干預的平行世界</p>
+    </details>`;
+  $('ending').classList.remove('archive');
+  card.scrollTop = 0;
   $('ending').hidden = false;
   const shown = new Set<StatKey>(['govLean', 'popLean', 'stability', 'gdp', 'tension']);
   const palette = ['#9d6bd8', '#e2a93b', '#3fd0ff', '#ffd166', '#f28482', '#4fb0c6', '#ff4d5e', '#b8c0ff', '#90be6d', '#c77dff', '#f9c74f'];
@@ -974,7 +968,7 @@ function showEnding(end: Ending) {
     b.classList.toggle('off');
     draw();
   });
-  requestAnimationFrame(draw);
+  card.querySelector('.end-more')!.addEventListener('toggle', () => requestAnimationFrame(draw));
   $('eNew').onclick = () => { $('ending').hidden = true; newGame(); };
   $('eView').onclick = () => { $('ending').hidden = true; };
   $('eShare').onclick = async () => {
@@ -983,7 +977,7 @@ function showEnding(end: Ending) {
     btn.disabled = true;
     try {
       const blob = await renderShareCard({
-        title: end.title, kicker: `${end.survived ? '守護之路' : '終局'}・${shortDate(end.day)}・第 ${years} 年`,
+        title: end.title, kicker,
         text: end.text, score: end.score, baseline: base.score, years, interventions: intervened,
         milestones: ms.map(m => m.title), code: e.s.code ?? String(e.s.seed),
         stats: STAT_ORDER.map(k => ({ label: STAT_META[k].label, value: STAT_META[k].lean ? describeLean(e.s.stats[k]) : String(Math.round(e.s.stats[k])) })),
@@ -1202,6 +1196,31 @@ function renderRecords() {
   });
   $('records').hidden = !list.length;
   $('records').classList.toggle('is-open', ($('records') as HTMLDetailsElement).open);
+  renderEndArchive();
+}
+
+// 標題頁「過往結局」：重看之前的結局畫面
+function renderEndArchive() {
+  const list = loadEndings();
+  const box = $('endArchive') as HTMLDetailsElement;
+  box.innerHTML = list.length ? `<summary>過往結局</summary><ul>${list.map((r, i) =>
+    `<li data-i="${i}" title="重看這個結局"><b>${esc(r.title)}</b>守護指數 ${r.score}・${esc(r.years)} 年<small>${new Date(r.at).toLocaleDateString('zh-TW')}</small></li>`).join('')}</ul>` : '';
+  box.querySelectorAll<HTMLElement>('li[data-i]').forEach(li => li.onclick = () => openArchived(list[Number(li.dataset.i)]));
+  box.hidden = !list.length;
+  box.classList.toggle('is-open', box.open);
+}
+
+function openArchived(r: EndingRecord) {
+  sfx.play('click');
+  const card = $('ending').querySelector('.card') as HTMLElement;
+  card.innerHTML = `${endingShotHtml(r, BASE)}
+    <div class="menu-btns">${r.code ? '<button class="btn primary" id="eAgain">用這個種子碼再玩</button>' : ''}<button class="btn" id="eClose">關閉</button></div>
+    <details class="end-more"><summary>完整數據</summary>${endingGridHtml(r)}</details>`;
+  $('ending').classList.add('archive');
+  $('ending').hidden = false;
+  card.scrollTop = 0;
+  $('eClose').onclick = () => { sfx.play('click'); $('ending').hidden = true; };
+  card.querySelector('#eAgain')?.addEventListener('click', () => { $('ending').hidden = true; setCode(r.code!); });
 }
 
 function refreshMute() {

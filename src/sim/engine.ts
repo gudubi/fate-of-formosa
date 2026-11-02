@@ -671,8 +671,13 @@ export class Engine {
   }
 
   private pushLog(e: LogEntry) {
-    this.s.log.push(e);
-    if (this.s.log.length > 400) this.s.log.splice(0, this.s.log.length - 400);
+    const log = this.s.log;
+    log.push(e);
+    if (log.length > 400) {
+      // 重大事件與玩家干預整局保留（結局回顧要用），其他從最舊的開始捨棄
+      const i = log.findIndex(l => l.tier !== 'major' && !l.intervened);
+      log.splice(Math.max(0, i), 1);
+    }
   }
 
   private checkMilestones() {
