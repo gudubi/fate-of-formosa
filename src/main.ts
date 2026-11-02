@@ -23,7 +23,7 @@ import { animateDetails } from './ui/collapse';
 import { recordEgg, eggParents, dexHtml, dexDetailHtml, dexProgress } from './ui/eggs';
 import type { EventDef } from './sim/types';
 
-const SPEEDS = [0, 4, 8, 16];       // 天／秒
+const SPEEDS = [0, 7, 14, 28];      // 天／秒（標準速度一年約 52 秒，一局十年約 9 分鐘加上做決定的時間）
 // 開場：日期從中華民國建立（1912-01-01）開始以遊戲速度跳動，
 // 接著指數加速穿越歷史，接近此刻時減速，銜接標準遊戲速度（約 12 秒）
 const ROC_START_TW = Date.UTC(1912, 0, 1);
@@ -132,15 +132,78 @@ function updateLabels() {
     place(el, l.x, labelY[i], l.y, true);
   });
   for (const n of neighborLabels) place(n.el, n.x, 1, n.y);
+  const view = visibleRect();
+  const placed: { x: number; y: number }[] = [];
   for (const [uid, el] of bubbles) {
     const p = eng?.s.pending.find(x => x.uid === uid);
     if (!p) continue;
     const { x, y } = locXY(p.county, p.point);
     const s = map.toScreen(x, map.surfaceY(x, y) + 1, y);
-    if (!s) { el.style.display = 'none'; continue; }
+    if (!s) { el.style.display = 'none'; edgePins.get(uid)?.remove(); edgePins.delete(uid); continue; }
     el.style.display = '';
     el.style.left = `${s.x}px`; el.style.top = `${s.y}px`;
+    // 氣泡本體畫在事件點上方約 40px：事件點跑到可視範圍外，或氣泡被上方介面蓋住時，改在邊緣顯示指示器
+    const off = s.x < view.left || s.x > view.right || s.y - 30 < view.top || s.y > view.bottom;
+    if (off) placeEdgePin(uid, p, s, view, placed);
+    else { edgePins.get(uid)?.remove(); edgePins.delete(uid); }
   }
+}
+
+// ---------- 畫面外的事件：在可視範圍邊緣顯示指向箭頭 ----------
+const edgePins = new Map<number, HTMLButtonElement>();
+
+/** 地圖真正看得到的範圍：扣掉上方狀態列、快訊列，以及手機底部的抽屜 */
+function visibleRect() {
+  let top = 8, bottom = innerHeight - 8;
+  const els = [$('topbar'), $('ticker'), $('history'), isMobile() ? $('panels') : null];
+  for (const el of els) {
+    if (!el) continue;
+    const r = el.getBoundingClientRect();
+    if (!r.height) continue;
+    if (r.top + r.height / 2 < innerHeight / 2) top = Math.max(top, r.bottom + 8);
+    else bottom = Math.min(bottom, r.top - 8);
+  }
+  return { left: 8, right: innerWidth - 8, top, bottom };
+}
+
+function placeEdgePin(uid: number, p: Pending, s: { x: number; y: number }, v: ReturnType<typeof visibleRect>,
+  placed: { x: number; y: number }[]) {
+  let pin = edgePins.get(uid);
+  if (!pin) {
+    const d = eng!.defs.get(p.eventId)!;
+    pin = document.createElement('button');
+    pin.className = `edge-pin ${p.tier === 'major' ? 'major' : ''} ${d.egg ? 'egg' : ''}`;
+    pin.style.setProperty('--c', CAT_META[d.cat].color);
+    pin.innerHTML = `<span class="arr"></span>${iconSvg(d.cat, 16)}`;
+    pin.title = `${eng!.text(d.title, p)}（點擊前往）`;
+    pin.setAttribute('aria-label', pin.title);
+    pin.onclick = ev => {
+      ev.stopPropagation();
+      sfx.play('click');
+      const { x, y } = locXY(p.county, p.point);
+      if (settings.cam !== 'off') map.flyTo(x, y, isMobile() ? 360 : 300, 1.2, 0.7);
+      openModal(p.uid);
+    };
+    labelLayer.appendChild(pin);
+    edgePins.set(uid, pin);
+  }
+  // 從可視範圍中心朝事件點的方向，停在邊緣內側
+  const R = 22;
+  const cx = (v.left + v.right) / 2, cy = (v.top + v.bottom) / 2;
+  const dx = s.x - cx, dy = s.y - cy;
+  const kx = ((v.right - v.left) / 2 - R) / Math.max(1e-6, Math.abs(dx));
+  const ky = ((v.bottom - v.top) / 2 - R) / Math.max(1e-6, Math.abs(dy));
+  const k = Math.min(kx, ky, 1);
+  let px = cx + dx * k, py = cy + dy * k;
+  // 同一處有其他指示器時，沿著邊緣錯開
+  const horizontalEdge = Math.abs(py - (v.top + R)) < 2 || Math.abs(py - (v.bottom - R)) < 2;
+  for (let n = 0; n < 6 && placed.some(q => Math.hypot(q.x - px, q.y - py) < 2 * R + 4); n++) {
+    if (horizontalEdge) px = Math.min(v.right - R, Math.max(v.left + R, px + (dx > 0 ? -1 : 1) * (2 * R + 6)));
+    else py = Math.min(v.bottom - R, Math.max(v.top + R, py + (dy > 0 ? -1 : 1) * (2 * R + 6)));
+  }
+  placed.push({ x: px, y: py });
+  pin.style.left = `${px}px`; pin.style.top = `${py}px`;
+  pin.style.setProperty('--a', `${Math.atan2(s.y - py, s.x - px)}rad`);
 }
 
 // ---------- 時間與主迴圈 ----------
@@ -668,6 +731,8 @@ function addBubble(p: Pending) {
 function removeBubble(uid: number) {
   bubbles.get(uid)?.remove();
   bubbles.delete(uid);
+  edgePins.get(uid)?.remove();
+  edgePins.delete(uid);
 }
 
 // ---------- 引擎掛勾 ----------

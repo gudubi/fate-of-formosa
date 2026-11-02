@@ -14,7 +14,7 @@
 | 路徑 | 全部是相對路徑，可以放在任何子資料夾，例如 `gudubi.com/games/fate-of-formosa/` |
 | 建議資料夾名稱 | `fate-of-formosa` |
 | 遊戲名稱 | 命運之手：台灣（Fate of Formosa） |
-| 一句話介紹 | 將這座小島交給你三十年，你會交出什麼答案？ |
+| 一句話介紹 | 將這座小島交給你十年，你會交出什麼答案？ |
 | 列表用圖示 | 產出裡的 `assets/icon-512.png`（正方形）、`assets/icon-192.png` |
 | 分享連結格式 | `https://gudubi.com/games/fate-of-formosa/?seed=XXXXXX`（6 碼種子碼，玩家在遊戲內按「複製連結」產生） |
 

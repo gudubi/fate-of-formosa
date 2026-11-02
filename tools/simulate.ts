@@ -50,7 +50,7 @@ function play(seed: number, bot: Bot, stats?: { tier: Record<string, number>; ev
     e.hooks.resolved = l => {
       stats.tier[l.tier] = (stats.tier[l.tier] ?? 0) + 1; stats.ev[l.eventId] = (stats.ev[l.eventId] ?? 0) + 1;
       if (stats.decade && l.tier === 'major' && !l.eventId.startsWith('sys_')) {
-        const d = Math.min(2, Math.floor(l.day / 3652.5));
+        const d = Math.min(2, Math.floor(l.day * 3 / s.endDay));
         stats.decade[d] = (stats.decade[d] ?? 0) + 1;
       }
     };
@@ -93,7 +93,7 @@ console.log(`\n${N} 局（全程不干預），平均結束於第 ${endYears.toF
 console.log('結局：', Object.entries(endings).map(([k, v]) => `${k} ${pct(v)}`).join('  '));
 console.log('稱號：', Object.entries(titles).map(([k, v]) => `${k} ${pct(v)}`).join('  '));
 console.log('每局事件數：', Object.entries(tierCount).map(([k, v]) => `${k} ${(v / N).toFixed(0)}`).join('  '));
-console.log('隨機重大事件（不含選舉等系統事件）各十年：', decadeCount.map((v, i) => `第${i + 1}個十年 ${(v / N).toFixed(1)}`).join('  '));
+console.log('隨機重大事件（不含選舉等系統事件）前／中／後三分之一：', decadeCount.map(v => (v / N).toFixed(1)).join(' / '));
 console.log('\n數值         終局平均   終局標準差');
 [...STAT_ORDER, 'dep'].forEach((k, i) => {
   const xs = finals.map(f => f[i]);

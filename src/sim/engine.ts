@@ -8,12 +8,12 @@ import { SYSTEM_EVENTS } from './systemEvents';
 export const DAY_MS = 86_400_000;
 /** 遊戲一律使用台北時間（UTC+8）計算日期 */
 export const TW_OFFSET = 8 * 3_600_000;
-export const YEARS = 30;
+export const YEARS = 10;
 export const DIVINE_MAX = 25;
-export const DIVINE_EVERY = 24; // 每 N 天 +1 命運
+export const DIVINE_EVERY = 30; // 每 N 天 +1 命運
 
 /** 各層級每年平均事件數 */
-const TIER_RATE: Record<Tier, number> = { news: 26, general: 15, major: 2.4 };
+const TIER_RATE: Record<Tier, number> = { news: 22, general: 12, major: 2.4 };
 /** 重大事件配速：剩餘件數 × 此倍率 ÷ 剩餘年數，下限 MAJOR_RATE_MIN 次／年 */
 const MAJOR_PACE = 0.85;
 const MAJOR_RATE_MIN = 0.8;
@@ -23,8 +23,8 @@ export const MAX_PENDING = 5;
 /** 每局最多出現幾個彩蛋（不含彩蛋的後續事件），讓稀有事件保持稀有 */
 export const EGG_CAP = 3;
 /** 彩蛋每年平均發生次數（不和一般事件搶同一個抽籤池，稀有度才穩定） */
-const EGG_RATE = 0.048;
-/** 每五年一次回顧 */
+const EGG_RATE = 0.13;
+/** 每五年一次回顧（一局十年，第 5 年回顧一次） */
 export const REVIEW_DAYS = 1826;
 /** 事件選項的影響倍率：讓每個選擇的後果更明顯（快訊不受影響） */
 export const OPTION_IMPACT = 1.5;
@@ -154,14 +154,14 @@ export interface Milestone { id: string; title: string; desc: string }
 /** 里程碑：check 回傳 true 的連續天數達 days 即達成 */
 const MILESTONES: (Milestone & { days: number; check: (e: Engine) => boolean })[] = [
   { id: 'term', title: '撐過第一個任期', desc: '島嶼走過 4 年', days: 1, check: e => e.s.day >= 1461 },
-  { id: 'decade', title: '走過十年', desc: '島嶼走過 10 年', days: 1, check: e => e.s.day >= 3652 },
+  { id: 'decade', title: '走完十年', desc: '島嶼平安走完這十年', days: 1, check: e => e.s.day >= e.s.endDay },
   { id: 'calm', title: '風平浪靜', desc: '兩岸緊張度連續 2 年不高於 30', days: 730, check: e => e.s.stats.tension <= 30 },
-  { id: 'settled', title: '安居樂業', desc: '社會狀態連續 5 年不低於 65', days: 1826, check: e => e.s.stats.stability >= 65 },
+  { id: 'settled', title: '安居樂業', desc: '社會狀態連續 3 年不低於 65', days: 1096, check: e => e.s.stats.stability >= 65 },
   { id: 'rich', title: '藏富於民', desc: '人民財富達到 72', days: 1, check: e => e.s.stats.wealth >= 72 },
   { id: 'shield', title: '矽之盾', desc: '科技產業 90 以上且國際看法 80 以上', days: 1, check: e => e.s.stats.tech >= 90 && e.s.stats.intl >= 80 },
   { id: 'youth', title: '人口回春', desc: '第 5 年後人口活力回到 50', days: 1, check: e => e.s.day > 1826 && e.s.stats.demo >= 50 },
   { id: 'trust', title: '民心所向', desc: '政府信任度達到 75', days: 1, check: e => e.s.stats.trust >= 75 },
-  { id: 'wuwei', title: '無為而治', desc: '前 10 年完全不出手干預', days: 1, check: e => e.s.day >= 3652 && e.s.interventions === 0 },
+  { id: 'wuwei', title: '無為而治', desc: '整局完全不出手干預', days: 1, check: e => e.s.day >= e.s.endDay && e.s.interventions === 0 },
   { id: 'not_alone', title: '我們並不孤單', desc: '收到來自深空的規律訊號', days: 1, check: e => e.s.eggs.includes('egg_alien_signal') },
   { id: 'sea_guest', title: '海上的訪客', desc: '鯨群游進台灣海峽', days: 1, check: e => e.s.eggs.includes('egg_whales_strait') },
   { id: 'lucky', title: '奇遇連連', desc: '同一局遇到 3 個彩蛋', days: 1, check: e => e.eggCount() >= 3 },
@@ -376,7 +376,7 @@ export class Engine {
 
   /**
    * 重大事件每年頻率：同一局不重複，事件池有限，
-   * 依「尚未出現的件數 ÷ 剩餘年數」調節，讓三十年都分得到重大事件，不會前二十年就用完
+   * 依「尚未出現的件數 ÷ 剩餘年數」調節，讓整局都分得到重大事件，不會前段就用完
    */
   private majorRate(): number {
     const s = this.s;
@@ -406,7 +406,7 @@ export class Engine {
     // 經濟依賴度：與兩岸緊張度完全鏡像（同一起點、相反斜率、同樣的影響與門檻），
     // 偏向獨立推高緊張、偏向統一推高依賴，兩端各有代價
     // 斜率略大於緊張度，用以抵銷事件層面施壓事件較多的落差（以 tools/simulate.ts 的偏統／偏獨機器人校準）
-    h.dep = clamp(h.dep + (40 - st.govLean * 0.4 - st.popLean * 0.1 - h.stance * 30
+    h.dep = clamp(h.dep + (40 - st.govLean * 0.5 - st.popLean * 0.1 - h.stance * 30
       - (st.tech - 80) * 0.05 - (st.intl - 50) * 0.05 - h.dep) * 0.004, 0, 100);
 
     relax('gdp', 0.3 * st.tech + 0.15 * st.intl + 0.15 * st.stability + 0.15 * (100 - st.tension)
@@ -464,8 +464,8 @@ export class Engine {
     if (!this.blocking()) {
       if (st.tension >= 85 && ready('sys_brink')) this.fire(this.defs.get('sys_brink')!);
       else if (s.hidden.dep >= 85 && ready('sys_dep_crisis')) this.fire(this.defs.get('sys_dep_crisis')!);
-      else if (st.govLean >= 75 && st.popLean >= 40 && ready('sys_indep')) this.fire(this.defs.get('sys_indep')!);
-      else if (st.govLean <= -75 && st.popLean <= -40 && ready('sys_unify')) this.fire(this.defs.get('sys_unify')!);
+      else if (st.govLean >= 50 && st.popLean >= 25 && ready('sys_indep')) this.fire(this.defs.get('sys_indep')!);
+      else if (st.govLean <= -50 && st.popLean <= -25 && ready('sys_unify')) this.fire(this.defs.get('sys_unify')!);
     }
     s.lowStab = st.stability <= 8 ? s.lowStab + 1 : Math.max(0, s.lowStab - 2);
     s.lowEcon = st.gdp <= 10 && st.wealth <= 15 ? s.lowEcon + 1 : Math.max(0, s.lowEcon - 2);
@@ -770,12 +770,13 @@ export class Engine {
         break;
       case 'timeup': {
         const r = (k: StatKey) => st[k];
-        if (r('stability') >= 70 && r('wealth') >= 65 && r('gdp') >= 65) title = '繁榮之島';
+        // 門檻依十年局的終局分布校準（tools/simulate.ts）
+        if (r('stability') >= 64 && r('wealth') >= 58 && r('gdp') >= 58) title = '繁榮之島';
         else if (r('tech') >= 90 && r('intl') >= 80) title = '矽之盾';
         else if (r('tension') >= 80 || s.hidden.dep >= 80) title = '臨界之島';
-        else if (r('stability') < 35) title = '風雨飄搖';
-        else if (r('demo') < 20 && r('gdp') < 45) title = '沉睡之島';
-        else if (Math.abs(r('govLean')) < 25) title = '現狀的三十年';
+        else if (r('stability') < 32) title = '風雨飄搖';
+        else if (r('demo') < 29 && r('gdp') < 44) title = '沉睡之島';
+        else if (Math.abs(r('govLean')) < 15) title = '現狀的十年';
         else title = '平凡的日子';
         const flavor: Record<string, string> = {
           繁榮之島: '富足與安穩並存，這是許多世代夢想中的模樣。',
@@ -785,10 +786,10 @@ export class Engine {
             : '和平仍在，但海峽的弦繃得前所未有地緊。',
           風雨飄搖: '島嶼撐了下來，卻是在一次次的動盪之中勉強站穩。',
           沉睡之島: '人口老去、經濟停滯，島嶼在安靜中慢慢沉睡。',
-          現狀的三十年: '三十年來，島嶼始終在兩端之間找到平衡。',
+          現狀的十年: '十年來，島嶼始終在兩端之間找到平衡。',
           平凡的日子: '沒有奇蹟，也沒有崩塌，日子就這樣一天天過去。',
         };
-        text = `${flavor[title]}三十年過去，你陪著這座島嶼走到了今天。政府路線${leanDesc}，`
+        text = `${flavor[title]}十年過去，你陪著這座島嶼走到了今天。政府路線${leanDesc}，`
           + `社會${st.stability >= 60 ? '安穩' : st.stability >= 35 ? '時有波瀾' : '動盪不安'}，`
           + `人民${st.wealth >= 60 ? '富足' : st.wealth >= 40 ? '小康' : '困頓'}。`;
         break;

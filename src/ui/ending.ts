@@ -75,8 +75,8 @@ export function buildEnding({ s, end, baseline, kicker, milestones, eggs }: Buil
   const years = end.day / 365.25;
 
   // ---- 分段回顧 ----
-  const n = years >= 20 ? 3 : years >= 8 ? 2 : 1;
-  const names = n === 3 ? ['最初的十年', '第二個十年', '最後的十年'] : n === 2 ? ['前半段的日子', '後半段的日子'] : [`這短短 ${years.toFixed(1)} 年`];
+  const n = years >= 6 ? 3 : years >= 3 ? 2 : 1;
+  const names = n === 3 ? ['最初的幾年', '中間的幾年', '最後的幾年'] : n === 2 ? ['前半段的日子', '後半段的日子'] : [`這短短 ${years.toFixed(1)} 年`];
   const recap: string[] = [];
   for (let i = 0; i < n; i++) {
     const d0 = Math.round(end.day * i / n), d1 = Math.round(end.day * (i + 1) / n);

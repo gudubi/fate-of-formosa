@@ -61,6 +61,17 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .bubble svg { rotate: 45deg; }
 .bubble .ttl { position: absolute; inset: -4px; border-radius: inherit; border: 3px solid transparent; }
 .bubble.major { width: 48px; height: 48px; margin: -48px 0 0 0; }
+/* 畫面外事件的邊緣指示器：分類色圓點＋指向事件方向的箭頭 */
+.edge-pin { position: absolute; left: 0; top: 0; width: 36px; height: 36px; margin: -18px 0 0 -18px; border-radius: 50%;
+  border: 2px solid #fff; background: var(--c); color: #111; pointer-events: auto; display: grid; place-items: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,.55); animation: pop .3s ease-out; }
+.edge-pin svg { position: relative; }
+.edge-pin .arr { position: absolute; left: 50%; top: 50%; width: 0; height: 0;
+  border-left: 9px solid #fff; border-top: 6px solid transparent; border-bottom: 6px solid transparent;
+  transform: translate(-50%, -50%) rotate(var(--a, 0rad)) translateX(24px); filter: drop-shadow(0 0 2px rgba(0,0,0,.6)); }
+.edge-pin.major { width: 42px; height: 42px; margin: -21px 0 0 -21px; animation: pop .3s ease-out, pulse 1.6s ease-out infinite; }
+.edge-pin.major .arr { transform: translate(-50%, -50%) rotate(var(--a, 0rad)) translateX(27px); }
+.edge-pin.egg { border-color: var(--gold); box-shadow: 0 0 14px rgba(255,211,107,.8); }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 var(--c), 0 4px 14px rgba(0,0,0,.5); } 100% { box-shadow: 0 0 0 18px transparent, 0 4px 14px rgba(0,0,0,.5); } }
 @keyframes pop { from { scale: 0; } to { scale: 1; } }
 
