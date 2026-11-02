@@ -272,6 +272,7 @@ function buildStats() {
   const root = $('stats');
   root.innerHTML = '';
   shownVals = {};
+  miniReset();
   for (const k of STAT_ORDER) {
     const m = STAT_META[k];
     const div = document.createElement('div');
@@ -319,20 +320,11 @@ function refreshStats() {
   const ref = h.length >= 3 ? h[h.length - 3].s : h[0].s;
   let anyDanger = false;
   for (const [i, k] of STAT_ORDER.entries()) {
-    const v = st[k], el = statEls.get(k)!, m = STAT_META[k];
-    if (m.lean) {
-      el.val.textContent = `${describeLean(v)} ${v > 0 ? '+' : ''}${Math.round(v)}`;
-      const left = Math.min(50, 50 + v / 2), w = Math.abs(v / 2);
-      el.fill.style.left = `${left}%`; el.fill.style.width = `${w}%`;
-      el.fill.style.background = v < 0 ? LEAN_NEG : LEAN_POS;
-      el.mark!.style.left = `${50 + v / 2}%`;
-    } else {
-      el.val.textContent = `${Math.round(v)}`;
-      el.fill.style.width = `${v}%`;
-      el.fill.style.background = isDanger(k, v) ? 'var(--danger)' : k === 'tension' ? `hsl(${120 - v * 1.2}, 70%, 60%)` : 'var(--accent)';
-    }
+    const v = st[k], el = statEls.get(k)!;
+    el.val.textContent = statText(k, v);
+    paintBar(el.fill, el.mark, k, v);
     const prev = shownVals[k];
-    if (prev !== undefined && Math.abs(v - prev) >= 0.6) flashStat(k, v - prev);
+    if (prev !== undefined && Math.abs(v - prev) >= 0.6) flashStat(k, v - prev, prev);
     shownVals[k] = v;
     const diff = v - ref[i];
     el.tr.textContent = diff > 1 ? '▲' : diff < -1 ? '▼' : '';
@@ -346,39 +338,141 @@ function refreshStats() {
   const w = document.getElementById('weather');
   if (w) w.innerHTML = weatherHtml(e);
 
-  const mini: StatKey[] = ['stability', 'wealth', 'gdp', 'tension', 'govLean', 'popLean', 'intl', 'trust'];
-  $('mini').innerHTML = mini.map(k => {
-    const v = st[k], m = STAT_META[k];
-    const txt = m.lean ? `${v > 0 ? '+' : ''}${Math.round(v)}` : Math.round(v);
-    return `<span class="mchip ${isDanger(k, v) ? 'danger' : ''}">${m.short}<b>${txt}</b></span>`;
-  }).join('');
+  miniLive();
 }
 
-/** 數值條依變化量短暫變色：好轉綠、惡化紅（統獨依方向用紫／琥珀），變化越大越亮越久，並浮出 ±值 */
-function flashStat(k: StatKey, d: number) {
-  const el = statEls.get(k);
-  if (!el) return;
+function statText(k: StatKey, v: number) {
+  return STAT_META[k].lean ? `${describeLean(v)} ${v > 0 ? '+' : ''}${Math.round(v)}` : `${Math.round(v)}`;
+}
+
+function paintBar(fill: HTMLElement, mark: HTMLElement | null | undefined, k: StatKey, v: number) {
+  if (STAT_META[k].lean) {
+    fill.style.left = `${Math.min(50, 50 + v / 2)}%`; fill.style.width = `${Math.abs(v / 2)}%`;
+    fill.style.background = v < 0 ? LEAN_NEG : LEAN_POS;
+    if (mark) mark.style.left = `${50 + v / 2}%`;
+  } else {
+    fill.style.width = `${v}%`;
+    fill.style.background = isDanger(k, v) ? 'var(--danger)' : k === 'tension' ? `hsl(${120 - v * 1.2}, 70%, 60%)` : 'var(--accent)';
+  }
+}
+
+/** 變化的顏色：好轉綠、惡化紅（統獨依方向用紫／琥珀） */
+function deltaColor(k: StatKey, d: number) {
   const m = STAT_META[k];
-  const color = m.lean ? (d < 0 ? LEAN_NEG : LEAN_POS)
-    : (m.danger === 'high' ? d < 0 : d > 0) ? '#5ee59a' : '#ff5a6a';
+  return m.lean ? (d < 0 ? LEAN_NEG : LEAN_POS) : (m.danger === 'high' ? d < 0 : d > 0) ? '#5ee59a' : '#ff5a6a';
+}
+
+/** 數值條短暫發光變色，並在標題列浮出 ±值；變化越大越亮越久 */
+function glowBar(root: HTMLElement, fill: HTMLElement, k: StatKey, d: number) {
+  const color = deltaColor(k, d);
   const mag = Math.min(1, Math.abs(d) / 6);
   const dur = 700 + mag * 1100;
-  const bar = el.fill.parentElement!;
-  bar.animate([
+  fill.parentElement!.animate([
     { boxShadow: `0 0 0 1px ${color}, 0 0 ${6 + mag * 14}px ${color}` },
     { boxShadow: `0 0 0 1px ${color}, 0 0 ${6 + mag * 14}px ${color}`, offset: 0.4 },
     { boxShadow: '0 0 0 0 transparent' },
   ], { duration: dur, easing: 'ease-out' });
-  const base = getComputedStyle(el.fill).backgroundColor;
-  el.fill.animate([{ background: color }, { background: color, offset: 0.4 }, { background: base }], { duration: dur, easing: 'ease-out' });
+  const base = getComputedStyle(fill).backgroundColor;
+  fill.animate([{ background: color }, { background: color, offset: 0.4 }, { background: base }], { duration: dur, easing: 'ease-out' });
   if (Math.abs(d) >= 1 && !reducedMotion()) {
     const f = document.createElement('span');
     f.className = 'delta-float';
     f.style.color = color;
     f.textContent = `${d > 0 ? '+' : ''}${Math.round(d)}`;
-    el.root.querySelector('.stat-head')!.appendChild(f);
+    root.querySelector('.stat-head')!.appendChild(f);
     setTimeout(() => f.remove(), 1500);
   }
+}
+
+// ---------- 手機底部：輪播最近變動的數值 ----------
+const MINI_DEFAULT: StatKey[] = ['stability', 'wealth', 'gdp', 'tension', 'govLean', 'popLean', 'intl', 'trust'];
+const MINI_HOLD = 3200;   // 平常每組停留的毫秒數
+const MINI_CHANGE = 1400; // 有變動時每組至少停留的毫秒數
+let miniQueue: { k: StatKey; from: number; d: number }[] = [];
+let miniRecent: StatKey[] = [];
+let miniIdx = 0, miniAt = 0;
+
+function miniReset() {
+  miniQueue = []; miniRecent = []; miniIdx = 0; miniAt = 0;
+  $('mini').innerHTML = '';
+}
+
+/** 記錄一筆變動，輪播會優先顯示 */
+function miniPush(k: StatKey, from: number, d: number) {
+  const q = miniQueue.find(x => x.k === k);
+  if (q) q.d += d; else miniQueue.push({ k, from, d });
+  miniRecent = [k, ...miniRecent.filter(x => x !== k)].slice(0, 6);
+}
+
+function miniShow(items: { k: StatKey; from?: number; d?: number }[]) {
+  const box = $('mini'), st = eng!.s.stats;
+  miniAt = performance.now();
+  const slide = document.createElement('div');
+  slide.className = 'mslide';
+  slide.innerHTML = items.map(({ k }) => {
+    const m = STAT_META[k];
+    return `<div class="mstat" data-k="${k}"><div class="stat-head"><span class="name">${m.label}</span><span class="val"></span></div>
+      <div class="bar ${m.lean ? 'lean' : ''}"><div class="fill"></div>${m.lean ? '<div class="mark"></div>' : ''}</div></div>`;
+  }).join('');
+  const old = [...box.querySelectorAll<HTMLElement>('.mslide')];
+  box.appendChild(slide);
+  const cells = [...slide.querySelectorAll<HTMLElement>('.mstat')];
+  items.forEach(({ k, from, d }, i) => {
+    const cell = cells[i], fill = cell.querySelector<HTMLElement>('.fill')!, mark = cell.querySelector<HTMLElement>('.mark');
+    const v = st[k];
+    cell.querySelector('.val')!.textContent = statText(k, v);
+    cell.classList.toggle('danger', isDanger(k, v));
+    if (d === undefined || from === undefined || reducedMotion()) { paintBar(fill, mark, k, v); return; }
+    // 從變動前的值滑到現在的值，同時發光
+    cell.classList.add('anim');
+    paintBar(fill, mark, k, from);
+    void fill.offsetWidth;
+    paintBar(fill, mark, k, v);
+    glowBar(cell, fill, k, d);
+    setTimeout(() => cell.classList.remove('anim'), 1000);
+  });
+  if (reducedMotion()) { old.forEach(o => o.remove()); return; }
+  slide.animate([{ transform: 'translateY(100%)', opacity: 0 }, { transform: 'translateY(0)', opacity: 1 }], { duration: 380, easing: 'cubic-bezier(.2,.8,.2,1)' });
+  for (const o of old) {
+    o.animate([{ transform: 'translateY(0)', opacity: 1 }, { transform: 'translateY(-100%)', opacity: 0 }], { duration: 320, easing: 'ease-in' })
+      .onfinish = () => o.remove();
+  }
+}
+
+function miniTick() {
+  // 事件彈窗、回顧等視窗開著時暫停，關閉後才播出剛才的變動
+  if (!eng || phase !== 'play' || !isMobile() || !$('panels').classList.contains('collapsed') || document.hidden
+    || openUid !== null || reviewOpen || historyOpen) return;
+  const now = performance.now();
+  if (miniQueue.length) {
+    if (now - miniAt < MINI_CHANGE) return;
+    const items: { k: StatKey; from?: number; d?: number }[] = miniQueue.splice(0, 2);
+    // 只有一筆變動時，旁邊補上另一個最近變動或常用的數值
+    if (items.length === 1) items.push({ k: [...miniRecent, ...MINI_DEFAULT].find(k => k !== items[0].k)! });
+    return miniShow(items);
+  }
+  if (now - miniAt < MINI_HOLD) return;
+  const pool = miniRecent.length >= 4 ? miniRecent : MINI_DEFAULT;
+  miniIdx = (miniIdx + 2) % pool.length;
+  miniShow([pool[miniIdx], pool[(miniIdx + 1) % pool.length]].map(k => ({ k })));
+}
+
+/** 輪播中正在顯示、沒有在跑動畫的數值，跟著時間更新 */
+function miniLive() {
+  const st = eng!.s.stats;
+  $('mini').querySelectorAll<HTMLElement>('.mslide:last-child .mstat:not(.anim)').forEach(cell => {
+    const k = cell.dataset.k as StatKey, v = st[k];
+    cell.querySelector('.val')!.textContent = statText(k, v);
+    paintBar(cell.querySelector<HTMLElement>('.fill')!, cell.querySelector<HTMLElement>('.mark'), k, v);
+    cell.classList.toggle('danger', isDanger(k, v));
+  });
+}
+
+/** 數值條依變化量短暫變色並浮出 ±值；手機上同時送進底部輪播 */
+function flashStat(k: StatKey, d: number, from: number) {
+  const el = statEls.get(k);
+  if (el) glowBar(el.root, el.fill, k, d);
+  if (isMobile()) miniPush(k, from, d);
 }
 
 // ---------- 圖層 ----------
@@ -648,8 +742,6 @@ function openModal(uid: number) {
   const card = $('modal').querySelector('.card') as HTMLElement;
   card.style.setProperty('--c', c.color);
   card.classList.toggle('egg', !!d.egg);
-  // 上一個事件的出手光爆停在放大狀態，留著會撐開卡片寬度
-  card.classList.remove('divine-burst');
   const isMajor = p.tier === 'major';
   // 彩蛋優先用自己的插圖（後續事件沿用母事件），沒有圖時退回分類插圖
   const eggArt = d.egg ? `url('${BASE}assets/eggs/${parents().get(d.id) ?? d.id}.webp'), ` : '';
@@ -704,14 +796,21 @@ function choose(uid: number, i: number | null) {
   card.querySelectorAll<HTMLButtonElement>('.opt, .btn').forEach(b => b.disabled = true);
   const opts = [...card.querySelectorAll<HTMLElement>('.opt')];
   const finish = () => {
-    opts[res.option]?.classList.add('picked');
-    promoteOption(card, res.option);
+    const picked = opts[res.option];
     statsHold = false;
     if (!res.intervened) sfx.play('resolve');
     const foot = card.querySelector('.ev-foot')!;
     const opt = e.defs.get(p.eventId)!.options![res.option];
     const lasting = lastingNote(opt, d => (d >= 365 ? `約 ${Math.round(d / 365)} 年` : `${d} 天`));
-    foot.insertAdjacentHTML('beforebegin', `<div class="result"><b>${res.intervened ? '✋ 你出手了：' : '自然命運：'}${esc(res.optionText ?? '')}</b><br>${esc(res.result ?? '')}<div>${deltaChips(res.deltas)}</div>${lasting ? `<div class="lasting">⏳ ${esc(lasting)}</div>` : ''}</div>`);
+    if (picked) {
+      // 結果直接寫進選中的選項：機率與花費換成「出手／自然命運」標記，預覽換成實際變化
+      picked.classList.add('picked');
+      picked.querySelector('.pr')?.remove();
+      picked.querySelector('.cost')!.outerHTML = `<span class="how ${res.intervened ? 'hand' : ''}">${res.intervened ? '✋ 你出手了' : '自然命運'}</span>`;
+      picked.querySelector('.pvs')!.outerHTML = `<div class="res-text">${esc(res.result ?? '')}</div>`
+        + `<div class="res-chips">${deltaChips(res.deltas)}</div>${lasting ? `<div class="lasting">⏳ ${esc(lasting)}</div>` : ''}`;
+    }
+    settleOptions(card, res.option);
     foot.innerHTML = `<span class="note"></span><button class="btn primary" id="mOk">繼續</button>`;
     $('mOk').onclick = () => { sfx.play('click'); closeModal(isMajor); };
     refreshHud();
@@ -730,22 +829,40 @@ function choose(uid: number, i: number | null) {
   } else interveneFx(card, i!, cost, p, finish);
 }
 
-/** 結算後選中的選項移到最上方，其餘往下移並淡化（FLIP 動畫） */
-function promoteOption(card: HTMLElement, idx: number) {
+/** 結算後選中的選項移到最上方（FLIP 動畫），其餘選項接著疊放在下方，點擊才展開 */
+function settleOptions(card: HTMLElement, idx: number) {
   const list = card.querySelector<HTMLElement>('.opts');
   if (!list) return;
-  const opts = [...list.querySelectorAll<HTMLElement>('.opt')];
+  const opts = [...list.querySelectorAll<HTMLButtonElement>('.opt')];
   const picked = opts[idx];
   if (!picked) return;
-  opts.forEach(o => o.classList.toggle('unpicked', o !== picked));
+  const rest = opts.filter(o => o !== picked);
+  rest.forEach(o => o.classList.add('unpicked'));
   const before = new Map(opts.map(o => [o, o.getBoundingClientRect().top]));
   list.prepend(picked);
-  if (reducedMotion()) return;
+  list.classList.add('settled');
+  const more = document.createElement('button');
+  more.type = 'button';
+  more.className = 'opt-more';
+  list.append(more);
+  const setStacked = (on: boolean) => {
+    list.classList.toggle('stacked', on);
+    more.textContent = on ? `其他 ${rest.length} 個選項 ▾` : '收起其他選項 ▴';
+  };
+  const toggle = () => { sfx.play('click'); setStacked(!list.classList.contains('stacked')); };
+  more.onclick = toggle;
+  // 未選的選項改成可點（只用來展開／收起），不會再觸發選擇
+  rest.forEach(o => { o.disabled = false; o.setAttribute('aria-disabled', 'true'); o.onclick = toggle; });
+  more.textContent = `其他 ${rest.length} 個選項 ▾`;
+  const stack = () => setStacked(true);
+  if (reducedMotion()) return stack();
   for (const o of opts) {
     const dy = before.get(o)! - o.getBoundingClientRect().top;
     if (Math.abs(dy) > 0.5) o.animate([{ transform: `translateY(${dy}px)` }, { transform: 'translateY(0)' }],
-      { duration: 560, easing: 'cubic-bezier(.2,.8,.2,1)' });
+      { duration: 520, easing: 'cubic-bezier(.2,.8,.2,1)' });
   }
+  setTimeout(stack, 560);
+  picked.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
 /** 出手干預的特效：命運計數器飛出光芒，沿弧線落到選項上爆開，接著呼叫 done 結算畫面 */
@@ -760,13 +877,22 @@ function interveneFx(card: HTMLElement, i: number, cost: number, p: Pending, don
 
   // 抵達選項：金色光爆、光點四散、地圖金色漣漪
   const impact = () => {
-    const cr = card.getBoundingClientRect(), or = opt.getBoundingClientRect();
+    // 光爆是 body 上的獨立元素、卡片光暈用 WAAPI：不切換卡片 class（會讓進場動畫重播而閃動），也不撐高卡片
+    const or = opt.getBoundingClientRect();
     const cx = or.left + or.width / 2, cy = or.top + or.height / 2;
-    card.style.setProperty('--bx', `${cx - cr.left}px`);
-    card.style.setProperty('--by', `${cy - cr.top + card.scrollTop}px`);
-    card.classList.remove('divine-burst'); void card.offsetWidth; card.classList.add('divine-burst');
-    setTimeout(() => card.classList.remove('divine-burst'), 1200);
     opt.classList.add('chosen');
+    card.animate([
+      { boxShadow: '0 0 0 1px #ffd36b, 0 0 60px rgba(255,211,107,.6), 0 20px 60px rgba(0,0,0,.6)' },
+      { boxShadow: '0 20px 60px rgba(0,0,0,.6)' },
+    ], { duration: 1100, easing: 'ease-out' });
+    if (!reducedMotion()) {
+      const burst = document.createElement('span');
+      burst.className = 'divine-burst';
+      burst.style.left = `${cx}px`; burst.style.top = `${cy}px`;
+      document.body.appendChild(burst);
+      burst.animate([{ transform: 'translate(-50%, -50%) scale(.2)', opacity: 1 }, { transform: 'translate(-50%, -50%) scale(18)', opacity: 0 }],
+        { duration: 900, easing: 'ease-out' }).onfinish = () => burst.remove();
+    }
     const gold = new THREE.Color('#ffd36b');
     const { x, y } = locXY(p.county, p.point);
     map.ripple(x, y, gold, p.county !== null ? 55 : 110, 6);
@@ -1317,11 +1443,19 @@ function bindInput() {
   document.querySelectorAll<HTMLButtonElement>('#tabs button').forEach(b => b.onclick = () => {
     sfx.play('click');
     const on = b.classList.contains('on');
-    if (on && !panels.classList.contains('collapsed')) { panels.classList.add('collapsed'); return; }
-    panels.classList.remove('collapsed');
-    document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b));
-    document.querySelectorAll('#panels .panel').forEach(p => p.classList.toggle('on', p.id === b.dataset.tab));
+    if (on && !panels.classList.contains('collapsed')) panels.classList.add('collapsed');
+    else {
+      panels.classList.remove('collapsed');
+      document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b));
+      document.querySelectorAll('#panels .panel').forEach(p => p.classList.toggle('on', p.id === b.dataset.tab));
+    }
+    // 展開中的分頁按鈕顯示為關閉圖示（樣式見 CSS），讀屏軟體念「收合」
+    document.querySelectorAll<HTMLButtonElement>('#tabs button').forEach(x => {
+      if (x.classList.contains('on') && !panels.classList.contains('collapsed')) x.setAttribute('aria-label', '收合');
+      else x.removeAttribute('aria-label');
+    });
   });
+  setInterval(miniTick, 250);
   $('mini').onclick = () => (document.querySelector('#tabs button.on') as HTMLButtonElement)?.click();
 
   map.controls.addEventListener('start', () => { lastInteract = performance.now(); });
@@ -1404,5 +1538,7 @@ if (import.meta.env.DEV) {
     },
     draw(dt = 0.016) { map.render(dt); updateLabels(); },
     review: () => openReview(),
+    skipIntro: () => { if (eng) { gameTw = eng.s.startTw; endIntro(); } },
+    miniTick: () => miniTick(),
   };
 }
