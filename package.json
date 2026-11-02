@@ -9,7 +9,8 @@
     "dev": "vite --host",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host",
-    "simulate": "tsx tools/simulate.ts"
+    "simulate": "tsx tools/simulate.ts",
+    "check-history": "tsx tools/check-history.ts"
   },
   "dependencies": {
     "d3-geo": "^3.1.1",

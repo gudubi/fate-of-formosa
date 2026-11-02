@@ -53,6 +53,7 @@
     </div>
 
     <div id="ticker"><span class="tag">快訊</span><div id="tickerText"></div></div>
+    <button id="history" type="button" title="點擊查看這一天的台灣歷史"><span class="tag">歷史上的今天</span><div id="historyText"></div></button>
     <div id="countyCard" hidden></div>
     <div id="toasts"></div>
     <div id="accel" hidden></div>
@@ -60,6 +61,7 @@
 
   <div id="modal" hidden><div class="card" role="dialog" aria-modal="true"></div></div>
   <div id="menuDlg" hidden><div class="card"></div></div>
+  <div id="historyDlg" hidden><div class="card"></div></div>
   <div id="ending" hidden><div class="card"></div></div>
 
   <div id="title">
@@ -100,6 +102,8 @@
           <dd>縣市界線：<a href="https://data.gov.tw/dataset/7442" target="_blank" rel="noopener">內政部國土測繪中心</a>（政府資料開放授權條款第 1 版），經 <a href="https://github.com/dkaoster/taiwan-atlas" target="_blank" rel="noopener">taiwan-atlas</a>（MIT，© Daniel Kao）簡化</dd>
           <dd>周邊地區：<a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a>（公眾領域），經 <a href="https://github.com/topojson/world-atlas" target="_blank" rel="noopener">world-atlas</a> 整理</dd>
           <dd>地形：依主要山脈稜線近似建模</dd>
+          <dt>歷史上的今天</dt>
+          <dd>整理自維基百科、政府網站與新聞資料，日期經交叉查核</dd>
           <dt>音效</dt>
           <dd>以 Web Audio API 即時合成</dd>
         </dl>

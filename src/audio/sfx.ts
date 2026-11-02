@@ -2,9 +2,9 @@
 // 若 public/audio/<name>.mp3 存在，會優先播放該檔案（可替換為 CC0 音效）。
 import type { Category } from '../sim/types';
 
-export type SfxName = Category | 'click' | 'major' | 'resolve' | 'divine' | 'warn' | 'ending' | 'news' | 'start';
+export type SfxName = Category | 'click' | 'major' | 'resolve' | 'divine' | 'warn' | 'ending' | 'news' | 'start' | 'tick';
 
-const FILE_SFX: SfxName[] = ['click', 'major', 'resolve', 'divine', 'warn', 'ending', 'news', 'start',
+const FILE_SFX: SfxName[] = ['click', 'major', 'resolve', 'divine', 'warn', 'ending', 'news', 'start', 'tick',
   'disaster', 'strait', 'politics', 'public', 'intl', 'economy'];
 
 class Sfx {
@@ -117,6 +117,10 @@ class Sfx {
     }
     switch (name) {
       case 'click': this.tone(880, 0.06, { gain: 0.08, type: 'triangle' }); break;
+      case 'tick': // 時鐘滴答
+        this.noiseBurst(0.035, 3200, { gain: 0.25, type: 'highpass', attack: 0.002 });
+        this.tone(1900, 0.03, { gain: 0.05, type: 'triangle' });
+        break;
       case 'news': this.tone(1320, 0.12, { gain: 0.03 }); this.tone(1760, 0.1, { gain: 0.02, at: 0.06 }); break;
       case 'start':
         [261.6, 329.6, 392, 523.3].forEach((f, i) => this.tone(f, 1.6, { gain: 0.08, at: i * 0.12, attack: 0.05 }));

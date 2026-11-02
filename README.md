@@ -11,6 +11,7 @@ npm install
 npm run dev        # 開發伺服器（--host，同網段的手機與平板可直接連線測試）
 npm run build      # 輸出至 dist/，可部署到任何靜態網站主機
 npm run simulate   # 無畫面批次模擬 300 局，檢查平衡
+npm run check-history  # 檢查「歷史上的今天」資料格式與日期涵蓋
 ```
 
 ## 時間設計
@@ -41,6 +42,7 @@ src/
     systemEvents.ts 選舉、海峽危機、宣告統一／獨立
     types.ts        事件資料格式（新增事件請看這裡）
   data/events/  事件資料 JSON（223 個）
+  data/history/ 歷史上的今天（01–12.json，約 1,280 則，依月份延遲載入）
   map/          投影（1 單位 = 1 公里）、縣市柵格、地形
   render/       Three.js 場景
   ui/ audio/    介面設定、合成音效
@@ -64,6 +66,8 @@ docs/ASSET_PROMPTS.md  圖片素材提示詞
 |---|---|---|
 | 縣市界線 | 內政部國土測繪中心「直轄市、縣市界線（TWD97 經緯度）」，經 [taiwan-atlas](https://github.com/dkaoster/taiwan-atlas) 簡化 | 政府資料開放授權條款；taiwan-atlas 為 MIT |
 | 周邊國家 | Natural Earth，經 [world-atlas](https://github.com/topojson/world-atlas) 整理 | 公眾領域 |
+
+「歷史上的今天」整理自維基百科日期與年份條目、政府網站及新聞資料，日期經交叉查核；無法確認日期的條目已排除。
 
 地形是依主要山脈稜線（中央、雪山、玉山、阿里山、海岸山脈等）近似建模，並非真實 DEM。
 

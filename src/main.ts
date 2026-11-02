@@ -10,17 +10,22 @@ import { ALL_EVENTS } from './data/events';
 import { validateEvents } from './sim/validate';
 import { STAT_META, CAT_META, LAYERS, ramp, iconSvg, HAND_ICON, catColor, LEAN_NEG, LEAN_POS, type LayerKey } from './ui/meta';
 import { sfx } from './audio/sfx';
+import { entriesOn, entriesOnSync, KIND_LABEL, type HistoryKind } from './data/history';
 
 const SPEEDS = [0, 4, 8, 16];       // 天／秒
-const INTRO_HOLD = 2.5;             // 開場以真實時間流動的秒數
-const INTRO_RAMP = 10;              // 加速到標準速度所需秒數
+// 開場：日期從中華民國建立（1912-01-01）開始以遊戲速度跳動，
+// 接著指數加速穿越歷史，接近此刻時減速，銜接標準遊戲速度（約 12 秒）
+const ROC_START_TW = Date.UTC(1912, 0, 1);
+const INTRO_GROWTH = 2.0;           // 加速度（倍率每秒乘以 e^2）
+const INTRO_PEAK = 6e8;             // 最高倍率：約每秒 19 年，讓年份清楚可見
+const INTRO_SETTLE = 0.5;           // 接近此刻時的減速時間常數（秒）
+const TICK_GAP = 70;                // 滴答聲最短間隔（毫秒）
 const SAVE_KEY = 'tgh-save-v1';
 const SETTINGS_KEY = 'tgh-settings-v1';
 const WEEK = ['日', '一', '二', '三', '四', '五', '六'];
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 const isMobile = () => matchMedia('(max-width: 820px), (orientation: portrait) and (max-width: 1100px)').matches;
-const fmt = (n: number) => n.toLocaleString('zh-TW');
 const esc = (s: string) => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
 
 if (import.meta.env.DEV) {
@@ -47,6 +52,7 @@ let layer: LayerKey = 'terrain';
 let selCounty: number | null = null;
 let lastInteract = 0;
 let lastSaveDay = 0;
+let historyOpen = false;
 const bubbles = new Map<number, HTMLButtonElement>();
 
 // ---------- 地點 ----------
@@ -111,27 +117,29 @@ function updateLabels() {
 // ---------- 時間與主迴圈 ----------
 function currentRate(): number {
   // 遊戲毫秒 / 真實毫秒
-  if (phase === 'intro') {
-    const target = SPEEDS[speed] * DAY_MS / 1000;
-    const s = Math.min(1, Math.max(0, (introT - INTRO_HOLD) / INTRO_RAMP));
-    const e = s * s * (3 - 2 * s);
-    return Math.pow(target, e);
+  const target = SPEEDS[speed] * DAY_MS / 1000;
+  if (phase === 'intro' && eng) {
+    const accel = Math.min(INTRO_PEAK, target * Math.exp(INTRO_GROWTH * introT));
+    const remain = eng.s.startTw - gameTw;
+    return Math.min(accel, target + remain / (INTRO_SETTLE * 1000));
   }
-  return SPEEDS[speed] * DAY_MS / 1000;
+  return target;
 }
 
 function frozen() {
-  return !eng || !!eng.s.ended || !!eng.blocking() || openUid !== null || userPaused;
+  return !eng || !!eng.s.ended || !!eng.blocking() || openUid !== null || userPaused || historyOpen;
 }
 
 function advance(dt: number) {
-  if (phase === 'intro') {
-    introT += dt;
-    if (introT >= INTRO_HOLD + INTRO_RAMP) { phase = 'play'; $('accel').hidden = true; }
-  }
   if (frozen()) return;
   const e = eng!;
+  if (phase === 'intro') introT += dt;
+  const before = gameTw;
   gameTw += dt * 1000 * currentRate();
+  if (phase === 'intro') {
+    introTicks(before, gameTw);
+    if (gameTw >= e.s.startTw) endIntro();
+  }
   const target = Math.floor((gameTw - e.s.startDayTw) / DAY_MS);
   let n = 0;
   while (e.s.day < target && n++ < 64) {
@@ -140,6 +148,25 @@ function advance(dt: number) {
   }
   if (e.blocking() || e.s.ended) gameTw = Math.min(gameTw, e.dateTw(e.s.day + 1) - 1);
   if (e.s.day - lastSaveDay >= 60) { lastSaveDay = e.s.day; save(); }
+}
+
+/** 滴答聲：每跨過一天一聲，加速後受最短間隔限制，形成由慢而快再放慢的節奏 */
+let lastTick = 0;
+function introTicks(from: number, to: number) {
+  const now = performance.now();
+  if (Math.floor(to / DAY_MS) > Math.floor(from / DAY_MS) && now - lastTick > TICK_GAP) {
+    lastTick = now;
+    sfx.play('tick');
+  }
+}
+
+function endIntro() {
+  if (phase !== 'intro') return;
+  phase = 'play';
+  gameTw = Math.max(gameTw, eng!.s.startTw);
+  $('accel').hidden = true;
+  histAcc = HISTORY_EVERY; // 立即換成此刻的歷史上的今天
+  sfx.play('start');
 }
 
 let last = performance.now();
@@ -152,6 +179,10 @@ function frame(now: number) {
   updateLabels();
   uiAcc += dt;
   if (eng && uiAcc > 0.12) { uiAcc = 0; refreshHud(); }
+  if (eng && phase !== 'title') {
+    histAcc += dt;
+    if (histAcc > HISTORY_EVERY) nextHistory();
+  }
   if (phase === 'title') refreshTitleClock();
   requestAnimationFrame(frame);
 }
@@ -182,7 +213,7 @@ function refreshTop() {
   $('date').textContent = dateStr(gameTw);
   const year = Math.floor(e.s.day / 365.25) + 1;
   const status = e.blocking() || openUid !== null ? '<b>等待你的決定</b>' : userPaused ? '<b>暫停中</b>' : '';
-  $('time').innerHTML = rate < 3600 * 6
+  $('time').innerHTML = phase === 'intro' ? '&nbsp;' : rate < 3600 * 6
     ? `${timeStr(gameTw)} 台北時間 ${status}`
     : `第 ${year} 年 · ${SPEEDS[speed]} 天/秒 ${status}`;
   ($('progress').firstElementChild as HTMLElement).style.width = `${(e.s.day / e.s.endDay) * 100}%`;
@@ -194,7 +225,8 @@ function refreshTop() {
   if (phase === 'intro') {
     const acc = $('accel');
     acc.hidden = false;
-    acc.innerHTML = `<div class="big">×${fmt(Math.round(rate))}</div><div class="small">${introT < INTRO_HOLD ? '此刻・台北' : '時間加速中'}</div>`;
+    const d = new Date(gameTw);
+    acc.innerHTML = `<div class="big">${d.getUTCFullYear()}<small>年</small>${String(d.getUTCMonth() + 1).padStart(2, '0')}<small>月</small>${String(d.getUTCDate()).padStart(2, '0')}<small>日</small></div>`;
   }
 }
 
@@ -331,6 +363,72 @@ function refreshHud() {
   refreshTop();
   refreshStats();
   if (++hudTick % 4 === 0) { refreshFeed(); refreshLayer(); if (selCounty !== null) showCounty(selCounty); }
+}
+
+// ---------- 歷史上的今天 ----------
+const HISTORY_EVERY = 7; // 每則顯示秒數
+let histAcc = HISTORY_EVERY;
+let histDate: [number, number] = [1, 1];
+let histPos = 0;
+const mmdd = (m: number, d: number) => `${m}月${String(d).padStart(2, '0')}日`;
+
+function gameMonthDay(): [number, number] {
+  const d = new Date(gameTw);
+  return [d.getUTCMonth() + 1, d.getUTCDate()];
+}
+
+/** 依當下遊戲日期輪播一則史事；高速時只會取樣當下那一天 */
+function nextHistory() {
+  const [m, d] = gameMonthDay();
+  if (m !== histDate[0] || d !== histDate[1]) { histDate = [m, d]; histPos = Math.floor(Math.random() * 8); }
+  const list = entriesOnSync(m, d);
+  if (list === null) { histAcc = HISTORY_EVERY - 0.3; return; } // 該月資料載入中，稍後再試
+  histAcc = 0;
+  const el = $('historyText');
+  el.classList.remove('in'); void el.offsetWidth; el.classList.add('in');
+  if (!list.length) { el.innerHTML = `<span class="y">${mmdd(m, d)}</span>點擊查看鄰近日期的台灣史事`; return; }
+  const e = list[histPos++ % list.length];
+  el.innerHTML = `<span class="y">${e.y}・${mmdd(m, d)}</span><span class="k">${KIND_LABEL[e.k]}</span>${esc(e.t)}`;
+}
+
+let histFilter: HistoryKind | 'all' = 'all';
+async function openHistory(m: number, d: number) {
+  sfx.play('click');
+  historyOpen = true;
+  const card = $('historyDlg').querySelector('.card') as HTMLElement;
+  const list = await entriesOn(m, d);
+  const shown = list.filter(e => histFilter === 'all' || e.k === histFilter);
+  const filters: [HistoryKind | 'all', string][] = [['all', '全部'], ['event', KIND_LABEL.event], ['birth', KIND_LABEL.birth], ['other', KIND_LABEL.other]];
+  card.innerHTML = `
+    <div class="hist-head">
+      <button id="hPrev" aria-label="前一天">‹</button>
+      <div class="ttl"><small>歷史上的今天</small><b>${mmdd(m, d)}</b></div>
+      <button id="hNext" aria-label="後一天">›</button>
+    </div>
+    <div class="hist-filter">${filters.map(([k, label]) => `<button data-k="${k}" class="${histFilter === k ? 'on' : ''}">${label}</button>`).join('')}</div>
+    <div class="hist-list">${shown.length ? shown.map(e => `
+      <div class="hist-item"><div class="yr">${e.y}<small>${eng ? `${new Date(gameTw).getUTCFullYear() - e.y} 年前` : ''}</small></div>
+      <div><div class="t"><span class="pill ${e.k}">${KIND_LABEL[e.k]}</span>${esc(e.t)}</div><div class="d">${esc(e.d)}</div></div></div>`).join('')
+      : '<p class="empty">這一天目前沒有收錄的史事。</p>'}</div>
+    <div class="hist-foot"><span class="note">資料整理自公開史料，如有錯誤歡迎回報。閱讀時遊戲暫停。</span><button class="btn primary" id="hClose">關閉</button></div>`;
+  $('historyDlg').hidden = false;
+  const shift = (delta: number) => {
+    const t = new Date(Date.UTC(2024, m - 1, d + delta)); // 2024 為閏年，可走到 2 月 29 日
+    void openHistory(t.getUTCMonth() + 1, t.getUTCDate());
+  };
+  $('hPrev').onclick = () => shift(-1);
+  $('hNext').onclick = () => shift(1);
+  card.querySelectorAll<HTMLButtonElement>('.hist-filter button').forEach(b => b.onclick = () => {
+    histFilter = b.dataset.k as HistoryKind | 'all';
+    void openHistory(m, d);
+  });
+  $('hClose').onclick = closeHistory;
+}
+
+function closeHistory() {
+  sfx.play('click');
+  $('historyDlg').hidden = true;
+  historyOpen = false;
 }
 
 // ---------- 快訊、提示 ----------
@@ -606,6 +704,8 @@ function startEngine(s: GameState) {
   for (const uid of [...bubbles.keys()]) removeBubble(uid);
   eng = new Engine(ALL_EVENTS, s);
   attachHooks(eng);
+  histDate = gameMonthDay();
+  histAcc = HISTORY_EVERY;
   lastSaveDay = s.day;
   for (const p of s.pending) if (p.tier !== 'major') addBubble(p);
   buildStats(); buildLayers(); refreshLog(); refreshFeed(); refreshHud();
@@ -617,17 +717,18 @@ function startEngine(s: GameState) {
 
 function newGame() {
   sfx.unlock();
-  sfx.play('start');
+  sfx.play('click');
   clearSave();
   const seed = (Math.random() * 2 ** 32) >>> 0;
   const s = Engine.newGame(COUNTIES, seed, Date.now());
-  gameTw = s.startTw;
+  gameTw = ROC_START_TW;
   speed = 1; userPaused = false; introT = 0;
   phase = 'intro';
   closeModal(); showCounty(null);
   startEngine(s);
+  histAcc = HISTORY_EVERY;
   map.introFrom();
-  map.flyTo(-25, 10, overviewDistance(), 4.5, 0.5);
+  map.flyTo(-25, 10, overviewDistance(), 9, 0.5);
 }
 
 function overviewDistance() {
@@ -697,7 +798,7 @@ function bindInput() {
     sfx.play('click');
     const v = Number(b.dataset.speed);
     if (v === 0) userPaused = !userPaused;
-    else { speed = v; userPaused = false; if (phase === 'intro') { phase = 'play'; $('accel').hidden = true; } }
+    else { speed = v; userPaused = false; endIntro(); }
     refreshTop();
   });
   $('btnOverview').onclick = () => { sfx.play('click'); map.overview(true); };
@@ -705,6 +806,8 @@ function bindInput() {
   $('btnMenu').onclick = openMenu;
   $('btnNew').onclick = newGame;
   $('btnContinue').onclick = continueGame;
+  $('history').onclick = () => void openHistory(...histDate);
+  $('historyDlg').onclick = ev => { if (ev.target === $('historyDlg')) closeHistory(); };
 
   const panels = $('panels');
   document.querySelectorAll<HTMLButtonElement>('#tabs button').forEach(b => b.onclick = () => {
@@ -737,7 +840,11 @@ function bindInput() {
     if (phase === 'title' || !eng) return;
     if (ev.code === 'Space') { ev.preventDefault(); userPaused = !userPaused; }
     else if (ev.key >= '1' && ev.key <= '3') { speed = Number(ev.key); userPaused = false; }
-    else if (ev.key === 'Escape') { showCounty(null); if (!$('menuDlg').hidden) $('menuDlg').hidden = true; }
+    else if (ev.key === 'Escape') {
+      showCounty(null);
+      if (!$('menuDlg').hidden) $('menuDlg').hidden = true;
+      if (historyOpen) closeHistory();
+    }
   });
   window.addEventListener('resize', () => map.resize());
   document.addEventListener('visibilitychange', () => {
