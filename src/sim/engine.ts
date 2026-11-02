@@ -77,7 +77,7 @@ export interface Ending {
 export interface GameState {
   version: 1;
   seed: number;
-  /** 對局代碼（分享給其他玩家用） */
+  /** 種子碼（分享給其他玩家用） */
   code?: string;
   /** 世界亂數：事件何時發生、發生什麼、背景因子 */
   rng: number;
@@ -317,7 +317,7 @@ export class Engine {
 
     // 隨機事件
     // 每個層級每天固定抽兩個亂數（是否發生、抽哪一件），不論結果如何，
-    // 讓同一個對局代碼的玩家即使選擇不同，事件發生的時間點仍保持一致
+    // 讓同一個種子碼的玩家即使選擇不同，事件發生的時間點仍保持一致
     for (const tier of ['news', 'general', 'major'] as Tier[]) {
       const roll = this.rng.next(), u = this.rng.next();
       if (tier === 'major' && (this.blocking() || s.day < 20)) continue;

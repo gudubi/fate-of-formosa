@@ -1,4 +1,4 @@
-// 對局代碼：6 個好念好抄的字元（去掉 0/O、1/I/L 等易混淆字），對應到 32 位元種子
+// 種子碼：6 個好念好抄的字元（去掉 0/O、1/I/L 等易混淆字），對應到 32 位元種子
 const ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
 export const CODE_LENGTH = 6;
 
@@ -13,7 +13,7 @@ export function normalizeCode(input: string): string {
   return input.trim().toUpperCase().replace(/\s+/g, '');
 }
 
-/** 代碼 → 種子（FNV-1a）。任何字串都可以當代碼，相同代碼一定得到相同種子 */
+/** 種子碼 → 種子（FNV-1a）。任何字串都可以當種子碼，相同種子碼一定得到相同種子 */
 export function codeToSeed(code: string): number {
   let h = 0x811c9dc5;
   for (const ch of normalizeCode(code)) {

@@ -109,7 +109,7 @@ export async function renderShareCard(d: ShareData, endingImg: string, icon: str
   ctx.fillText('命運之手：台灣', x + 104, H - 92);
   ctx.fillStyle = '#8fa3b5';
   ctx.font = `400 24px ${font}`;
-  ctx.fillText(`對局代碼 ${d.code}・gudubi.com`, x + 104, H - 56);
+  ctx.fillText(`種子碼 ${d.code}・gudubi.com`, x + 104, H - 56);
 
   return new Promise((res, rej) => cv.toBlob(b => (b ? res(b) : rej(new Error('toBlob'))), 'image/png'));
 }
