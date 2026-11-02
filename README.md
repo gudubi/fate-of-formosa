@@ -15,6 +15,8 @@ npm run check-history  # 檢查「歷史上的今天」資料格式與日期涵�
 npm run publish:site -- <資料夾>  # 建置並放進網站資料夾（相對路徑，可放在任何子目錄）
 ```
 
+上架到網站的完整步驟、主機需求與檢查清單見 [docs/DEPLOY.md](docs/DEPLOY.md)。
+
 ## 時間設計
 
 | 項目 | 數值 |
