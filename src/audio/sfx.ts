@@ -2,9 +2,9 @@
 // 若 public/audio/<name>.mp3 存在，會優先播放該檔案（可替換為 CC0 音效）。
 import type { Category } from '../sim/types';
 
-export type SfxName = Category | 'click' | 'major' | 'resolve' | 'divine' | 'warn' | 'ending' | 'news' | 'start' | 'tick';
+export type SfxName = Category | 'click' | 'major' | 'resolve' | 'divine' | 'warn' | 'ending' | 'news' | 'start' | 'tick' | 'intervene';
 
-const FILE_SFX: SfxName[] = ['click', 'major', 'resolve', 'divine', 'warn', 'ending', 'news', 'start', 'tick',
+const FILE_SFX: SfxName[] = ['click', 'major', 'resolve', 'divine', 'warn', 'ending', 'news', 'start', 'tick', 'intervene',
   'disaster', 'strait', 'politics', 'public', 'intl', 'economy'];
 
 class Sfx {
@@ -150,6 +150,12 @@ class Sfx {
         this.noiseBurst(1.5, 300, { gain: 0.25 });
         break;
       case 'resolve': this.tone(523.3, 0.3, { gain: 0.07 }); this.tone(784, 0.4, { gain: 0.06, at: 0.08 }); break;
+      case 'intervene': // 出手干預：低沉一擊＋上升的光之和弦
+        this.tone(73.4, 1.4, { gain: 0.35, glide: 55 });
+        this.noiseBurst(0.6, 2400, { gain: 0.2, type: 'bandpass', q: 0.6, attack: 0.15 });
+        [523.3, 659.3, 784, 1046.5, 1318.5].forEach((f, k) => this.tone(f, 1.2, { gain: 0.06, at: 0.05 + k * 0.06, attack: 0.02 }));
+        this.tone(2093, 0.9, { gain: 0.03, at: 0.35 });
+        break;
       case 'divine': this.tone(1046.5, 0.5, { gain: 0.04 }); this.tone(1568, 0.6, { gain: 0.03, at: 0.07 }); break;
       case 'warn': this.tone(220, 0.35, { type: 'sawtooth', gain: 0.05 }); this.tone(207.7, 0.35, { type: 'sawtooth', gain: 0.05, at: 0.35 }); break;
       case 'ending':

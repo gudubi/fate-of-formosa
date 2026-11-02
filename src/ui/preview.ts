@@ -1,16 +1,18 @@
 // 事件選項的效果預覽：只顯示方向與粗略幅度，讓選擇有依據但保留不確定性
 import type { OptionDef, StatKey } from '../sim/types';
 import { STAT_META } from './meta';
+import { OPTION_IMPACT, POLICY_IMPACT } from '../sim/engine';
 
 /** 把立即、持續與長期效果合併成每個數值的方向與份量 */
 function collect(o: OptionDef) {
   const now: Partial<Record<string, number>> = {};
   const later: Partial<Record<string, number>> = {};
   const add = (m: Partial<Record<string, number>>, k: string, v: number) => { m[k] = (m[k] ?? 0) + v; };
-  for (const [k, v] of Object.entries(o.effects ?? {})) add(now, k, v as number);
-  for (const [k, v] of Object.entries(o.local ?? {})) add(now, k, (v as number) * 0.3);
-  for (const [k, v] of Object.entries(o.over?.effects ?? {})) add(later, k, v as number);
-  for (const p of o.policy ?? []) add(later, p.stat, p.shift);
+  // 與引擎實際套用的倍率一致，箭頭數量才反映真正的影響
+  for (const [k, v] of Object.entries(o.effects ?? {})) add(now, k, (v as number) * OPTION_IMPACT);
+  for (const [k, v] of Object.entries(o.local ?? {})) add(now, k, (v as number) * 0.3 * OPTION_IMPACT);
+  for (const [k, v] of Object.entries(o.over?.effects ?? {})) add(later, k, (v as number) * OPTION_IMPACT);
+  for (const p of o.policy ?? []) add(later, p.stat, p.shift * POLICY_IMPACT);
   return { now, later };
 }
 

@@ -19,6 +19,19 @@ const DEFAULT_COOLDOWN: Record<Tier, number> = { news: 365, general: 365, major:
 export const MAX_PENDING = 5;
 /** 每五年一次回顧 */
 export const REVIEW_DAYS = 1826;
+/** 事件選項的影響倍率：讓每個選擇的後果更明顯（快訊不受影響） */
+export const OPTION_IMPACT = 1.5;
+/** 長期政策移動平衡點的倍率 */
+export const POLICY_IMPACT = 0.75;
+
+/** 依倍率放大效果；「向對方靠攏」是比例，放大後上限 0.95 */
+export function scaleEffects(e: Effects, f = OPTION_IMPACT): Effects {
+  const out: Effects = {};
+  for (const [k, v] of Object.entries(e)) {
+    (out as any)[k] = k === 'govToPop' || k === 'popToGov' ? Math.min(0.95, (v as number) * f) : (v as number) * f;
+  }
+  return out;
+}
 const POLICY_STATS: StatKey[] = ['gdp', 'trust', 'tension', 'intl', 'defense', 'tech', 'demo', 'stability', 'wealth'];
 
 export const STAT_ORDER: StatKey[] = [
@@ -135,7 +148,7 @@ const MILESTONES: (Milestone & { days: number; check: (e: Engine) => boolean })[
   { id: 'calm', title: '風平浪靜', desc: '兩岸緊張度連續 2 年不高於 30', days: 730, check: e => e.s.stats.tension <= 30 },
   { id: 'settled', title: '安居樂業', desc: '社會狀態連續 5 年不低於 65', days: 1826, check: e => e.s.stats.stability >= 65 },
   { id: 'rich', title: '藏富於民', desc: '人民財富達到 72', days: 1, check: e => e.s.stats.wealth >= 72 },
-  { id: 'shield', title: '矽之盾', desc: '科技產業 85 以上且國際看法 75 以上', days: 1, check: e => e.s.stats.tech >= 85 && e.s.stats.intl >= 75 },
+  { id: 'shield', title: '矽之盾', desc: '科技產業 90 以上且國際看法 80 以上', days: 1, check: e => e.s.stats.tech >= 90 && e.s.stats.intl >= 80 },
   { id: 'youth', title: '人口回春', desc: '第 5 年後人口活力回到 50', days: 1, check: e => e.s.day > 1826 && e.s.stats.demo >= 50 },
   { id: 'trust', title: '民心所向', desc: '政府信任度達到 75', days: 1, check: e => e.s.stats.trust >= 75 },
   { id: 'wuwei', title: '無為而治', desc: '前 10 年完全不出手干預', days: 1, check: e => e.s.day >= 3652 && e.s.interventions === 0 },
@@ -346,7 +359,7 @@ export class Engine {
     const gap = Math.abs(st.govLean - st.popLean);
     s.policies = s.policies.filter(p => p.until > s.day);
     // 政策移動平衡點；多項政策可疊加，但效果減半避免長期一路墊高
-    const pol = (k: StatKey) => s.policies.reduce((a, p) => (p.stat === k ? a + p.shift : a), 0) * 0.5;
+    const pol = (k: StatKey) => s.policies.reduce((a, p) => (p.stat === k ? a + p.shift : a), 0) * POLICY_IMPACT;
 
     // 隱藏因子（AR(1) 隨機漫步）：全球景氣、對岸態度、世代認同趨勢、社會氛圍
     h.econ = clamp(h.econ * 0.998 + r.normal() * 0.032, -1, 1);
@@ -567,7 +580,7 @@ export class Engine {
     }
     Engine.aggregate(s);
     const e: LogEntry = {
-      day: s.day, eventId: def.id, title: def.title, cat: def.cat, tier: def.tier, place: this.placeName(p),
+      day: s.day, eventId: def.id, title: this.text(def.title, p), cat: def.cat, tier: def.tier, place: this.placeName(p),
       county: p.county, point: p.point, option: i, optionText: o.text, intervened, result: o.result, deltas: this.diff(before),
     };
     this.pushLog(e);
@@ -578,15 +591,15 @@ export class Engine {
   }
 
   private applyOption(o: OptionDef, p: Pending) {
-    if (o.effects) this.applyEffects(o.effects);
+    if (o.effects) this.applyEffects(scaleEffects(o.effects));
     for (const pl of o.policy ?? []) {
       if (POLICY_STATS.includes(pl.stat)) this.s.policies.push({ stat: pl.stat, shift: pl.shift, until: this.s.day + pl.days });
     }
-    if (o.local && p.county !== null) this.applyLocal(o.local, p.county);
+    if (o.local && p.county !== null) this.applyLocal(scaleEffects(o.local) as typeof o.local, p.county);
     if (o.over && o.over.days > 0) {
       const d = o.over.days;
       const perDay: Effects = {};
-      for (const [k, v] of Object.entries(o.over.effects)) {
+      for (const [k, v] of Object.entries(scaleEffects(o.over.effects))) {
         (perDay as any)[k] = k === 'govToPop' || k === 'popToGov' ? 1 - Math.pow(1 - (v as number), 1 / d) : (v as number) / d;
       }
       this.s.ongoing.push({ perDay, days: d });
@@ -702,7 +715,7 @@ export class Engine {
       case 'timeup': {
         const r = (k: StatKey) => st[k];
         if (r('stability') >= 70 && r('wealth') >= 65 && r('gdp') >= 65) title = '繁榮之島';
-        else if (r('tech') >= 85 && r('intl') >= 75) title = '矽之盾';
+        else if (r('tech') >= 90 && r('intl') >= 80) title = '矽之盾';
         else if (r('tension') >= 80 || s.hidden.dep >= 80) title = '臨界之島';
         else if (r('stability') < 35) title = '風雨飄搖';
         else if (r('demo') < 20 && r('gdp') < 45) title = '沉睡之島';

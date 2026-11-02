@@ -70,6 +70,10 @@ let lastInteract = 0;
 let lastSaveDay = 0;
 let historyOpen = false;
 let reviewOpen = false;
+/** 擲骰動畫進行中：左側數值暫不更新，等結果揭曉才一起變動 */
+let statsHold = false;
+/** 左側目前顯示的數值，用來偵測變化並閃爍 */
+let shownVals: Partial<Record<StatKey, number>> = {};
 const bubbles = new Map<number, HTMLButtonElement>();
 
 // ---------- 地點 ----------
@@ -261,6 +265,7 @@ const statEls = new Map<StatKey, { root: HTMLElement; val: HTMLElement; tr: HTML
 function buildStats() {
   const root = $('stats');
   root.innerHTML = '';
+  shownVals = {};
   for (const k of STAT_ORDER) {
     const m = STAT_META[k];
     const div = document.createElement('div');
@@ -302,6 +307,7 @@ function isDanger(k: StatKey, v: number) {
 
 let wasDanger = false;
 function refreshStats() {
+  if (statsHold) return;
   const e = eng!, st = e.s.stats;
   const h = e.s.history;
   const ref = h.length >= 3 ? h[h.length - 3].s : h[0].s;
@@ -319,6 +325,9 @@ function refreshStats() {
       el.fill.style.width = `${v}%`;
       el.fill.style.background = isDanger(k, v) ? 'var(--danger)' : k === 'tension' ? `hsl(${120 - v * 1.2}, 70%, 60%)` : 'var(--accent)';
     }
+    const prev = shownVals[k];
+    if (prev !== undefined && Math.abs(v - prev) >= 0.6) flashStat(k, v - prev);
+    shownVals[k] = v;
     const diff = v - ref[i];
     el.tr.textContent = diff > 1 ? '▲' : diff < -1 ? '▼' : '';
     el.tr.className = `tr ${diff > 1 ? 'up' : diff < -1 ? 'down' : ''}`;
@@ -339,6 +348,33 @@ function refreshStats() {
   }).join('');
 }
 
+/** 數值條依變化量短暫變色：好轉綠、惡化紅（統獨依方向用紫／琥珀），變化越大越亮越久，並浮出 ±值 */
+function flashStat(k: StatKey, d: number) {
+  const el = statEls.get(k);
+  if (!el) return;
+  const m = STAT_META[k];
+  const color = m.lean ? (d < 0 ? LEAN_NEG : LEAN_POS)
+    : (m.danger === 'high' ? d < 0 : d > 0) ? '#5ee59a' : '#ff5a6a';
+  const mag = Math.min(1, Math.abs(d) / 6);
+  const dur = 700 + mag * 1100;
+  const bar = el.fill.parentElement!;
+  bar.animate([
+    { boxShadow: `0 0 0 1px ${color}, 0 0 ${6 + mag * 14}px ${color}` },
+    { boxShadow: `0 0 0 1px ${color}, 0 0 ${6 + mag * 14}px ${color}`, offset: 0.4 },
+    { boxShadow: '0 0 0 0 transparent' },
+  ], { duration: dur, easing: 'ease-out' });
+  const base = getComputedStyle(el.fill).backgroundColor;
+  el.fill.animate([{ background: color }, { background: color, offset: 0.4 }, { background: base }], { duration: dur, easing: 'ease-out' });
+  if (Math.abs(d) >= 1 && !reducedMotion()) {
+    const f = document.createElement('span');
+    f.className = 'delta-float';
+    f.style.color = color;
+    f.textContent = `${d > 0 ? '+' : ''}${Math.round(d)}`;
+    el.root.querySelector('.stat-head')!.appendChild(f);
+    setTimeout(() => f.remove(), 1500);
+  }
+}
+
 // ---------- 圖層 ----------
 function buildLayers() {
   const root = $('layers');
@@ -354,7 +390,15 @@ function buildLayers() {
   root.querySelector('.legend')!.innerHTML = l.key === 'terrain'
     ? '依真實山脈走勢呈現的地形（垂直放大 5 倍）'
     : `<div class="grad" style="background:linear-gradient(90deg,${l.colors.join(',')})"></div><div class="row"><span>${l.lo}</span><span>${l.hi}</span></div>`;
+  syncLayersHeight();
 }
+
+/** 圖層面板貼齊左下角，數值面板的高度依它實際高度讓位（面板隱藏時高度為 0，不更新） */
+function syncLayersHeight() {
+  const h = $('layers').offsetHeight;
+  if (h > 0) document.documentElement.style.setProperty('--layers-h', `${h}px`);
+}
+new ResizeObserver(syncLayersHeight).observe(document.getElementById('layers')!);
 
 function refreshLayer() {
   map.setMode(layer === 'terrain' ? 'terrain' : 'layer');
@@ -386,7 +430,7 @@ function refreshFeed() {
     const d = e.defs.get(p.eventId)!, c = CAT_META[d.cat];
     const waited = e.s.day - p.createdDay;
     return `<div class="ev pend ${p.tier === 'major' ? 'major' : ''}" data-uid="${p.uid}" style="--c:${c.color}"><span class="ic">${iconSvg(d.cat)}</span>
-      <div class="body"><div class="t">${p.tier === 'major' ? '<span class="tag-major">重大</span>' : ''}${esc(d.title)}</div>
+      <div class="body"><div class="t">${p.tier === 'major' ? '<span class="tag-major">重大</span>' : ''}${esc(e.text(d.title, p))}</div>
       <div class="m">${c.label} · ${esc(e.placeName(p))} · ${waited ? `已等待 ${waited} 天` : '剛發生'}</div></div></div>`;
   }).join('') : '<p class="empty">目前沒有待決事件</p>';
   $('pendingList').querySelectorAll<HTMLElement>('[data-uid]').forEach(el => el.onclick = () => openModal(Number(el.dataset.uid)));
@@ -516,7 +560,7 @@ function addBubble(p: Pending) {
   el.className = `bubble ${p.tier === 'major' ? 'major' : ''}`;
   el.style.setProperty('--c', CAT_META[d.cat].color);
   el.innerHTML = iconSvg(d.cat, p.tier === 'major' ? 22 : 18);
-  el.title = d.title;
+  el.title = eng!.text(d.title, p);
   el.onclick = ev => { ev.stopPropagation(); openModal(p.uid); };
   labelLayer.appendChild(el);
   bubbles.set(p.uid, el);
@@ -596,7 +640,7 @@ function openModal(uid: number) {
     <div class="ev-hero" style="background-image:radial-gradient(120% 140% at 20% 0%, ${c.color}, transparent 60%), url('/assets/events/${d.cat}.webp')"><span class="ic">${iconSvg(d.cat, 40)}</span></div>
     <div class="ev-head">
       <div class="ev-kind"><span class="pill">${c.label}</span><span>${isMajor ? '重大事件' : '事件'} · ${esc(e.placeName(p))} · ${shortDate(e.s.day)}</span></div>
-      <div class="ev-title">${esc(d.title)}</div>
+      <div class="ev-title">${esc(e.text(d.title, p))}</div>
     </div>
     <div class="ev-desc">${esc(e.text(d.desc, p))}</div>
     <div class="opts">${d.options!.map((o, i) => `
@@ -634,13 +678,19 @@ function choose(uid: number, i: number | null) {
   const p = e.s.pending.find(x => x.uid === uid);
   if (!p) return closeModal();
   const isMajor = p.tier === 'major';
+  const def = e.defs.get(p.eventId)!;
+  const cost = i !== null ? e.cost(def, i) : 0;
+  // 順其自然：左側數值等骰子停下才變動
+  if (i === null) statsHold = true;
   const res = e.resolve(uid, i);
-  if (!res) { card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); return; }
+  if (!res) { statsHold = false; card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); return; }
+  if (res.intervened) interveneFx(card, i!, cost, p);
   card.querySelectorAll<HTMLButtonElement>('.opt, .btn').forEach(b => b.disabled = true);
   const opts = [...card.querySelectorAll<HTMLElement>('.opt')];
   const finish = () => {
     opts[res.option]?.classList.add('picked');
-    sfx.play('resolve');
+    statsHold = false;
+    if (!res.intervened) sfx.play('resolve');
     const foot = card.querySelector('.ev-foot')!;
     const opt = e.defs.get(p.eventId)!.options![res.option];
     const lasting = lastingNote(opt, d => (d >= 365 ? `約 ${Math.round(d / 365)} 年` : `${d} 天`));
@@ -661,6 +711,52 @@ function choose(uid: number, i: number | null) {
     };
     spin();
   } else finish();
+}
+
+/** 出手干預的特效：金色光爆、光點四散、命運飛向計數器、地圖金色漣漪 */
+function interveneFx(card: HTMLElement, i: number, cost: number, p: Pending) {
+  sfx.play('intervene');
+  const opt = card.querySelectorAll<HTMLElement>('.opt')[i];
+  const cr = card.getBoundingClientRect(), or = opt.getBoundingClientRect();
+  const cx = or.left + or.width / 2, cy = or.top + or.height / 2;
+  card.style.setProperty('--bx', `${cx - cr.left}px`);
+  card.style.setProperty('--by', `${cy - cr.top + card.scrollTop}px`);
+  card.classList.remove('divine-burst'); void card.offsetWidth; card.classList.add('divine-burst');
+  opt.classList.add('chosen');
+
+  const gold = new THREE.Color('#ffd36b');
+  const { x, y } = locXY(p.county, p.point);
+  map.ripple(x, y, gold, p.county !== null ? 55 : 110, 6);
+  map.highlight(p.county, gold, 5);
+  const dv = $('divine');
+  dv.classList.remove('bump'); void dv.offsetWidth; dv.classList.add('bump');
+  if (reducedMotion()) return;
+
+  // 光點從選項向外散開
+  for (let k = 0; k < 22; k++) {
+    const sp = document.createElement('span');
+    sp.className = 'spark';
+    sp.style.left = `${cx}px`; sp.style.top = `${cy}px`;
+    document.body.appendChild(sp);
+    const ang = Math.random() * Math.PI * 2, dist = 60 + Math.random() * 140;
+    sp.animate([
+      { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+      { transform: `translate(calc(-50% + ${Math.cos(ang) * dist}px), calc(-50% + ${Math.sin(ang) * dist}px)) scale(0.2)`, opacity: 0 },
+    ], { duration: 600 + Math.random() * 500, easing: 'cubic-bezier(.2,.7,.3,1)' }).onfinish = () => sp.remove();
+  }
+  // 花費的命運從選項飛向頂列計數器
+  const costEl = opt.querySelector<HTMLElement>('.cost')!.getBoundingClientRect();
+  const dr = dv.getBoundingClientRect();
+  const fly = document.createElement('span');
+  fly.className = 'cost-fly';
+  fly.innerHTML = `${HAND_ICON}−${cost}`;
+  fly.style.left = `${costEl.left}px`; fly.style.top = `${costEl.top}px`;
+  document.body.appendChild(fly);
+  fly.animate([
+    { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+    { transform: 'translate(0, -16px) scale(1.25)', opacity: 1, offset: 0.25 },
+    { transform: `translate(${dr.left - costEl.left}px, ${dr.top - costEl.top}px) scale(0.7)`, opacity: 0 },
+  ], { duration: 950, easing: 'cubic-bezier(.4,0,.2,1)' }).onfinish = () => fly.remove();
 }
 
 // ---------- 五年回顧 ----------
@@ -1078,7 +1174,7 @@ function bindInput() {
       if (p && p.tier !== 'major') closeModal();
     }
   });
-  window.addEventListener('resize', () => { map.resize(); labelY = []; });
+  window.addEventListener('resize', () => { map.resize(); labelY = []; syncLayersHeight(); });
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && eng && (phase === 'play' || phase === 'intro')) { userPaused = true; save(); }
   });
