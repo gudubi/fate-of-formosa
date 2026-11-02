@@ -75,7 +75,15 @@
         <button id="btnNew" class="primary" disabled>地圖生成中…</button>
         <button id="btnContinue" hidden>繼續上一局</button>
       </div>
-      <label class="seed">種子（選填，同一個種子會遇到同樣的天意）<input id="seedInput" inputmode="numeric" placeholder="留空則隨機" autocomplete="off" /></label>
+      <div class="seed">
+        <label for="seedInput">對局代碼</label>
+        <div class="seed-row">
+          <input id="seedInput" maxlength="16" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="seedHint" />
+          <button id="btnSeedRandom" type="button" title="換一個代碼" aria-label="隨機產生代碼">🎲 隨機</button>
+          <button id="btnSeedCopy" type="button" title="複製代碼" aria-label="複製代碼">複製</button>
+        </div>
+        <p id="seedHint">把代碼分享給朋友，同一天輸入相同代碼開始，就會從同一個世界出發，遇到同樣的事件節奏。</p>
+      </div>
       <details id="records" class="howto" hidden></details>
       <details class="howto">
         <summary>玩法說明</summary>

@@ -6,6 +6,8 @@ export interface RecordEntry {
   title: string;
   years: number;
   seed: number;
+  /** 對局代碼（較舊的紀錄沒有） */
+  code?: string;
   survived: boolean;
   /** 結束時的真實日期（ISO 字串） */
   at: string;

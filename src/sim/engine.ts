@@ -77,7 +77,12 @@ export interface Ending {
 export interface GameState {
   version: 1;
   seed: number;
+  /** 對局代碼（分享給其他玩家用） */
+  code?: string;
+  /** 世界亂數：事件何時發生、發生什麼、背景因子 */
   rng: number;
+  /** 天意亂數：順其自然的結果、事件鏈機率。與世界亂數分開，玩家的選擇不會打亂事件節奏 */
+  fateRng: number;
   /** 開局時刻（台北時間 ms） */
   startTw: number;
   /** 開局當天 00:00（台北時間 ms） */
@@ -153,6 +158,7 @@ export class Engine {
   readonly defs = new Map<string, EventDef>();
   private byTier: Record<Tier, EventDef[]> = { news: [], general: [], major: [] };
   rng: Rng;
+  fate: Rng;
   hooks: Partial<EngineHooks> = {};
 
   constructor(events: EventDef[], public s: GameState) {
@@ -160,7 +166,9 @@ export class Engine {
       this.defs.set(d.id, d);
       if (!d.chainOnly) this.byTier[d.tier].push(d);
     }
+    s.fateRng ??= (s.seed ^ 0x9e3779b9) >>> 0;
     this.rng = new Rng(s.rng);
+    this.fate = new Rng(s.fateRng);
     Engine.migrate(s, this.defs);
   }
 
@@ -206,7 +214,7 @@ export class Engine {
     });
 
     const s: GameState = {
-      version: 1, seed, rng: rng.s, startTw, startDayTw, day: 0, endDay,
+      version: 1, seed, rng: rng.s, fateRng: (seed ^ 0x9e3779b9) >>> 0, startTw, startDayTw, day: 0, endDay,
       stats: {
         govLean: clamp(rng.normal() * 5, -100, 100), popLean: 0, intl: 60, gdp: 62, wealth: 0, stability: 0,
         tension: 45, trust: 50, defense: 45, tech: 80, demo: 40,
@@ -308,10 +316,13 @@ export class Engine {
     }
 
     // 隨機事件
+    // 每個層級每天固定抽兩個亂數（是否發生、抽哪一件），不論結果如何，
+    // 讓同一個對局代碼的玩家即使選擇不同，事件發生的時間點仍保持一致
     for (const tier of ['news', 'general', 'major'] as Tier[]) {
+      const roll = this.rng.next(), u = this.rng.next();
       if (tier === 'major' && (this.blocking() || s.day < 20)) continue;
-      if (this.rng.next() < TIER_RATE[tier] / 365) {
-        const def = this.draw(tier);
+      if (roll < TIER_RATE[tier] / 365) {
+        const def = this.draw(tier, u);
         if (def) this.fire(def);
       }
     }
@@ -322,6 +333,7 @@ export class Engine {
     if (s.day % 30 === 0) s.history.push({ day: s.day, s: STAT_ORDER.map(k => +s.stats[k].toFixed(1)) });
     if (s.day >= s.endDay && !s.ended) this.end('timeup');
     s.rng = this.rng.s;
+    s.fateRng = this.fate.s;
   }
 
   /** 每日的數值連動：各數值緩慢趨向由其他數值決定的平衡點 */
@@ -425,16 +437,24 @@ export class Engine {
     return true;
   }
 
-  private draw(tier: Tier): EventDef | null {
+  private draw(tier: Tier, u: number): EventDef | null {
     const pool = this.byTier[tier].filter(d => this.eligible(d));
-    const i = this.rng.pick(pool.map(d => d.rate * this.modFactor(d.mods)));
+    const i = pickWith(u, pool.map(d => d.rate * this.modFactor(d.mods)));
     return i < 0 ? null : pool[i];
+  }
+
+  /** 由「種子＋日期＋事件＋用途」決定的亂數：不消耗任何亂數序列 */
+  private hashRand(id: string, salt: string): number {
+    let h = 0x811c9dc5 ^ this.s.seed;
+    for (const ch of `${this.s.day}|${id}|${salt}`) h = Math.imul(h ^ ch.charCodeAt(0), 0x01000193);
+    h ^= h >>> 15; h = Math.imul(h, 0x2c1b3c6d); h ^= h >>> 12;
+    return (h >>> 0) / 4294967296;
   }
 
   /** 發生地點：縣市索引或命名地點 */
   private locate(d: EventDef): { county: number | null; point: string | null } {
     const cs = this.s.counties;
-    const randomCounty = () => this.rng.pick(cs.map(c => c.pop));
+    const randomCounty = () => pickWith(this.hashRand(d.id, 'county'), cs.map(c => c.pop));
     if (typeof d.loc === 'string') {
       if (d.loc === 'random') return { county: randomCounty(), point: null };
       if (NAMED_POINTS[d.loc]) return { county: null, point: d.loc };
@@ -445,7 +465,7 @@ export class Engine {
     const points = d.loc.filter(n => NAMED_POINTS[n]);
     const all = [...options.map(i => ({ county: i, point: null })), ...points.map(p => ({ county: null, point: p }))];
     if (!all.length) return { county: randomCounty(), point: null };
-    return all[Math.floor(this.rng.next() * all.length)];
+    return all[Math.floor(this.hashRand(d.id, 'loc') * all.length)];
   }
 
   placeName(p: { county: number | null; point: string | null }): string {
@@ -468,7 +488,7 @@ export class Engine {
     if (def.tier === 'news' || !opts.length) {
       // 隨機挑一種寫法，避免同一句反覆出現
       const forms = [{ title: def.title, desc: def.desc }, ...(def.variants ?? [])];
-      const form = forms[Math.floor(this.rng.next() * forms.length)];
+      const form = forms[Math.floor(this.hashRand(def.id, 'form') * forms.length)];
       const before = this.snapshot();
       if (def.effects) this.applyEffects(def.effects);
       if (def.local && loc.county !== null) this.applyLocal(def.local, loc.county);
@@ -535,7 +555,7 @@ export class Engine {
       s.divine -= c;
       s.interventions++;
     } else {
-      i = this.rng.pick(this.probs(def));
+      i = this.fate.pick(this.probs(def));
       if (def.tier === 'major') s.divine = Math.min(DIVINE_MAX, s.divine + 1); // 順其自然的回饋
     }
     s.pending = s.pending.filter(x => x.uid !== uid);
@@ -543,7 +563,7 @@ export class Engine {
     const before = this.snapshot();
     this.applyOption(o, p);
     if (def.id === 'sys_pres_election') {
-      s.stats.govLean = clamp(s.stats.govLean + this.rng.normal() * 6, -100, 100);
+      s.stats.govLean = clamp(s.stats.govLean + this.fate.normal() * 6, -100, 100);
     }
     Engine.aggregate(s);
     const e: LogEntry = {
@@ -552,7 +572,7 @@ export class Engine {
     };
     this.pushLog(e);
     this.hooks.resolved?.(e, p);
-    s.rng = this.rng.s;
+    s.fateRng = this.fate.s;
     if (o.ending) this.end(o.ending);
     return e;
   }
@@ -572,7 +592,7 @@ export class Engine {
       this.s.ongoing.push({ perDay, days: d });
     }
     for (const f of o.follow ?? []) {
-      if (this.rng.next() < (f.chance ?? 1) && this.defs.has(f.id)) {
+      if (this.fate.next() < (f.chance ?? 1) && this.defs.has(f.id)) {
         this.s.scheduled.push({ day: this.s.day + Math.max(1, f.delay), id: f.id });
       }
     }
@@ -710,6 +730,18 @@ export class Engine {
     s.history.push({ day: s.day, s: STAT_ORDER.map(k => +s.stats[k].toFixed(1)) });
     this.hooks.ended?.(s.ended);
   }
+}
+
+/** 以給定的 u ∈ [0,1) 依權重選出索引；權重總和為 0 時回傳 -1 */
+function pickWith(u: number, weights: number[]): number {
+  const total = weights.reduce((a, b) => a + b, 0);
+  if (total <= 0) return -1;
+  let r = u * total;
+  for (let i = 0; i < weights.length; i++) {
+    r -= weights[i];
+    if (r < 0) return i;
+  }
+  return weights.length - 1;
 }
 
 export function describeLean(v: number): string {

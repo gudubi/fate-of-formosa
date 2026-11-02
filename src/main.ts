@@ -17,6 +17,7 @@ import { entriesOn, entriesOnSync, loadMonth, KIND_LABEL, type HistoryKind } fro
 import { optionPreview, lastingNote } from './ui/preview';
 import { addRecord, loadRecords } from './ui/records';
 import { renderShareCard, shareOrDownload } from './ui/share';
+import { randomCode, normalizeCode, codeToSeed } from './sim/seed';
 
 const SPEEDS = [0, 4, 8, 16];       // 天／秒
 // 開場：日期從中華民國建立（1912-01-01）開始以遊戲速度跳動，
@@ -729,7 +730,7 @@ function showEnding(end: Ending) {
   const diff = end.score - base.score;
   const ms = MILESTONE_LIST.filter(m => e.s.achieved.includes(m.id));
   const rank = addRecord({
-    score: end.score, title: end.title, years: +years, seed: e.s.seed, survived: end.survived,
+    score: end.score, title: end.title, years: +years, seed: e.s.seed, code: e.s.code, survived: end.survived,
     at: new Date().toISOString(), milestones: ms.length,
   });
   card.innerHTML = `
@@ -776,10 +777,10 @@ function showEnding(end: Ending) {
       const blob = await renderShareCard({
         title: end.title, kicker: `${end.survived ? '守護之路' : '終局'}・${shortDate(end.day)}・第 ${years} 年`,
         text: end.text, score: end.score, baseline: base.score, years, interventions: intervened,
-        milestones: ms.map(m => m.title), seed: e.s.seed,
+        milestones: ms.map(m => m.title), code: e.s.code ?? String(e.s.seed),
         stats: STAT_ORDER.map(k => ({ label: STAT_META[k].label, value: STAT_META[k].lean ? describeLean(e.s.stats[k]) : String(Math.round(e.s.stats[k])) })),
       }, `/assets/endings/${end.id}.webp`, '/assets/icon-192.png');
-      await shareOrDownload(blob, `命運之手-${end.title}-${end.score}.png`, `我在《命運之手：台灣》守護了 ${years} 年，結局「${end.title}」，守護指數 ${end.score}。`);
+      await shareOrDownload(blob, `命運之手-${end.title}-${end.score}.png`, `我在《命運之手：台灣》守護了 ${years} 年，結局「${end.title}」，守護指數 ${end.score}。${e.s.code ? `對局代碼 ${e.s.code}，一起來挑戰同一個世界！` : ''}`);
     } finally { btn.disabled = false; }
   };
 }
@@ -857,9 +858,10 @@ function newGame(fromTitle = false) {
   sfx.play('click');
   if (fromTitle && loadSave() && !confirm('開始新局會覆蓋目前的存檔，確定嗎？')) return;
   clearSave();
-  const typed = fromTitle ? Number(($<HTMLInputElement>('seedInput')).value.trim()) : NaN;
-  const seed = Number.isInteger(typed) && typed > 0 ? typed >>> 0 : (Math.random() * 2 ** 32) >>> 0;
-  const s = Engine.newGame(COUNTIES, seed, Date.now());
+  // 標題畫面的對局代碼決定整個世界；從其他地方開新局則換一個新代碼
+  const code = (fromTitle && normalizeCode($<HTMLInputElement>('seedInput').value)) || randomCode();
+  const s = Engine.newGame(COUNTIES, codeToSeed(code), Date.now());
+  s.code = code;
   gameTw = ROC_START_TW;
   speed = 1; userPaused = false; introT = 0;
   phase = 'intro';
@@ -925,7 +927,7 @@ function openMenu() {
     <div class="setting"><span>音效</span><div class="seg"><button data-snd="1" class="${sfx.muted ? '' : 'on'}">開</button><button data-snd="0" class="${sfx.muted ? 'on' : ''}">關</button></div></div>
     <div class="setting"><span>動態效果</span><div class="seg">${(['auto', 'full', 'reduce'] as MotionMode[]).map(m =>
       `<button data-motion="${m}" class="${settings.motion === m ? 'on' : ''}">${{ auto: '跟隨系統', full: '完整', reduce: '減少' }[m]}</button>`).join('')}</div></div>
-    <div class="setting"><span>隨機種子</span><span style="color:var(--dim)">${eng?.s.seed ?? '-'}</span></div>
+    <div class="setting"><span>對局代碼</span><span class="code-show">${eng?.s.code ?? eng?.s.seed ?? '-'}</span></div>
     <div class="menu-btns">
       <button class="btn primary" id="mResume">繼續</button>
       <button class="btn" id="mSaveQuit">存檔並回到標題</button>
@@ -949,14 +951,23 @@ function toTitle() {
   $('title').hidden = false;
   $('btnContinue').hidden = !loadSave();
   renderRecords();
+  setCode(randomCode());
   map.controls.autoRotate = !reducedMotion();
   map.overview(true);
+}
+
+function setCode(code: string) {
+  $<HTMLInputElement>('seedInput').value = code;
 }
 
 function renderRecords() {
   const list = loadRecords().slice(0, 5);
   $('records').innerHTML = list.length ? `<summary>本機最佳紀錄</summary><ol>${list.map(r =>
-    `<li><b>${r.score}</b> ${esc(r.title)}・${r.years} 年${r.milestones ? `・🏅${r.milestones}` : ''}<small>種子 ${r.seed}</small></li>`).join('')}</ol>` : '';
+    `<li ${r.code ? `data-code="${esc(r.code)}" title="使用這個代碼再玩一次"` : ''}><b>${r.score}</b> ${esc(r.title)}・${r.years} 年${r.milestones ? `・🏅${r.milestones}` : ''}<small>${r.code ? `代碼 ${esc(r.code)}` : `種子 ${r.seed}`}</small></li>`).join('')}</ol>` : '';
+  $('records').querySelectorAll<HTMLElement>('li[data-code]').forEach(li => li.onclick = () => {
+    sfx.play('click');
+    setCode(li.dataset.code!);
+  });
   $('records').hidden = !list.length;
 }
 
@@ -981,6 +992,17 @@ function bindInput() {
   $('btnMenu').onclick = openMenu;
   $('btnNew').onclick = () => newGame(true);
   $('btnContinue').onclick = continueGame;
+  $('btnSeedRandom').onclick = () => { sfx.unlock(); sfx.play('click'); setCode(randomCode()); };
+  $('btnSeedCopy').onclick = async () => {
+    const btn = $('btnSeedCopy');
+    const code = normalizeCode($<HTMLInputElement>('seedInput').value);
+    try { await navigator.clipboard.writeText(code); btn.textContent = '已複製'; } catch { $<HTMLInputElement>('seedInput').select(); btn.textContent = '請手動複製'; }
+    setTimeout(() => { btn.textContent = '複製'; }, 1500);
+  };
+  $('seedInput').addEventListener('input', () => {
+    const el = $<HTMLInputElement>('seedInput');
+    el.value = el.value.toUpperCase();
+  });
   $('history').onclick = () => void openHistory(...histDate);
   $('historyDlg').onclick = ev => { if (ev.target === $('historyDlg')) closeHistory(); };
 
@@ -1041,6 +1063,7 @@ async function boot() {
   bindInput();
   refreshMute();
   renderRecords();
+  setCode(randomCode());
   const btn = $<HTMLButtonElement>('btnNew');
   btn.disabled = false;
   btn.textContent = '降臨・開始新局';
