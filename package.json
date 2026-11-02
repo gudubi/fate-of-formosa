@@ -30,5 +30,10 @@
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^8.3.5"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gudubi/fate-of-formosa.git"
+  },
+  "homepage": "https://github.com/gudubi/fate-of-formosa"
 }

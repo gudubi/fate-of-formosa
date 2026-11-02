@@ -1,6 +1,6 @@
 # 命運之手：台灣（Fate of Formosa）
 
-作者：[gudubi.com](https://gudubi.com)（gudubi@gudubi.com）
+作者：gudubi（gudubi@gudubi.com）・官方網站：[gudubi.com](https://gudubi.com)・原始碼：[github.com/gudubi/fate-of-formosa](https://github.com/gudubi/fate-of-formosa)
 
 以 Three.js 製作的網頁模擬遊戲。從**此刻的真實時間**開始，玩家以「命運之手」介入事件，守護台灣走過 30 年。
 

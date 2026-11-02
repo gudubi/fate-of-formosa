@@ -13,7 +13,7 @@ export const DIVINE_MAX = 25;
 export const DIVINE_EVERY = 24; // 每 N 天 +1 命運
 
 /** 各層級每年平均事件數 */
-const TIER_RATE: Record<Tier, number> = { news: 26, general: 12, major: 2.4 };
+const TIER_RATE: Record<Tier, number> = { news: 26, general: 15, major: 2.4 };
 const DEFAULT_COOLDOWN: Record<Tier, number> = { news: 365, general: 365, major: 900 };
 /** 一般事件不倒數；同時待決超過此數時，最舊的一件交給天意 */
 export const MAX_PENDING = 5;
@@ -32,7 +32,8 @@ export const POLICY_IMPACT = 0.75;
 export function scaleEffects(e: Effects, f = OPTION_IMPACT): Effects {
   const out: Effects = {};
   for (const [k, v] of Object.entries(e)) {
-    (out as any)[k] = k === 'govToPop' || k === 'popToGov' ? Math.min(0.95, (v as number) * f) : (v as number) * f;
+    // 依賴度是緩慢累積的結構因子，不隨選項倍率放大
+    (out as any)[k] = k === 'dep' ? v : k === 'govToPop' || k === 'popToGov' ? Math.min(0.95, (v as number) * f) : (v as number) * f;
   }
   return out;
 }
@@ -385,12 +386,12 @@ export class Engine {
     // 隱藏因子（AR(1) 隨機漫步）：全球景氣、對岸態度、世代認同趨勢、社會氛圍
     h.econ = clamp(h.econ * 0.998 + r.normal() * 0.032, -1, 1);
     h.stance = clamp(h.stance * 0.999 + r.normal() * 0.04, -1, 1);
-    h.identity = clamp(h.identity * 0.999 + r.normal() * 0.016, -1, 1);
-    h.mood = clamp(h.mood * 0.998 + r.normal() * 0.03, -1, 1);
+    h.identity = clamp(h.identity * 0.999 + r.normal() * 0.024, -1, 1);
+    h.mood = clamp(h.mood * 0.998 + r.normal() * 0.036, -1, 1);
     // 經濟依賴度：與兩岸緊張度完全鏡像（同一起點、相反斜率、同樣的影響與門檻），
     // 偏向獨立推高緊張、偏向統一推高依賴，兩端各有代價
     // 斜率略大於緊張度，用以抵銷事件層面施壓事件較多的落差（以 tools/simulate.ts 的偏統／偏獨機器人校準）
-    h.dep = clamp(h.dep + (40 - st.govLean * 0.55 - st.popLean * 0.1 - h.stance * 30
+    h.dep = clamp(h.dep + (40 - st.govLean * 0.4 - st.popLean * 0.1 - h.stance * 30
       - (st.tech - 80) * 0.05 - (st.intl - 50) * 0.05 - h.dep) * 0.004, 0, 100);
 
     relax('gdp', 0.3 * st.tech + 0.15 * st.intl + 0.15 * st.stability + 0.15 * (100 - st.tension)
@@ -416,7 +417,7 @@ export class Engine {
         + (avgOf(c, 'popLean') - c.popLean) * 0.003
         + (st.popLean - c.popLean) * 0.002
         + (st.govLean - c.popLean) * 0.0003
-        - c.popLean * 0.0004
+        - c.popLean * 0.0003
         + shared + r.normal() * 0.12,
       stability: c.stability
         + (avgOf(c, 'stability') - c.stability) * 0.004
