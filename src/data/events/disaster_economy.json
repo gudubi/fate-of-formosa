@@ -1,0 +1,4527 @@
+[
+  {
+    "id": "dis_east_quake",
+    "cat": "disaster",
+    "tier": "general",
+    "title": "東部強震",
+    "desc": "{county}外海發生規模6.8淺層地震，多棟老舊大樓傾斜、濱海公路多處坍方，觀光旺季瞬間停擺，救難隊正趕往災區搶救受困民眾。",
+    "rate": 1.2,
+    "cooldown": 400,
+    "loc": [
+      "花蓮縣",
+      "台東縣",
+      "宜蘭縣"
+    ],
+    "ref": "花蓮型東部地震",
+    "options": [
+      {
+        "text": "中央全面接手救災",
+        "result": "搶救迅速，預備金大量支出",
+        "weight": 3,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "trust": 3,
+          "gdp": -2
+        },
+        "local": {
+          "stability": -4,
+          "wealth": -4
+        }
+      },
+      {
+        "text": "地方主導中央協助",
+        "result": "財政負擔小，但補助緩不濟急",
+        "weight": 3,
+        "effects": {
+          "gdp": -0.5,
+          "trust": -1
+        },
+        "local": {
+          "stability": -7,
+          "wealth": -5
+        }
+      },
+      {
+        "text": "危樓全面清查拆除",
+        "result": "短期成本高，長期建物更安全",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -3,
+          "trust": 1
+        },
+        "local": {
+          "stability": -5,
+          "wealth": -6
+        },
+        "over": {
+          "days": 540,
+          "effects": {
+            "stability": 2,
+            "trust": 1
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_typhoon_flood",
+    "cat": "disaster",
+    "tier": "general",
+    "title": "颱風豪雨釀災",
+    "desc": "強烈颱風挾帶豪雨登陸，{county}山區累積雨量破千毫米，河川潰堤、農田泡水，多處聚落斷水斷電，數萬人撤離至收容所。",
+    "rate": 1.5,
+    "cooldown": 300,
+    "loc": [
+      "屏東縣",
+      "高雄市",
+      "台東縣",
+      "台南市",
+      "嘉義縣"
+    ],
+    "mods": [
+      {
+        "stat": "elapsed",
+        "k": 0.4
+      }
+    ],
+    "ref": "颱風水災",
+    "options": [
+      {
+        "text": "提前強制撤離",
+        "result": "傷亡降到最低，部分居民抱怨",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "trust": 2,
+          "gdp": -1
+        },
+        "local": {
+          "stability": -3,
+          "wealth": -4
+        }
+      },
+      {
+        "text": "全力搶修基礎設施",
+        "result": "道路橋梁快速搶通，經費追加",
+        "weight": 3,
+        "effects": {
+          "gdp": -2,
+          "stability": 1
+        },
+        "local": {
+          "stability": -4,
+          "wealth": -3
+        }
+      },
+      {
+        "text": "發放災損現金補助",
+        "result": "災民手頭稍寬，補助標準起爭議",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -3,
+          "wealth": 1,
+          "trust": 1
+        },
+        "local": {
+          "stability": -4,
+          "wealth": -1
+        },
+        "follow": [
+          {
+            "id": "dis_rebuild_dispute",
+            "delay": 120,
+            "chance": 0.3
+          }
+        ]
+      },
+      {
+        "text": "應變遲緩",
+        "result": "救災失序，災區民怨沸騰",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1.5
+          },
+          {
+            "stat": "stability",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -4,
+          "stability": -1
+        },
+        "local": {
+          "stability": -8,
+          "wealth": -6
+        },
+        "follow": [
+          {
+            "id": "dis_rebuild_dispute",
+            "delay": 90,
+            "chance": 0.6
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dis_drought",
+    "cat": "disaster",
+    "tier": "general",
+    "title": "大旱限水",
+    "desc": "連續數月少雨，{county}主要水庫蓄水率跌破一成，自來水公司宣布分區供水，醫院、餐飲與工業區紛紛載水應急，農民望天興嘆。",
+    "rate": 0.8,
+    "cooldown": 900,
+    "loc": [
+      "台中市",
+      "新竹市",
+      "新竹縣",
+      "桃園市",
+      "苗栗縣",
+      "台南市",
+      "高雄市"
+    ],
+    "mods": [
+      {
+        "stat": "elapsed",
+        "k": 0.4
+      }
+    ],
+    "ref": "2021型旱災",
+    "options": [
+      {
+        "text": "農業停灌保工業",
+        "result": "晶圓廠產能保住，農民不滿",
+        "weight": 3,
+        "mods": [
+          {
+            "stat": "tech",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "tech": 1,
+          "gdp": 1,
+          "trust": -2
+        },
+        "local": {
+          "wealth": -6,
+          "stability": -3
+        }
+      },
+      {
+        "text": "全民分區輪流供水",
+        "result": "苦難共擔，產業出貨受影響",
+        "weight": 2,
+        "effects": {
+          "gdp": -2,
+          "stability": -1,
+          "trust": 1
+        },
+        "local": {
+          "stability": -4,
+          "wealth": -2
+        }
+      },
+      {
+        "text": "砸錢海淡與再生水",
+        "result": "短期花大錢，長期供水更穩",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -3
+        },
+        "local": {
+          "stability": -3,
+          "wealth": -2
+        },
+        "over": {
+          "days": 540,
+          "effects": {
+            "gdp": 2,
+            "stability": 1,
+            "tech": 1
+          }
+        }
+      },
+      {
+        "text": "靜待梅雨解渴",
+        "result": "幸運等到鋒面，整備不足遭批",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -2
+        },
+        "local": {
+          "stability": -5,
+          "wealth": -3
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_blackout",
+    "cat": "disaster",
+    "tier": "general",
+    "title": "全台大停電",
+    "desc": "{county}一座主力電廠開關場操作失誤，連鎖跳機導致全台數百萬戶停電，紅綠燈熄滅、電梯受困，科學園區緊急啟動備用電力。",
+    "rate": 0.6,
+    "cooldown": 1000,
+    "loc": [
+      "高雄市",
+      "台中市",
+      "桃園市",
+      "新北市",
+      "台南市"
+    ],
+    "mods": [
+      {
+        "stat": "tech",
+        "k": 0.3
+      }
+    ],
+    "ref": "大停電",
+    "options": [
+      {
+        "text": "主管請辭以示負責",
+        "result": "政治責任明確，能源部門動盪",
+        "weight": 2,
+        "effects": {
+          "trust": 2,
+          "stability": -1,
+          "gdp": -1
+        }
+      },
+      {
+        "text": "加速電網韌性投資",
+        "result": "分散式電網啟動，財政吃緊",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -2,
+          "stability": -1
+        },
+        "over": {
+          "days": 720,
+          "effects": {
+            "gdp": 1.5,
+            "tech": 1,
+            "stability": 1.5
+          }
+        }
+      },
+      {
+        "text": "宣布電價調漲",
+        "result": "電業財務改善，民眾荷包縮水",
+        "weight": 1.5,
+        "effects": {
+          "wealth": -2,
+          "trust": -2
+        },
+        "over": {
+          "days": 365,
+          "effects": {
+            "gdp": 1,
+            "stability": 1
+          }
+        }
+      },
+      {
+        "text": "歸咎個人疏失",
+        "result": "責任下放基層，結構問題未解",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -3,
+          "gdp": -1,
+          "stability": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_gas_explosion",
+    "cat": "disaster",
+    "tier": "general",
+    "title": "地下管線氣爆",
+    "desc": "深夜{county}市區地下石化管線外洩，連環氣爆掀翻數條街道，消防員與居民死傷慘重，管線圖資與權責歸屬一片混亂。",
+    "rate": 0.5,
+    "cooldown": 1200,
+    "loc": [
+      "高雄市",
+      "台南市",
+      "桃園市",
+      "雲林縣"
+    ],
+    "ref": "高雄型氣爆",
+    "options": [
+      {
+        "text": "強制業者遷移管線",
+        "result": "業者叫苦，城市安全提升",
+        "weight": 2,
+        "effects": {
+          "gdp": -2,
+          "trust": 2
+        },
+        "local": {
+          "stability": -5,
+          "wealth": -4
+        },
+        "over": {
+          "days": 365,
+          "effects": {
+            "stability": 1
+          }
+        }
+      },
+      {
+        "text": "國賠先行加速重建",
+        "result": "災民迅速安置，財政負擔重",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -3,
+          "trust": 3
+        },
+        "local": {
+          "stability": -3,
+          "wealth": -2
+        }
+      },
+      {
+        "text": "交由司法釐清責任",
+        "result": "程序漫長，災民苦等賠償",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -2
+        },
+        "local": {
+          "stability": -7,
+          "wealth": -6
+        },
+        "follow": [
+          {
+            "id": "dis_rebuild_dispute",
+            "delay": 180,
+            "chance": 0.5
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dis_landslide",
+    "cat": "disaster",
+    "tier": "general",
+    "title": "山區土石流",
+    "desc": "連日豪雨後，{county}山區邊坡整片滑落，土石流沖毀部落道路與橋梁，數十戶房舍遭掩埋，對外交通全面中斷，聚落成為孤島。",
+    "rate": 1,
+    "cooldown": 365,
+    "loc": [
+      "南投縣",
+      "嘉義縣",
+      "高雄市",
+      "屏東縣",
+      "台東縣",
+      "花蓮縣",
+      "新北市"
+    ],
+    "mods": [
+      {
+        "stat": "elapsed",
+        "k": 0.3
+      }
+    ],
+    "ref": "土石流",
+    "options": [
+      {
+        "text": "空勤直升機搶救",
+        "result": "受困者陸續脫困，費用驚人",
+        "weight": 3,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "gdp": -1,
+          "trust": 2
+        },
+        "local": {
+          "stability": -4,
+          "wealth": -4
+        }
+      },
+      {
+        "text": "部落整體遷村",
+        "result": "安全提升，文化流失引爭議",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -2,
+          "stability": -1
+        },
+        "local": {
+          "stability": -6,
+          "wealth": -2
+        },
+        "over": {
+          "days": 720,
+          "effects": {
+            "stability": 1
+          }
+        },
+        "follow": [
+          {
+            "id": "dis_rebuild_dispute",
+            "delay": 240,
+            "chance": 0.4
+          }
+        ]
+      },
+      {
+        "text": "原地重建加固",
+        "result": "居民留在家園，日後風險仍在",
+        "weight": 2,
+        "effects": {
+          "gdp": -1,
+          "trust": 1
+        },
+        "local": {
+          "stability": -3,
+          "wealth": -6
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_cold_damage",
+    "cat": "disaster",
+    "tier": "general",
+    "title": "寒害重創農漁",
+    "desc": "強烈大陸冷氣團南下，{county}低溫連續多日，養殖魚群大量暴斃、果樹凍傷，農漁民損失慘重，市場菜價與魚價跟著翻漲。",
+    "rate": 1,
+    "cooldown": 365,
+    "loc": [
+      "雲林縣",
+      "彰化縣",
+      "嘉義縣",
+      "屏東縣",
+      "台南市",
+      "澎湖縣"
+    ],
+    "ref": "寒害",
+    "options": [
+      {
+        "text": "啟動現金救助",
+        "result": "農漁民暫時止血，財政支出",
+        "weight": 3,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "gdp": -1.5,
+          "trust": 2
+        },
+        "local": {
+          "wealth": -2,
+          "stability": -1
+        }
+      },
+      {
+        "text": "提供低利貸款",
+        "result": "財政負擔小，業者恢復緩慢",
+        "weight": 2,
+        "effects": {
+          "gdp": -0.5
+        },
+        "local": {
+          "wealth": -5,
+          "stability": -2
+        }
+      },
+      {
+        "text": "推動農業保險",
+        "result": "當下補償有限，長期分散風險",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -1
+        },
+        "local": {
+          "wealth": -5,
+          "stability": -2
+        },
+        "over": {
+          "days": 720,
+          "effects": {
+            "wealth": 1,
+            "stability": 0.5
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_urban_flood",
+    "cat": "disaster",
+    "tier": "general",
+    "title": "強降雨癱瘓都會",
+    "desc": "滯留鋒面在{county}降下時雨量破百毫米豪雨，抽水站來不及運轉，地下道與捷運站出入口進水，數千輛汽機車泡水報廢。",
+    "rate": 1.2,
+    "cooldown": 300,
+    "loc": [
+      "台北市",
+      "新北市",
+      "台南市",
+      "高雄市",
+      "基隆市",
+      "台中市"
+    ],
+    "mods": [
+      {
+        "stat": "elapsed",
+        "k": 0.3
+      }
+    ],
+    "ref": "豪雨淹水",
+    "options": [
+      {
+        "text": "追加治水預算",
+        "result": "工程大舉發包，長期少淹水",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -2
+        },
+        "local": {
+          "stability": -3,
+          "wealth": -3
+        },
+        "over": {
+          "days": 540,
+          "effects": {
+            "stability": 1.5
+          }
+        }
+      },
+      {
+        "text": "泡水車減稅補助",
+        "result": "受災戶獲得補償，問題未根治",
+        "weight": 2,
+        "effects": {
+          "gdp": -1,
+          "trust": 1,
+          "wealth": 0.5
+        },
+        "local": {
+          "stability": -3,
+          "wealth": -2
+        }
+      },
+      {
+        "text": "中央地方相互究責",
+        "result": "口水戰延燒，災民無所適從",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1.5
+          }
+        ],
+        "effects": {
+          "trust": -3,
+          "stability": -1
+        },
+        "local": {
+          "stability": -5,
+          "wealth": -4
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_nuclear_scare",
+    "cat": "disaster",
+    "tier": "general",
+    "title": "核設施異常疑慮",
+    "desc": "{county}核設施傳出用過燃料池監測數據異常，網路謠言瘋傳輻射外洩，超商礦泉水與碘片遭搶購一空，當地居民要求說明。",
+    "rate": 0.4,
+    "cooldown": 1200,
+    "loc": [
+      "新北市",
+      "屏東縣"
+    ],
+    "ref": "核災疑慮",
+    "options": [
+      {
+        "text": "公開數據停機檢查",
+        "result": "謠言平息，檢查耗費大筆經費",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "trust": 3,
+          "gdp": -2
+        },
+        "local": {
+          "stability": -2
+        }
+      },
+      {
+        "text": "邀國際機構查核",
+        "result": "國際背書，結果出爐需時",
+        "weight": 1.5,
+        "effects": {
+          "intl": 2,
+          "trust": 1,
+          "gdp": -1
+        },
+        "local": {
+          "stability": -3
+        }
+      },
+      {
+        "text": "低調澄清謠言",
+        "result": "成本最低，但民眾半信半疑",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -2,
+          "stability": -1
+        },
+        "local": {
+          "stability": -6,
+          "wealth": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_flu_outbreak",
+    "cat": "disaster",
+    "tier": "general",
+    "title": "新型流感爆發",
+    "desc": "新型流感病毒在{county}出現社區群聚，多間醫院急診塞爆，學校陸續停課，民眾搶購口罩與快篩，專家警告恐擴散全台。",
+    "rate": 0.7,
+    "cooldown": 700,
+    "loc": "random",
+    "ref": "SARS型疫情",
+    "options": [
+      {
+        "text": "全國停課停班",
+        "result": "疫情壓制，經濟活動急凍",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "stability",
+            "k": -0.5
+          }
+        ],
+        "effects": {
+          "gdp": -3,
+          "trust": 1,
+          "stability": 1
+        },
+        "local": {
+          "stability": -2,
+          "wealth": -2
+        }
+      },
+      {
+        "text": "精準疫調圍堵",
+        "result": "社會照常運作，醫護壓力大",
+        "weight": 3,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -1,
+          "trust": 2
+        },
+        "local": {
+          "stability": -3,
+          "wealth": -1
+        }
+      },
+      {
+        "text": "維持正常運作",
+        "result": "經濟無損，疫情持續延燒",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "stability": -3,
+          "trust": -2,
+          "demo": -0.5
+        },
+        "local": {
+          "stability": -5
+        },
+        "follow": [
+          {
+            "id": "dis_pandemic_wave2",
+            "delay": 90,
+            "chance": 0.4
+          }
+        ]
+      },
+      {
+        "text": "緊急採購疫苗",
+        "result": "防護網提前建立，採購遭質疑",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -2,
+          "trust": 1,
+          "intl": 1
+        },
+        "local": {
+          "stability": -2
+        },
+        "follow": [
+          {
+            "id": "dis_vaccine_dispute",
+            "delay": 90,
+            "chance": 0.4
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dis_heatwave",
+    "cat": "disaster",
+    "tier": "general",
+    "title": "極端熱浪來襲",
+    "desc": "太平洋高壓籠罩，{county}氣溫連日飆破攝氏39度，熱傷害送醫人數創新高，用電負載逼近極限，戶外工作者與獨居長者首當其衝。",
+    "rate": 0.8,
+    "cooldown": 365,
+    "loc": [
+      "台北市",
+      "台南市",
+      "高雄市",
+      "台中市",
+      "屏東縣",
+      "嘉義市"
+    ],
+    "mods": [
+      {
+        "stat": "elapsed",
+        "k": 0.8
+      }
+    ],
+    "ref": "極端高溫",
+    "options": [
+      {
+        "text": "戶外勞工強制休息",
+        "result": "工安改善，工程進度延誤",
+        "weight": 2,
+        "effects": {
+          "gdp": -1,
+          "trust": 1,
+          "wealth": -0.5
+        },
+        "local": {
+          "stability": -1
+        }
+      },
+      {
+        "text": "開放公共場所避暑",
+        "result": "長者有處可去，耗電增加",
+        "weight": 2,
+        "effects": {
+          "gdp": -0.5,
+          "trust": 1
+        },
+        "local": {
+          "stability": -2
+        }
+      },
+      {
+        "text": "火力機組全開供電",
+        "result": "電力無虞，空汙與減碳遭批",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "tech",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "gdp": 1,
+          "stability": 1,
+          "intl": -1
+        },
+        "local": {
+          "stability": -3
+        }
+      },
+      {
+        "text": "緊急輪流限電",
+        "result": "電網保住，民生產業同受苦",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "gdp": -2,
+          "stability": -2,
+          "trust": -2
+        },
+        "local": {
+          "stability": -3
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_oil_spill",
+    "cat": "disaster",
+    "tier": "general",
+    "title": "貨輪擱淺漏油",
+    "desc": "外籍貨輪在{county}沿海觸礁擱淺，重油持續外洩，黑色油汙覆蓋礁岸與漁場，保育團體與漁民憂心生態浩劫，船東卻遲遲未回應。",
+    "rate": 0.5,
+    "cooldown": 900,
+    "loc": [
+      "澎湖縣",
+      "屏東縣",
+      "新北市",
+      "基隆市",
+      "金門縣",
+      "台東縣"
+    ],
+    "ref": "漏油汙染",
+    "options": [
+      {
+        "text": "政府先行清除求償",
+        "result": "油汙快速清除，代墊大筆經費",
+        "weight": 2,
+        "effects": {
+          "gdp": -1,
+          "trust": 2
+        },
+        "local": {
+          "wealth": -2
+        }
+      },
+      {
+        "text": "扣船要求船東負責",
+        "result": "求償有保障，清汙進度落後",
+        "weight": 2,
+        "effects": {
+          "trust": 1,
+          "intl": -1
+        },
+        "local": {
+          "wealth": -4,
+          "stability": -2
+        }
+      },
+      {
+        "text": "動員志工淨灘",
+        "result": "民間熱情投入，專業不足",
+        "weight": 2,
+        "effects": {
+          "stability": 1
+        },
+        "local": {
+          "wealth": -4,
+          "stability": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_avian_flu",
+    "cat": "disaster",
+    "tier": "general",
+    "title": "禽流感疫情",
+    "desc": "{county}養殖場驗出高病原性禽流感，周邊三公里內禽隻須全面撲殺，蛋價應聲上漲，業者擔心疫情沿候鳥路線向鄰近縣市擴散。",
+    "rate": 0.8,
+    "cooldown": 365,
+    "loc": [
+      "雲林縣",
+      "彰化縣",
+      "嘉義縣",
+      "屏東縣",
+      "台南市"
+    ],
+    "ref": "畜禽疫病",
+    "options": [
+      {
+        "text": "擴大撲殺範圍",
+        "result": "疫情迅速控制，業者損失慘重",
+        "weight": 2,
+        "effects": {
+          "gdp": -1,
+          "trust": 1
+        },
+        "local": {
+          "wealth": -5
+        }
+      },
+      {
+        "text": "精準撲殺加強消毒",
+        "result": "損失較小，擴散風險仍在",
+        "weight": 2,
+        "effects": {
+          "trust": -1
+        },
+        "local": {
+          "wealth": -2,
+          "stability": -2
+        }
+      },
+      {
+        "text": "進口雞蛋平抑物價",
+        "result": "蛋價回穩，國內業者抗議",
+        "weight": 2,
+        "effects": {
+          "wealth": 1,
+          "gdp": -1
+        },
+        "local": {
+          "wealth": -4,
+          "stability": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_central_mega_quake",
+    "cat": "disaster",
+    "tier": "major",
+    "title": "中部百年強震",
+    "desc": "凌晨時分，中部斷層錯動引發規模7.3強震，{county}一帶大樓倒塌、山崩阻斷道路，全台長時間停電，死傷人數持續攀升，舉國陷入悲慟。",
+    "rate": 0.4,
+    "once": true,
+    "loc": [
+      "南投縣",
+      "台中市",
+      "彰化縣",
+      "雲林縣",
+      "苗栗縣"
+    ],
+    "ref": "921型大地震",
+    "options": [
+      {
+        "text": "成立重建委員會",
+        "result": "舉國投入重建，災區逐步重生",
+        "weight": 3,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -8,
+          "trust": 5,
+          "stability": -4
+        },
+        "local": {
+          "stability": -10,
+          "wealth": -10
+        },
+        "over": {
+          "days": 720,
+          "effects": {
+            "gdp": 4,
+            "stability": 4
+          }
+        },
+        "follow": [
+          {
+            "id": "dis_aftershock",
+            "delay": 15,
+            "chance": 0.6
+          },
+          {
+            "id": "dis_rebuild_dispute",
+            "delay": 300,
+            "chance": 0.5
+          }
+        ]
+      },
+      {
+        "text": "發布緊急命令",
+        "result": "行政效率大增，擴權引發爭議",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "stability",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "gdp": -6,
+          "trust": 1,
+          "stability": -2
+        },
+        "local": {
+          "stability": -8,
+          "wealth": -10
+        },
+        "over": {
+          "days": 365,
+          "effects": {
+            "gdp": 2,
+            "stability": 3
+          }
+        },
+        "follow": [
+          {
+            "id": "dis_aftershock",
+            "delay": 15,
+            "chance": 0.6
+          },
+          {
+            "id": "dis_rebuild_dispute",
+            "delay": 240,
+            "chance": 0.3
+          }
+        ]
+      },
+      {
+        "text": "民間團體主導救災",
+        "result": "民間力量動人，重建進度參差",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1.5
+          }
+        ],
+        "effects": {
+          "gdp": -4,
+          "trust": -3,
+          "stability": -3
+        },
+        "local": {
+          "stability": -12,
+          "wealth": -12
+        },
+        "over": {
+          "days": 900,
+          "effects": {
+            "stability": 2,
+            "gdp": 1
+          }
+        },
+        "follow": [
+          {
+            "id": "dis_aftershock",
+            "delay": 15,
+            "chance": 0.6
+          }
+        ]
+      },
+      {
+        "text": "舉債大規模重建",
+        "result": "財政大失血，災區重建神速",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -11,
+          "wealth": 2,
+          "trust": 3,
+          "stability": -3
+        },
+        "local": {
+          "stability": -8,
+          "wealth": -6
+        },
+        "over": {
+          "days": 540,
+          "effects": {
+            "gdp": 5,
+            "stability": 3,
+            "wealth": 2
+          }
+        },
+        "follow": [
+          {
+            "id": "dis_aftershock",
+            "delay": 15,
+            "chance": 0.6
+          },
+          {
+            "id": "dis_rebuild_dispute",
+            "delay": 240,
+            "chance": 0.4
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dis_north_metro_quake",
+    "cat": "disaster",
+    "tier": "major",
+    "title": "北部都會強震",
+    "desc": "盆地邊緣活動斷層錯動，{county}高樓劇烈搖晃，老舊公寓倒塌、捷運停駛、維生管線斷裂，政經中樞一度癱瘓，金融市場暫停交易。",
+    "rate": 0.25,
+    "once": true,
+    "loc": [
+      "台北市",
+      "新北市",
+      "基隆市",
+      "桃園市"
+    ],
+    "ref": "都會區斷層地震",
+    "options": [
+      {
+        "text": "異地備援指揮",
+        "result": "政府運作不中斷，重建穩步推進",
+        "weight": 3,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -8,
+          "trust": 4,
+          "stability": -3
+        },
+        "local": {
+          "stability": -12,
+          "wealth": -10
+        },
+        "over": {
+          "days": 540,
+          "effects": {
+            "gdp": 4,
+            "stability": 3
+          }
+        },
+        "follow": [
+          {
+            "id": "dis_aftershock",
+            "delay": 10,
+            "chance": 0.5
+          }
+        ]
+      },
+      {
+        "text": "老屋全面都更重建",
+        "result": "城市脫胎換骨，產權爭議不斷",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -10,
+          "stability": -3,
+          "wealth": -2
+        },
+        "local": {
+          "stability": -10,
+          "wealth": -8
+        },
+        "over": {
+          "days": 1080,
+          "effects": {
+            "gdp": 5,
+            "stability": 4,
+            "wealth": 3
+          }
+        },
+        "follow": [
+          {
+            "id": "dis_rebuild_dispute",
+            "delay": 300,
+            "chance": 0.6
+          }
+        ]
+      },
+      {
+        "text": "穩定金融優先",
+        "result": "股匯市迅速回穩，災民感被忽略",
+        "weight": 2,
+        "effects": {
+          "gdp": -5,
+          "trust": -1,
+          "stability": -5
+        },
+        "local": {
+          "stability": -14,
+          "wealth": -12
+        },
+        "over": {
+          "days": 365,
+          "effects": {
+            "gdp": 3
+          }
+        },
+        "follow": [
+          {
+            "id": "dis_aftershock",
+            "delay": 10,
+            "chance": 0.5
+          }
+        ]
+      },
+      {
+        "text": "請求國際救援",
+        "result": "各國搜救隊馳援，外交好感上升",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "intl",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -7,
+          "intl": 4,
+          "trust": 2,
+          "stability": -4
+        },
+        "local": {
+          "stability": -11,
+          "wealth": -10
+        },
+        "over": {
+          "days": 540,
+          "effects": {
+            "gdp": 3,
+            "stability": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_super_typhoon",
+    "cat": "disaster",
+    "tier": "major",
+    "title": "超級颱風重創南台",
+    "desc": "罕見強颱滯留不前，{county}三天降下超過兩千毫米雨量，堰塞湖潰決、整座山村遭掩埋，堤防接連失守，災情遠超各界想像。",
+    "rate": 0.4,
+    "cooldown": 1500,
+    "loc": [
+      "屏東縣",
+      "高雄市",
+      "台東縣",
+      "台南市",
+      "嘉義縣"
+    ],
+    "mods": [
+      {
+        "stat": "elapsed",
+        "k": 0.5
+      }
+    ],
+    "ref": "莫拉克型風災",
+    "options": [
+      {
+        "text": "國軍全面投入救災",
+        "result": "大批災民獲救，國防部署受影響",
+        "weight": 3,
+        "mods": [
+          {
+            "stat": "defense",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "gdp": -5,
+          "trust": 4,
+          "defense": -2
+        },
+        "local": {
+          "stability": -8,
+          "wealth": -10
+        },
+        "over": {
+          "days": 540,
+          "effects": {
+            "stability": 3,
+            "gdp": 2
+          }
+        }
+      },
+      {
+        "text": "接受各國救援",
+        "result": "物資源源而來，國際關注提升",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "intl",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -5,
+          "intl": 3,
+          "trust": 1
+        },
+        "local": {
+          "stability": -9,
+          "wealth": -10
+        },
+        "over": {
+          "days": 540,
+          "effects": {
+            "stability": 2,
+            "gdp": 2
+          }
+        }
+      },
+      {
+        "text": "特別條例興建永久屋",
+        "result": "災民有屋可住，遷居引文化爭議",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -8,
+          "trust": 2
+        },
+        "local": {
+          "stability": -6,
+          "wealth": -6
+        },
+        "over": {
+          "days": 1080,
+          "effects": {
+            "stability": 3,
+            "wealth": 2
+          }
+        },
+        "follow": [
+          {
+            "id": "dis_rebuild_dispute",
+            "delay": 365,
+            "chance": 0.5
+          }
+        ]
+      },
+      {
+        "text": "應變失靈內閣改組",
+        "result": "救災失序，人事更替平息民怨",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1.5
+          },
+          {
+            "stat": "stability",
+            "k": -0.5
+          }
+        ],
+        "effects": {
+          "gdp": -5,
+          "trust": -8,
+          "stability": -4
+        },
+        "local": {
+          "stability": -12,
+          "wealth": -12
+        },
+        "over": {
+          "days": 365,
+          "effects": {
+            "trust": 3
+          }
+        },
+        "follow": [
+          {
+            "id": "dis_rebuild_dispute",
+            "delay": 180,
+            "chance": 0.7
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dis_pandemic",
+    "cat": "disaster",
+    "tier": "major",
+    "title": "全球大流行疫情",
+    "desc": "傳播力極強的新型病毒席捲全球，各國紛紛封城鎖國，{county}爆發首起本土群聚，醫療量能告急，口罩與疫苗成為各國爭奪的戰略物資。",
+    "rate": 0.3,
+    "once": true,
+    "loc": "random",
+    "ref": "COVID型大流行",
+    "options": [
+      {
+        "text": "嚴守邊境清零",
+        "result": "疫情壓得極低，經濟人流受限",
+        "weight": 2.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 1
+          },
+          {
+            "stat": "stability",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "gdp": -5,
+          "stability": 3,
+          "trust": 4,
+          "intl": 2
+        },
+        "over": {
+          "days": 365,
+          "effects": {
+            "gdp": -2
+          }
+        },
+        "follow": [
+          {
+            "id": "dis_pandemic_wave2",
+            "delay": 300,
+            "chance": 0.6
+          },
+          {
+            "id": "dis_vaccine_dispute",
+            "delay": 200,
+            "chance": 0.5
+          }
+        ]
+      },
+      {
+        "text": "與病毒共存",
+        "result": "經濟持續運轉，醫療一度崩潰",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "gdp": -2,
+          "stability": -5,
+          "trust": -3,
+          "demo": -2
+        },
+        "follow": [
+          {
+            "id": "dis_pandemic_wave2",
+            "delay": 120,
+            "chance": 0.4
+          }
+        ]
+      },
+      {
+        "text": "全民紓困振興券",
+        "result": "民眾荷包有底，國債大增",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -8,
+          "wealth": 4,
+          "trust": 3,
+          "stability": 1
+        },
+        "follow": [
+          {
+            "id": "dis_pandemic_wave2",
+            "delay": 240,
+            "chance": 0.5
+          }
+        ]
+      },
+      {
+        "text": "全力搶購疫苗",
+        "result": "疫苗陸續到貨，採購細節遭質疑",
+        "weight": 2,
+        "effects": {
+          "gdp": -4,
+          "trust": 1,
+          "intl": 1,
+          "stability": -1
+        },
+        "follow": [
+          {
+            "id": "dis_vaccine_dispute",
+            "delay": 120,
+            "chance": 0.7
+          },
+          {
+            "id": "dis_pandemic_wave2",
+            "delay": 240,
+            "chance": 0.3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dis_tsunami",
+    "cat": "disaster",
+    "tier": "major",
+    "title": "東部外海海嘯",
+    "desc": "外海隱沒帶發生規模8.0巨震，海嘯警報響徹{county}沿岸，數公尺高浪越過堤防湧入港口與聚落，漁港全毀、鐵公路中斷，東部陷入孤立。",
+    "rate": 0.15,
+    "once": true,
+    "loc": [
+      "花蓮縣",
+      "台東縣",
+      "宜蘭縣"
+    ],
+    "ref": "隱沒帶海嘯",
+    "options": [
+      {
+        "text": "海空全面馳援",
+        "result": "孤島迅速解圍，救災成本極高",
+        "weight": 3,
+        "mods": [
+          {
+            "stat": "defense",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "gdp": -5,
+          "trust": 4,
+          "defense": -1
+        },
+        "local": {
+          "stability": -10,
+          "wealth": -12
+        },
+        "over": {
+          "days": 540,
+          "effects": {
+            "stability": 2,
+            "gdp": 1
+          }
+        }
+      },
+      {
+        "text": "沿海聚落遷往高地",
+        "result": "安全大幅提升，居民離鄉不捨",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -6,
+          "stability": -2
+        },
+        "local": {
+          "stability": -8,
+          "wealth": -8
+        },
+        "over": {
+          "days": 1080,
+          "effects": {
+            "stability": 3,
+            "wealth": 1
+          }
+        },
+        "follow": [
+          {
+            "id": "dis_rebuild_dispute",
+            "delay": 300,
+            "chance": 0.5
+          }
+        ]
+      },
+      {
+        "text": "建置海嘯預警網",
+        "result": "科技防災升級，眼前災民受苦",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "tech",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -3,
+          "tech": 2,
+          "trust": 2
+        },
+        "local": {
+          "stability": -13,
+          "wealth": -13
+        },
+        "over": {
+          "days": 720,
+          "effects": {
+            "stability": 2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_rebuild_dispute",
+    "cat": "disaster",
+    "tier": "general",
+    "chainOnly": true,
+    "title": "災後重建爭議",
+    "desc": "{county}災後重建進度嚴重落後，組合屋住戶抗議補助遲未撥付，工程又傳出圍標疑雲，地方與中央互相推諉，災民再度走上街頭。",
+    "rate": 1,
+    "loc": [
+      "南投縣",
+      "台中市",
+      "高雄市",
+      "屏東縣",
+      "台東縣",
+      "花蓮縣",
+      "台南市",
+      "嘉義縣",
+      "新北市"
+    ],
+    "ref": "災後重建爭議",
+    "options": [
+      {
+        "text": "徹查工程弊案",
+        "result": "弊端揭露，重建再度延宕",
+        "weight": 2,
+        "effects": {
+          "trust": 2,
+          "gdp": -1
+        },
+        "local": {
+          "stability": -2
+        }
+      },
+      {
+        "text": "加碼重建經費",
+        "result": "災區加速復原，財政壓力增",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -3,
+          "trust": 1
+        },
+        "local": {
+          "stability": 4,
+          "wealth": 3
+        }
+      },
+      {
+        "text": "簡化程序加速發包",
+        "result": "進度追上，品質與弊端堪憂",
+        "weight": 2,
+        "effects": {
+          "trust": -1,
+          "gdp": -1
+        },
+        "local": {
+          "stability": 3,
+          "wealth": 2
+        }
+      },
+      {
+        "text": "冷處理等待降溫",
+        "result": "抗議漸息，災民心寒",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -3
+        },
+        "local": {
+          "stability": -4,
+          "wealth": -2
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_aftershock",
+    "cat": "disaster",
+    "tier": "general",
+    "chainOnly": true,
+    "title": "強烈餘震",
+    "desc": "主震後不久，{county}再發生規模6以上強烈餘震，受損建物二次倒塌，搜救人員被迫暫時撤離，災民不敢回家，紛紛在空地搭起帳篷。",
+    "rate": 1,
+    "loc": [
+      "南投縣",
+      "台中市",
+      "彰化縣",
+      "雲林縣",
+      "苗栗縣",
+      "台北市",
+      "新北市",
+      "花蓮縣"
+    ],
+    "ref": "餘震",
+    "options": [
+      {
+        "text": "全面封鎖危樓",
+        "result": "避免二次傷亡，搜救進度停擺",
+        "weight": 2,
+        "effects": {
+          "trust": 1,
+          "gdp": -1
+        },
+        "local": {
+          "stability": -3,
+          "wealth": -3
+        }
+      },
+      {
+        "text": "設置帳篷安置村",
+        "result": "災民有處安身，物資調度吃緊",
+        "weight": 2,
+        "effects": {
+          "gdp": -1.5,
+          "trust": 1
+        },
+        "local": {
+          "stability": -2,
+          "wealth": -3
+        }
+      },
+      {
+        "text": "冒險持續搜救",
+        "result": "救出更多生還者，人員風險高",
+        "weight": 1.5,
+        "effects": {
+          "trust": 2,
+          "stability": -1
+        },
+        "local": {
+          "stability": -4,
+          "wealth": -4
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_pandemic_wave2",
+    "cat": "disaster",
+    "tier": "general",
+    "chainOnly": true,
+    "title": "疫情第二波",
+    "desc": "變異株突破防線，{county}出現大規模社區感染，單日確診數破萬，醫護人員過勞請辭，民眾對防疫措施的耐心逐漸耗盡。",
+    "rate": 1,
+    "loc": "random",
+    "ref": "疫情第二波",
+    "options": [
+      {
+        "text": "再度升級警戒",
+        "result": "疫情趨緩，商家哀鴻遍野",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -3,
+          "stability": -1,
+          "trust": 1
+        },
+        "local": {
+          "stability": -2,
+          "wealth": -2
+        }
+      },
+      {
+        "text": "輕症改居家照護",
+        "result": "經濟運轉，長者重症增加",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "gdp": -1,
+          "stability": -3,
+          "demo": -1,
+          "trust": -1
+        },
+        "local": {
+          "stability": -3
+        }
+      },
+      {
+        "text": "擴充醫療量能",
+        "result": "醫院撐住，財政支出大增",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -3,
+          "trust": 2
+        },
+        "local": {
+          "stability": -2
+        },
+        "over": {
+          "days": 365,
+          "effects": {
+            "stability": 1
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_vaccine_dispute",
+    "cat": "disaster",
+    "tier": "general",
+    "chainOnly": true,
+    "title": "疫苗採購爭議",
+    "desc": "疫苗到貨進度落後他國，國產疫苗緊急授權引發專家論戰，網路謠言四起，{county}施打站大排長龍，又傳出冷鏈失溫事件。",
+    "rate": 1,
+    "loc": "random",
+    "ref": "疫苗爭議",
+    "options": [
+      {
+        "text": "公開採購合約",
+        "result": "透明換信任，與藥廠關係緊張",
+        "weight": 2,
+        "effects": {
+          "trust": 2,
+          "intl": -1
+        }
+      },
+      {
+        "text": "加碼國產疫苗",
+        "result": "生技產業受惠，信任出現分歧",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "tech",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "tech": 2,
+          "trust": -2,
+          "gdp": -1
+        }
+      },
+      {
+        "text": "爭取友邦捐贈",
+        "result": "疫苗到貨加快，國際互動升溫",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "intl",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "intl": 2,
+          "stability": 1,
+          "trust": 1,
+          "tension": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "dis_n_quake_small",
+    "cat": "disaster",
+    "tier": "news",
+    "title": "東部規模5.6有感地震",
+    "desc": "{county}近海發生有感地震，全台搖晃，山區零星落石，暫無重大傷亡。",
+    "rate": 3,
+    "cooldown": 180,
+    "loc": [
+      "花蓮縣",
+      "台東縣",
+      "宜蘭縣"
+    ],
+    "effects": {
+      "stability": -0.3
+    },
+    "local": {
+      "stability": -1
+    }
+  },
+  {
+    "id": "dis_n_afternoon_storm",
+    "cat": "disaster",
+    "tier": "news",
+    "title": "午後雷雨狂炸路口積水",
+    "desc": "{county}午後對流旺盛，多處路口積水，下班通勤族受困。",
+    "rate": 2,
+    "cooldown": 180,
+    "loc": [
+      "台北市",
+      "新北市",
+      "桃園市",
+      "台中市"
+    ],
+    "local": {
+      "stability": -1,
+      "wealth": -0.5
+    }
+  },
+  {
+    "id": "dis_n_reservoir_full",
+    "cat": "disaster",
+    "tier": "news",
+    "title": "颱風解渴水庫滿水位",
+    "desc": "颱風外圍環流帶來豐沛雨量，{county}水庫蓄水回升，供水無虞。",
+    "rate": 1.5,
+    "cooldown": 240,
+    "loc": [
+      "新竹縣",
+      "桃園市",
+      "台中市",
+      "台南市",
+      "苗栗縣"
+    ],
+    "effects": {
+      "gdp": 0.3,
+      "stability": 0.3
+    },
+    "local": {
+      "wealth": 1
+    }
+  },
+  {
+    "id": "dis_n_dengue",
+    "cat": "disaster",
+    "tier": "news",
+    "title": "南部登革熱疫情升溫",
+    "desc": "{county}本土登革熱病例持續增加，防疫人員挨家清除積水容器。",
+    "rate": 1.5,
+    "cooldown": 300,
+    "loc": [
+      "台南市",
+      "高雄市",
+      "屏東縣"
+    ],
+    "effects": {
+      "trust": -0.3
+    },
+    "local": {
+      "stability": -1.5
+    }
+  },
+  {
+    "id": "dis_n_enterovirus",
+    "cat": "disaster",
+    "tier": "news",
+    "title": "腸病毒進入流行高峰",
+    "desc": "幼兒園接連停課，家長被迫請假，小兒科診所人滿為患。",
+    "rate": 1.5,
+    "cooldown": 300,
+    "loc": "random",
+    "effects": {
+      "demo": -0.3,
+      "stability": -0.3
+    }
+  },
+  {
+    "id": "dis_n_air_pollution",
+    "cat": "disaster",
+    "tier": "news",
+    "title": "空品紫爆亮紅燈",
+    "desc": "{county}空氣品質達危害等級，學校取消戶外課，民眾出門戴口罩。",
+    "rate": 2,
+    "cooldown": 240,
+    "loc": [
+      "台中市",
+      "高雄市",
+      "雲林縣",
+      "彰化縣"
+    ],
+    "effects": {
+      "trust": -0.3
+    },
+    "local": {
+      "stability": -1
+    }
+  },
+  {
+    "id": "dis_n_road_collapse",
+    "cat": "disaster",
+    "tier": "news",
+    "title": "山區公路坍方中斷",
+    "desc": "{county}聯外公路邊坡坍落，交通中斷數日，觀光與通勤受影響。",
+    "rate": 2,
+    "cooldown": 240,
+    "loc": [
+      "花蓮縣",
+      "宜蘭縣",
+      "南投縣",
+      "台東縣"
+    ],
+    "local": {
+      "wealth": -1.5
+    }
+  },
+  {
+    "id": "dis_n_subsidence",
+    "cat": "disaster",
+    "tier": "news",
+    "title": "沿海地層持續下陷",
+    "desc": "{county}沿海超抽地下水，部分路段年沉陷數公分，高鐵安全受關注。",
+    "rate": 1,
+    "cooldown": 365,
+    "loc": [
+      "雲林縣",
+      "彰化縣",
+      "屏東縣"
+    ],
+    "effects": {
+      "stability": -0.3
+    },
+    "local": {
+      "wealth": -1
+    }
+  },
+  {
+    "id": "dis_n_factory_fire",
+    "cat": "disaster",
+    "tier": "news",
+    "title": "工廠大火延燒整夜",
+    "desc": "{county}工業區工廠深夜起火，濃煙瀰漫，消防員奮戰十多小時。",
+    "rate": 1.5,
+    "cooldown": 240,
+    "loc": [
+      "桃園市",
+      "新北市",
+      "台中市",
+      "彰化縣",
+      "台南市"
+    ],
+    "local": {
+      "wealth": -1.5,
+      "stability": -0.5
+    }
+  },
+  {
+    "id": "dis_n_drill",
+    "cat": "disaster",
+    "tier": "news",
+    "title": "全民防災演習登場",
+    "desc": "全國同步進行地震避難演練，學校與機關參與踴躍。",
+    "rate": 1,
+    "cooldown": 365,
+    "loc": "random",
+    "effects": {
+      "stability": 0.5,
+      "trust": 0.3
+    }
+  },
+  {
+    "id": "dis_n_peak_power",
+    "cat": "disaster",
+    "tier": "news",
+    "title": "用電創新高備轉吃緊",
+    "desc": "夏季高溫推升用電，備轉容量率跌至警戒，電力單位呼籲節電。",
+    "rate": 1.5,
+    "cooldown": 240,
+    "loc": "random",
+    "mods": [
+      {
+        "stat": "elapsed",
+        "k": 0.3
+      },
+      {
+        "stat": "tech",
+        "k": 0.3
+      }
+    ],
+    "effects": {
+      "stability": -0.5,
+      "gdp": -0.3
+    }
+  },
+  {
+    "id": "dis_n_cold_snap",
+    "cat": "disaster",
+    "tier": "news",
+    "title": "寒流來襲猝死頻傳",
+    "desc": "強烈冷氣團南下，平地低溫逼近六度，急診湧入心血管病患。",
+    "rate": 1.5,
+    "cooldown": 300,
+    "loc": "random",
+    "effects": {
+      "demo": -0.3,
+      "stability": -0.3
+    }
+  },
+  {
+    "id": "dis_n_dust",
+    "cat": "disaster",
+    "tier": "news",
+    "title": "境外沙塵籠罩北台",
+    "desc": "沙塵隨東北季風南下，{county}能見度下降，呼吸道就診增加。",
+    "rate": 1,
+    "cooldown": 240,
+    "loc": [
+      "台北市",
+      "新北市",
+      "基隆市",
+      "連江縣",
+      "金門縣"
+    ],
+    "local": {
+      "stability": -0.8
+    }
+  },
+  {
+    "id": "dis_n_typhoon_miss",
+    "cat": "disaster",
+    "tier": "news",
+    "title": "颱風轉向虛驚一場",
+    "desc": "原預測登陸的颱風北轉，各地放颱風假卻只見微雨，引發熱議。",
+    "rate": 1.5,
+    "cooldown": 240,
+    "loc": "random",
+    "effects": {
+      "gdp": -0.3,
+      "stability": 0.3
+    }
+  },
+  {
+    "id": "dis_n_early_warning",
+    "cat": "disaster",
+    "tier": "news",
+    "title": "地震預警系統升級",
+    "desc": "新一代地震預警啟用，可提前數十秒發送手機警報。",
+    "rate": 0.6,
+    "cooldown": 900,
+    "loc": "random",
+    "effects": {
+      "tech": 0.5,
+      "trust": 0.5
+    }
+  },
+  {
+    "id": "dis_n_barrier_lake",
+    "cat": "disaster",
+    "tier": "news",
+    "title": "山區堰塞湖警戒",
+    "desc": "{county}山區崩塌形成堰塞湖，下游聚落預防性撤離。",
+    "rate": 0.8,
+    "cooldown": 365,
+    "loc": [
+      "花蓮縣",
+      "南投縣",
+      "高雄市",
+      "嘉義縣"
+    ],
+    "local": {
+      "stability": -1.5,
+      "wealth": -0.5
+    }
+  },
+  {
+    "id": "eco_housing_surge",
+    "cat": "economy",
+    "tier": "general",
+    "title": "房價再創新高",
+    "desc": "{county}新建案每坪單價再創新高，房價所得比突破十五倍，年輕人直呼一輩子買不起，投資客則持續搶進預售屋。",
+    "rate": 1.2,
+    "cooldown": 540,
+    "loc": [
+      "台北市",
+      "新北市",
+      "新竹縣",
+      "新竹市",
+      "台中市",
+      "台南市",
+      "高雄市",
+      "桃園市"
+    ],
+    "mods": [
+      {
+        "stat": "gdp",
+        "k": 1
+      }
+    ],
+    "ref": "房價飆漲",
+    "options": [
+      {
+        "text": "央行信用管制",
+        "result": "房市降溫，營建業與屋主不滿",
+        "weight": 2,
+        "effects": {
+          "gdp": -2,
+          "wealth": -1,
+          "stability": 1,
+          "trust": 1
+        },
+        "local": {
+          "wealth": -2
+        }
+      },
+      {
+        "text": "擴建社會住宅",
+        "result": "財政壓力大，長期安居有望",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "gdp": -2,
+          "trust": 1
+        },
+        "over": {
+          "days": 1080,
+          "effects": {
+            "stability": 2,
+            "demo": 1
+          }
+        }
+      },
+      {
+        "text": "課徵囤房稅",
+        "result": "投資客拋售，地方稅收增加",
+        "weight": 1.5,
+        "effects": {
+          "wealth": -2,
+          "trust": 1
+        },
+        "local": {
+          "wealth": -3
+        },
+        "over": {
+          "days": 540,
+          "effects": {
+            "stability": 1
+          }
+        }
+      },
+      {
+        "text": "放任市場機制",
+        "result": "有屋族受惠，青年怨氣加深",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": 2,
+          "wealth": 1,
+          "stability": -2,
+          "demo": -1
+        },
+        "local": {
+          "wealth": 3
+        },
+        "follow": [
+          {
+            "id": "eco_bubble_burst",
+            "delay": 540,
+            "chance": 0.25
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "eco_low_wage",
+    "cat": "economy",
+    "tier": "general",
+    "title": "青年低薪困境",
+    "desc": "最新統計顯示，大學畢業生起薪多年來幾乎原地踏步，扣除房租後所剩無幾，{county}青年留不住也回不去，網路掀起「躺平」熱議。",
+    "rate": 1,
+    "cooldown": 540,
+    "loc": "random",
+    "mods": [
+      {
+        "stat": "wealth",
+        "k": -1
+      }
+    ],
+    "ref": "低薪",
+    "options": [
+      {
+        "text": "大幅調升基本工資",
+        "result": "勞工受惠，中小企業喊苦",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "wealth",
+            "k": -0.5
+          }
+        ],
+        "effects": {
+          "wealth": 3,
+          "gdp": -2,
+          "trust": 1
+        }
+      },
+      {
+        "text": "企業加薪減稅",
+        "result": "大企業響應，基層感受有限",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "gdp": 1,
+          "wealth": 1,
+          "trust": -1
+        }
+      },
+      {
+        "text": "擴大青年職訓補助",
+        "result": "見效緩慢，技能升級有成",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -1
+        },
+        "over": {
+          "days": 720,
+          "effects": {
+            "wealth": 1.5,
+            "tech": 1
+          }
+        }
+      },
+      {
+        "text": "維持現狀",
+        "result": "企業成本穩定，青年持續出走",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -0.5
+          }
+        ],
+        "effects": {
+          "gdp": 0.5,
+          "stability": -2,
+          "demo": -1,
+          "trust": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_childcare",
+    "cat": "economy",
+    "tier": "general",
+    "title": "育兒補貼大戰",
+    "desc": "生育率跌至全球墊底，各縣市競相加碼生育津貼與托育補助，{county}更喊出每胎發放十萬元，專家質疑撒錢難以扭轉趨勢。",
+    "rate": 1,
+    "cooldown": 720,
+    "loc": "random",
+    "mods": [
+      {
+        "stat": "demo",
+        "k": -1
+      }
+    ],
+    "ref": "少子化育兒補貼",
+    "options": [
+      {
+        "text": "中央加碼育兒津貼",
+        "result": "家長歡迎，財政負擔沉重",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -3,
+          "demo": 2,
+          "wealth": 1,
+          "trust": 1
+        }
+      },
+      {
+        "text": "公共托育普及化",
+        "result": "短期看不到效果，長期扎根",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -2
+        },
+        "over": {
+          "days": 1080,
+          "effects": {
+            "demo": 3,
+            "wealth": 1
+          }
+        }
+      },
+      {
+        "text": "推動友善育嬰職場",
+        "result": "企業抱怨成本，雙薪家庭受惠",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -1,
+          "demo": 1,
+          "stability": 1
+        }
+      },
+      {
+        "text": "交由地方競相加碼",
+        "result": "富縣加碼窮縣難跟，城鄉落差",
+        "weight": 2,
+        "effects": {
+          "demo": 0.5,
+          "stability": -1
+        },
+        "local": {
+          "wealth": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_migrant_workers",
+    "cat": "economy",
+    "tier": "general",
+    "title": "移工政策爭議",
+    "desc": "製造業、營造業與長照嚴重缺工，業者要求擴大引進移工；{county}工業區周邊移工人數倍增，治安與勞動權益的討論同時升溫。",
+    "rate": 1,
+    "cooldown": 720,
+    "loc": [
+      "桃園市",
+      "彰化縣",
+      "台中市",
+      "雲林縣",
+      "新北市",
+      "台南市"
+    ],
+    "mods": [
+      {
+        "stat": "demo",
+        "k": -0.8
+      }
+    ],
+    "ref": "移工/新住民",
+    "options": [
+      {
+        "text": "擴大引進移工",
+        "result": "產線補足人力，本勞薪資承壓",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": -0.5
+          }
+        ],
+        "effects": {
+          "gdp": 3,
+          "wealth": -1,
+          "stability": -1
+        },
+        "local": {
+          "stability": -2,
+          "wealth": 2
+        }
+      },
+      {
+        "text": "改善移工權益",
+        "result": "國際評價提升，雇主成本增加",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "intl",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "intl": 2,
+          "gdp": -1,
+          "trust": 1
+        }
+      },
+      {
+        "text": "開放技術移工留台",
+        "result": "人口結構改善，社會適應需時",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "demo",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "gdp": 1,
+          "demo": 2,
+          "stability": -1
+        }
+      },
+      {
+        "text": "嚴格管控總量",
+        "result": "本勞就業穩定，缺工惡化",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -2,
+          "stability": 1,
+          "wealth": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_fab_expansion",
+    "cat": "economy",
+    "tier": "general",
+    "title": "先進晶圓廠擴建",
+    "desc": "半導體龍頭宣布在{county}興建最先進製程晶圓廠，投資金額上兆元，但每日用水用電驚人，周邊農地徵收與房價飆漲也引發居民疑慮。",
+    "rate": 1,
+    "cooldown": 720,
+    "loc": [
+      "新竹市",
+      "新竹縣",
+      "台南市",
+      "台中市",
+      "高雄市"
+    ],
+    "mods": [
+      {
+        "stat": "tech",
+        "k": 0.5
+      }
+    ],
+    "ref": "半導體擴廠",
+    "options": [
+      {
+        "text": "全力配合水電土地",
+        "result": "科技實力大增，居民抗議徵收",
+        "weight": 3,
+        "mods": [
+          {
+            "stat": "tech",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "tech": 4,
+          "gdp": 3,
+          "stability": -1
+        },
+        "local": {
+          "wealth": 5,
+          "stability": -4
+        }
+      },
+      {
+        "text": "要求環評與回饋",
+        "result": "進度延後，地方獲得回饋",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "tech": 2,
+          "gdp": 1,
+          "trust": 1
+        },
+        "local": {
+          "wealth": 3,
+          "stability": -1
+        }
+      },
+      {
+        "text": "鼓勵擴廠移往海外",
+        "result": "盟友關係加分，產業空洞疑慮",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "intl",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "intl": 3,
+          "tech": -1,
+          "gdp": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_ai_wave",
+    "cat": "economy",
+    "tier": "general",
+    "title": "AI伺服器訂單爆量",
+    "desc": "全球AI熱潮帶動伺服器與先進封裝訂單暴增，{county}相關廠商營收翻倍、股價狂飆，但傳產與服務業薪資仍停滯，貧富差距討論升溫。",
+    "rate": 1,
+    "cooldown": 540,
+    "loc": [
+      "新竹市",
+      "新竹縣",
+      "桃園市",
+      "台中市",
+      "台北市",
+      "高雄市"
+    ],
+    "mods": [
+      {
+        "stat": "tech",
+        "k": 1
+      }
+    ],
+    "ref": "AI浪潮",
+    "options": [
+      {
+        "text": "全力發展AI產業",
+        "result": "經濟高成長，貧富差距擴大",
+        "weight": 3,
+        "effects": {
+          "tech": 4,
+          "gdp": 3,
+          "stability": -1,
+          "wealth": -0.5
+        },
+        "local": {
+          "wealth": 4
+        }
+      },
+      {
+        "text": "課徵超額利潤分享",
+        "result": "全民分享紅利，企業抱怨稅負",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "wealth",
+            "k": -0.5
+          }
+        ],
+        "effects": {
+          "gdp": 1,
+          "wealth": 2,
+          "tech": 1,
+          "trust": 1
+        }
+      },
+      {
+        "text": "培育AI跨域人才",
+        "result": "短期投入大，長期人才厚實",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -1
+        },
+        "over": {
+          "days": 1080,
+          "effects": {
+            "tech": 3,
+            "gdp": 2,
+            "wealth": 1
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_chip_shortage",
+    "cat": "economy",
+    "tier": "general",
+    "title": "全球晶片荒",
+    "desc": "需求暴衝加上產能不足，全球車廠與家電廠缺晶片停工，各國政府紛紛致電台灣尋求優先供貨，{county}廠區二十四小時趕工。",
+    "rate": 0.6,
+    "cooldown": 1200,
+    "loc": [
+      "新竹市",
+      "新竹縣",
+      "台南市",
+      "台中市"
+    ],
+    "mods": [
+      {
+        "stat": "tech",
+        "k": 0.8
+      }
+    ],
+    "ref": "晶片荒",
+    "options": [
+      {
+        "text": "優先供應友好國家",
+        "result": "國際好感大增，對岸不滿",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "intl",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "intl": 4,
+          "gdp": 2,
+          "tension": 1
+        }
+      },
+      {
+        "text": "依市場價格出貨",
+        "result": "業者賺飽，盟友頗有微詞",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": -0.5
+          }
+        ],
+        "effects": {
+          "gdp": 4,
+          "wealth": 1,
+          "intl": -2
+        }
+      },
+      {
+        "text": "擴大產能投資",
+        "result": "短期吃緊，長期產能領先",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -1,
+          "tech": 2
+        },
+        "local": {
+          "stability": -2
+        },
+        "over": {
+          "days": 720,
+          "effects": {
+            "gdp": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_power_shortage",
+    "cat": "economy",
+    "tier": "general",
+    "title": "電力吃緊限電",
+    "desc": "經濟成長與資料中心用電暴增，備轉容量屢屢跌破紅線，{county}工業區被要求錯峰生產，能源轉型路線之爭再起。",
+    "rate": 1,
+    "cooldown": 540,
+    "loc": [
+      "台中市",
+      "高雄市",
+      "桃園市",
+      "新竹縣",
+      "台南市"
+    ],
+    "mods": [
+      {
+        "stat": "tech",
+        "k": 0.5
+      },
+      {
+        "stat": "elapsed",
+        "k": 0.5
+      }
+    ],
+    "ref": "能源政策/限電",
+    "options": [
+      {
+        "text": "加速綠能建設",
+        "result": "短期仍吃緊，長期減碳供電",
+        "weight": 2,
+        "effects": {
+          "gdp": -2,
+          "intl": 2
+        },
+        "over": {
+          "days": 1080,
+          "effects": {
+            "gdp": 2,
+            "stability": 1
+          }
+        }
+      },
+      {
+        "text": "延役火力機組",
+        "result": "供電穩定，空汙引發抗議",
+        "weight": 2,
+        "effects": {
+          "gdp": 1,
+          "stability": 1,
+          "intl": -1
+        },
+        "local": {
+          "stability": -4
+        }
+      },
+      {
+        "text": "重啟核能討論",
+        "result": "社會激辯，長期供電有望",
+        "weight": 1.5,
+        "effects": {
+          "stability": -2,
+          "gdp": 1
+        },
+        "over": {
+          "days": 1080,
+          "effects": {
+            "gdp": 1.5,
+            "tech": 1
+          }
+        }
+      },
+      {
+        "text": "電價大幅調漲",
+        "result": "節電見效，民眾荷包縮水",
+        "weight": 1.5,
+        "effects": {
+          "wealth": -3,
+          "trust": -2,
+          "gdp": 1
+        },
+        "over": {
+          "days": 540,
+          "effects": {
+            "stability": 1
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_offshoring",
+    "cat": "economy",
+    "tier": "general",
+    "title": "傳產外移潮",
+    "desc": "面對人力成本上升與關稅壁壘，{county}多家傳統製造廠宣布將產線移往東南亞，留下閒置廠房與中高齡失業員工，地方商圈一片蕭條。",
+    "rate": 1,
+    "cooldown": 540,
+    "loc": [
+      "台中市",
+      "彰化縣",
+      "桃園市",
+      "台南市",
+      "新北市",
+      "雲林縣"
+    ],
+    "mods": [
+      {
+        "stat": "gdp",
+        "k": -0.8
+      }
+    ],
+    "ref": "產業外移",
+    "options": [
+      {
+        "text": "提供回流投資優惠",
+        "result": "台商回流設廠，政府讓利不少",
+        "weight": 2,
+        "effects": {
+          "gdp": -2
+        },
+        "local": {
+          "wealth": 2
+        },
+        "over": {
+          "days": 720,
+          "effects": {
+            "gdp": 3
+          }
+        }
+      },
+      {
+        "text": "輔導轉型智慧製造",
+        "result": "部分工廠留下，轉型陣痛",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "tech",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "gdp": -1,
+          "tech": 2
+        },
+        "local": {
+          "wealth": -2
+        },
+        "over": {
+          "days": 720,
+          "effects": {
+            "gdp": 1.5
+          }
+        }
+      },
+      {
+        "text": "失業轉職輔導",
+        "result": "勞工有所依靠，產業仍流失",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -1,
+          "trust": 1,
+          "stability": 1
+        },
+        "local": {
+          "wealth": -3
+        }
+      },
+      {
+        "text": "順應全球分工",
+        "result": "企業獲利維持，地方就業重傷",
+        "weight": 1.5,
+        "effects": {
+          "gdp": 1,
+          "wealth": -1
+        },
+        "local": {
+          "wealth": -6,
+          "stability": -3
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_tourism_slump",
+    "cat": "economy",
+    "tier": "general",
+    "title": "觀光產業寒冬",
+    "desc": "國際旅客來台人數遠不如預期，國人卻大舉出國旅遊，觀光逆差創新高，{county}民宿與飯店住房率慘澹，業者呼籲政府救援。",
+    "rate": 1,
+    "cooldown": 540,
+    "loc": [
+      "花蓮縣",
+      "台東縣",
+      "澎湖縣",
+      "金門縣",
+      "連江縣",
+      "南投縣",
+      "屏東縣",
+      "宜蘭縣"
+    ],
+    "ref": "觀光",
+    "options": [
+      {
+        "text": "發放國旅補助",
+        "result": "國旅回溫，補助結束恐退燒",
+        "weight": 2,
+        "effects": {
+          "gdp": -1,
+          "trust": 1
+        },
+        "local": {
+          "wealth": 4
+        }
+      },
+      {
+        "text": "國際行銷擴大免簽",
+        "result": "國際旅客回流，見效較慢",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "intl",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "gdp": -1,
+          "intl": 2
+        },
+        "local": {
+          "wealth": 1
+        },
+        "over": {
+          "days": 540,
+          "effects": {
+            "gdp": 2
+          }
+        }
+      },
+      {
+        "text": "引進大型開發案",
+        "result": "財團帶來商機，環保爭議激烈",
+        "weight": 1.5,
+        "effects": {
+          "gdp": 2
+        },
+        "local": {
+          "wealth": 5,
+          "stability": -4
+        }
+      },
+      {
+        "text": "業者自求轉型",
+        "result": "政府省錢，業者倒閉潮",
+        "weight": 1.5,
+        "effects": {
+          "gdp": 0.5
+        },
+        "local": {
+          "wealth": -4,
+          "stability": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_inflation",
+    "cat": "economy",
+    "tier": "general",
+    "title": "物價全面上漲",
+    "desc": "國際原物料與運費上揚，便當、早餐與外送價格輪番調漲，{county}菜籃族直呼撐不住，消費者物價年增率創十多年新高。",
+    "rate": 1,
+    "cooldown": 450,
+    "loc": "random",
+    "mods": [
+      {
+        "stat": "gdp",
+        "k": 0.5
+      }
+    ],
+    "ref": "通膨",
+    "options": [
+      {
+        "text": "央行升息抗通膨",
+        "result": "物價漸穩，房貸族與企業叫苦",
+        "weight": 2,
+        "effects": {
+          "gdp": -2,
+          "wealth": 1,
+          "stability": 1
+        }
+      },
+      {
+        "text": "凍漲油電民生",
+        "result": "民生暫穩，國營事業虧損擴大",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "gdp": -2,
+          "wealth": 2,
+          "trust": 1
+        },
+        "over": {
+          "days": 365,
+          "effects": {
+            "gdp": -1
+          }
+        }
+      },
+      {
+        "text": "全民普發現金",
+        "result": "民眾開心入帳，物價再被推升",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -3,
+          "wealth": 2,
+          "trust": 2
+        },
+        "over": {
+          "days": 180,
+          "effects": {
+            "wealth": -1
+          }
+        }
+      },
+      {
+        "text": "放任市場調整",
+        "result": "財政無負擔，民怨升高",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -0.5
+          }
+        ],
+        "effects": {
+          "wealth": -3,
+          "stability": -2,
+          "gdp": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_stock_frenzy",
+    "cat": "economy",
+    "tier": "general",
+    "title": "股市狂熱散戶湧入",
+    "desc": "加權指數接連突破歷史天價，年輕人瘋開證券戶當沖，{county}餐廳裡人人盯著手機看盤，央行則警告資產泡沫風險正在累積。",
+    "rate": 1,
+    "cooldown": 540,
+    "loc": [
+      "台北市",
+      "新北市",
+      "台中市",
+      "高雄市",
+      "新竹市"
+    ],
+    "mods": [
+      {
+        "stat": "gdp",
+        "k": 1
+      },
+      {
+        "stat": "tech",
+        "k": 0.5
+      }
+    ],
+    "ref": "股市",
+    "options": [
+      {
+        "text": "加強金融監理",
+        "result": "市場降溫，股民抱怨",
+        "weight": 2,
+        "effects": {
+          "gdp": -1,
+          "stability": 1,
+          "trust": 1
+        }
+      },
+      {
+        "text": "順勢推動資本市場",
+        "result": "股民大賺，泡沫隱憂浮現",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "gdp": 2,
+          "wealth": 2
+        },
+        "follow": [
+          {
+            "id": "eco_bubble_burst",
+            "delay": 365,
+            "chance": 0.3
+          }
+        ]
+      },
+      {
+        "text": "推廣長期投資教育",
+        "result": "短期無感，理財觀念成熟",
+        "weight": 1.5,
+        "effects": {
+          "wealth": 0.5
+        },
+        "over": {
+          "days": 1080,
+          "effects": {
+            "wealth": 1.5,
+            "stability": 0.5
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_long_term_care",
+    "cat": "economy",
+    "tier": "general",
+    "title": "長照人力崩潰",
+    "desc": "超高齡社會來臨，{county}長照機構一床難求，照服員薪資低、流動率高，許多中年子女被迫離職照顧父母，長照悲歌新聞屢見不鮮。",
+    "rate": 1,
+    "cooldown": 720,
+    "loc": "random",
+    "mods": [
+      {
+        "stat": "elapsed",
+        "k": 1
+      },
+      {
+        "stat": "demo",
+        "k": -1
+      }
+    ],
+    "ref": "長照",
+    "options": [
+      {
+        "text": "開辦長照保險",
+        "result": "保費上身，長期體系穩固",
+        "weight": 1.5,
+        "effects": {
+          "wealth": -2,
+          "trust": -1
+        },
+        "over": {
+          "days": 1080,
+          "effects": {
+            "stability": 2,
+            "demo": 1,
+            "trust": 1
+          }
+        }
+      },
+      {
+        "text": "稅收擴大長照服務",
+        "result": "家庭負擔大減，財政吃緊",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -3,
+          "stability": 2,
+          "trust": 2
+        }
+      },
+      {
+        "text": "擴大引進外籍看護",
+        "result": "家庭喘息，看護權益受關注",
+        "weight": 2,
+        "effects": {
+          "stability": 1,
+          "wealth": 1,
+          "intl": -1
+        }
+      },
+      {
+        "text": "家庭自行承擔",
+        "result": "財政省錢，照顧者身心俱疲",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -0.5
+          }
+        ],
+        "effects": {
+          "gdp": 0.5,
+          "wealth": -2,
+          "demo": -1,
+          "stability": -2
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_food_safety",
+    "cat": "economy",
+    "tier": "general",
+    "title": "食安風暴",
+    "desc": "檢調查獲{county}知名油品廠以飼料油混充食用油，數百家餐廳與食品大廠中招，下架品項不斷擴大，民眾驚呼「什麼都不敢吃」。",
+    "rate": 0.8,
+    "cooldown": 900,
+    "loc": [
+      "彰化縣",
+      "雲林縣",
+      "台南市",
+      "屏東縣",
+      "台中市",
+      "新北市",
+      "高雄市"
+    ],
+    "mods": [
+      {
+        "stat": "trust",
+        "k": -0.5
+      }
+    ],
+    "ref": "食安風暴",
+    "options": [
+      {
+        "text": "重罰並追查源頭",
+        "result": "業者重創，民眾信心稍回",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "trust": 2,
+          "gdp": -2
+        },
+        "local": {
+          "wealth": -4
+        }
+      },
+      {
+        "text": "建立全國溯源系統",
+        "result": "短期衝擊仍在，長期體質改善",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -1,
+          "tech": 1
+        },
+        "local": {
+          "wealth": -3
+        },
+        "over": {
+          "days": 720,
+          "effects": {
+            "trust": 2,
+            "stability": 1
+          }
+        }
+      },
+      {
+        "text": "低調下架止血",
+        "result": "產業衝擊小，後續恐再爆",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -3,
+          "stability": -1
+        },
+        "local": {
+          "wealth": -2
+        },
+        "follow": [
+          {
+            "id": "eco_food_safety_spread",
+            "delay": 90,
+            "chance": 0.6
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "eco_strike",
+    "cat": "economy",
+    "tier": "general",
+    "title": "交通業大罷工",
+    "desc": "{county}交通運輸工會不滿超時工作與薪資凍漲，宣布連假期間罷工，數十萬旅客行程大亂，勞資談判陷入僵局。",
+    "rate": 0.8,
+    "cooldown": 540,
+    "loc": [
+      "台北市",
+      "桃園市",
+      "高雄市",
+      "台中市",
+      "新北市"
+    ],
+    "mods": [
+      {
+        "stat": "wealth",
+        "k": -1.2
+      },
+      {
+        "stat": "stability",
+        "k": -0.5
+      }
+    ],
+    "ref": "罷工",
+    "options": [
+      {
+        "text": "政府介入調解",
+        "result": "雙方各退一步，罷工落幕",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "trust": 1,
+          "gdp": -1,
+          "stability": 1
+        }
+      },
+      {
+        "text": "資方全盤讓步",
+        "result": "勞工大勝，其他工會相繼跟進",
+        "weight": 1.5,
+        "effects": {
+          "wealth": 1,
+          "gdp": -2,
+          "stability": 1
+        },
+        "over": {
+          "days": 365,
+          "effects": {
+            "stability": -1
+          }
+        }
+      },
+      {
+        "text": "資方強硬對抗",
+        "result": "罷工拖長，勞動成本壓低",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": -0.5
+          }
+        ],
+        "effects": {
+          "gdp": -2,
+          "stability": -3,
+          "trust": -1
+        },
+        "local": {
+          "stability": -3
+        },
+        "over": {
+          "days": 365,
+          "effects": {
+            "gdp": 1.5
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_financial_crisis",
+    "cat": "economy",
+    "tier": "major",
+    "title": "全球金融海嘯",
+    "desc": "海外大型投資銀行倒閉引爆連鎖信用危機，全球股市崩跌，外銷訂單一夕腰斬，工業區無薪假蔓延，失業率直線上升，民眾恐慌擠兌。",
+    "rate": 0.3,
+    "cooldown": 1500,
+    "loc": "world",
+    "ref": "全球金融海嘯",
+    "options": [
+      {
+        "text": "擴大內需振興經濟",
+        "result": "景氣較快回溫，國債大增",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -5,
+          "wealth": 2,
+          "trust": 3,
+          "stability": 1
+        },
+        "over": {
+          "days": 540,
+          "effects": {
+            "gdp": 4
+          }
+        },
+        "follow": [
+          {
+            "id": "eco_layoff_wave",
+            "delay": 90,
+            "chance": 0.3
+          }
+        ]
+      },
+      {
+        "text": "降息寬鬆穩匯市",
+        "result": "資金充沛，資產價格再漲",
+        "weight": 2,
+        "effects": {
+          "gdp": -5,
+          "wealth": -2,
+          "stability": -2
+        },
+        "over": {
+          "days": 540,
+          "effects": {
+            "gdp": 4,
+            "wealth": 1
+          }
+        },
+        "follow": [
+          {
+            "id": "eco_layoff_wave",
+            "delay": 90,
+            "chance": 0.4
+          },
+          {
+            "id": "eco_bubble_burst",
+            "delay": 900,
+            "chance": 0.15
+          }
+        ]
+      },
+      {
+        "text": "全額保障存款",
+        "result": "擠兌平息，財政承擔風險",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "stability",
+            "k": -0.5
+          }
+        ],
+        "effects": {
+          "gdp": -6,
+          "trust": 2,
+          "stability": 3,
+          "wealth": -1
+        },
+        "over": {
+          "days": 720,
+          "effects": {
+            "gdp": 4
+          }
+        },
+        "follow": [
+          {
+            "id": "eco_layoff_wave",
+            "delay": 90,
+            "chance": 0.4
+          }
+        ]
+      },
+      {
+        "text": "緊縮財政保守應對",
+        "result": "衝擊最深，財政保持健全",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "gdp": -8,
+          "wealth": -4,
+          "stability": -4,
+          "trust": -3
+        },
+        "over": {
+          "days": 720,
+          "effects": {
+            "gdp": 7
+          }
+        },
+        "follow": [
+          {
+            "id": "eco_layoff_wave",
+            "delay": 60,
+            "chance": 0.7
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "eco_pension_crisis",
+    "cat": "economy",
+    "tier": "major",
+    "title": "年金破產危機",
+    "desc": "精算報告顯示勞保與公教退休基金將在數年內用罄，年輕世代擔心繳了領不到，退休族群走上{county}街頭抗議，改革時鐘開始倒數。",
+    "rate": 0.5,
+    "cooldown": 1500,
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        2
+      ]
+    ],
+    "loc": [
+      "台北市"
+    ],
+    "mods": [
+      {
+        "stat": "demo",
+        "k": -1
+      }
+    ],
+    "ref": "退休金改革",
+    "options": [
+      {
+        "text": "大刀闊斧刪減給付",
+        "result": "基金延壽，退休族群強烈反彈",
+        "weight": 1.5,
+        "effects": {
+          "gdp": 4,
+          "stability": -6,
+          "trust": -3,
+          "wealth": -3
+        },
+        "local": {
+          "stability": -6
+        },
+        "over": {
+          "days": 1080,
+          "effects": {
+            "stability": 3,
+            "trust": 2
+          }
+        }
+      },
+      {
+        "text": "政府撥補延長壽命",
+        "result": "風波暫息，國債負擔加重",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -7,
+          "stability": 2,
+          "trust": 1
+        }
+      },
+      {
+        "text": "延後請領年齡",
+        "result": "財務改善，中年族群不滿",
+        "weight": 1.5,
+        "effects": {
+          "gdp": 3,
+          "stability": -3,
+          "wealth": -1,
+          "trust": -1
+        },
+        "over": {
+          "days": 720,
+          "effects": {
+            "gdp": 2
+          }
+        }
+      },
+      {
+        "text": "擱置爭議",
+        "result": "眼前平靜，破產時鐘持續走",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -4,
+          "stability": 1
+        },
+        "over": {
+          "days": 1080,
+          "effects": {
+            "gdp": -4,
+            "stability": -2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_energy_crisis",
+    "cat": "economy",
+    "tier": "major",
+    "title": "國際能源危機",
+    "desc": "產油地區爆發戰事、主要航道受阻，國際油價與天然氣價格暴漲數倍，能源九成以上仰賴進口的台灣首當其衝，電廠燃料庫存僅剩數日。",
+    "rate": 0.3,
+    "cooldown": 1500,
+    "loc": "world",
+    "ref": "能源危機",
+    "options": [
+      {
+        "text": "政府吸收凍漲",
+        "result": "民生穩住，國營事業巨額虧損",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -7,
+          "wealth": 1,
+          "trust": 2,
+          "stability": 2
+        }
+      },
+      {
+        "text": "反映成本漲價",
+        "result": "財政無虞，物價全面飆漲",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -2,
+          "wealth": -5,
+          "trust": -3,
+          "stability": -3
+        }
+      },
+      {
+        "text": "緊急限電節能",
+        "result": "燃料撐住，產業出貨大受影響",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -5,
+          "stability": -3,
+          "tech": -1
+        }
+      },
+      {
+        "text": "加速能源自主",
+        "result": "短痛加劇，長期擺脫進口依賴",
+        "weight": 1,
+        "effects": {
+          "gdp": -6,
+          "wealth": -2,
+          "intl": 2
+        },
+        "over": {
+          "days": 1080,
+          "effects": {
+            "gdp": 4,
+            "tech": 2,
+            "stability": 2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_demographic_cliff",
+    "cat": "economy",
+    "tier": "major",
+    "title": "人口雪崩警訊",
+    "desc": "全年新生兒跌破十萬人，死亡數持續大於出生數，{county}偏鄉小學一間接一間廢校，推估總人口將加速縮減，勞動力斷層近在眼前。",
+    "rate": 0.6,
+    "cooldown": 1500,
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        3
+      ]
+    ],
+    "loc": [
+      "嘉義縣",
+      "屏東縣",
+      "雲林縣",
+      "台東縣",
+      "南投縣",
+      "苗栗縣"
+    ],
+    "mods": [
+      {
+        "stat": "demo",
+        "k": -1.5
+      }
+    ],
+    "ref": "少子化",
+    "options": [
+      {
+        "text": "國家級人口政策",
+        "result": "生育誘因大增，財政沉重",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -6,
+          "demo": 6,
+          "trust": 2
+        }
+      },
+      {
+        "text": "大舉開放移民",
+        "result": "人口補充，社會融合成挑戰",
+        "weight": 1.5,
+        "effects": {
+          "demo": 5,
+          "gdp": 3,
+          "stability": -4
+        }
+      },
+      {
+        "text": "自動化補足人力",
+        "result": "產業效率提升，人口問題擱置",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "tech",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "tech": 4,
+          "gdp": 2,
+          "demo": -2,
+          "wealth": -1
+        }
+      },
+      {
+        "text": "地方創生與縮城",
+        "result": "偏鄉轉型，成效需長期累積",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -2,
+          "stability": 1
+        },
+        "local": {
+          "wealth": 3,
+          "stability": 2
+        },
+        "over": {
+          "days": 1080,
+          "effects": {
+            "demo": 2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_bubble_burst",
+    "cat": "economy",
+    "tier": "major",
+    "chainOnly": true,
+    "title": "資產泡沫破裂",
+    "desc": "房市與股市同步急跌，投資客斷頭拋售，{county}預售屋大量解約，建商跳票傳聞不斷，銀行緊縮放款，消費信心跌至谷底。",
+    "rate": 1,
+    "loc": [
+      "台北市",
+      "新北市",
+      "新竹縣",
+      "台中市",
+      "桃園市",
+      "台南市",
+      "高雄市"
+    ],
+    "ref": "資產泡沫",
+    "options": [
+      {
+        "text": "央行注資救市",
+        "result": "跌勢止穩，被批評救富人",
+        "weight": 2,
+        "effects": {
+          "gdp": -3,
+          "wealth": -3,
+          "trust": -1,
+          "stability": -1
+        },
+        "local": {
+          "wealth": -5
+        }
+      },
+      {
+        "text": "讓市場自然出清",
+        "result": "痛苦但健康，房價回歸合理",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -6,
+          "wealth": -6,
+          "stability": -4
+        },
+        "local": {
+          "wealth": -8
+        },
+        "over": {
+          "days": 1080,
+          "effects": {
+            "gdp": 4,
+            "demo": 2
+          }
+        }
+      },
+      {
+        "text": "紓困房貸家庭",
+        "result": "家庭免於斷頭，財政承擔",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "gdp": -5,
+          "wealth": -2,
+          "trust": 3,
+          "stability": 1
+        },
+        "local": {
+          "wealth": -5
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_layoff_wave",
+    "cat": "economy",
+    "tier": "general",
+    "chainOnly": true,
+    "title": "無薪假與裁員潮",
+    "desc": "外需急凍，{county}電子與機械大廠接連宣布無薪假，數萬名勞工收入驟減，勞工團體夜宿部會前，要求政府保障工作權。",
+    "rate": 1,
+    "loc": [
+      "桃園市",
+      "新竹市",
+      "台中市",
+      "台南市",
+      "高雄市",
+      "新北市"
+    ],
+    "ref": "無薪假",
+    "options": [
+      {
+        "text": "補貼企業保留僱用",
+        "result": "裁員減緩，企業依賴補貼",
+        "weight": 2,
+        "effects": {
+          "gdp": -2,
+          "stability": 1,
+          "trust": 1
+        },
+        "local": {
+          "wealth": -2,
+          "stability": -1
+        }
+      },
+      {
+        "text": "擴大失業給付",
+        "result": "勞工生活有保障，就業未回",
+        "weight": 2,
+        "effects": {
+          "gdp": -2,
+          "wealth": 1,
+          "trust": 1
+        },
+        "local": {
+          "wealth": -3,
+          "stability": -2
+        }
+      },
+      {
+        "text": "公共工程創造就業",
+        "result": "短期財政吃重，景氣漸回溫",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 0.5
+          }
+        ],
+        "effects": {
+          "gdp": -3
+        },
+        "local": {
+          "wealth": -3,
+          "stability": -2
+        },
+        "over": {
+          "days": 365,
+          "effects": {
+            "gdp": 2,
+            "stability": 1
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_food_safety_spread",
+    "cat": "economy",
+    "tier": "general",
+    "chainOnly": true,
+    "title": "黑心食品再爆",
+    "desc": "食安風暴持續延燒，{county}又查獲業者竄改過期原料標籤重新出貨，連學校營養午餐也受波及，消費者對國產食品信心崩盤。",
+    "rate": 1,
+    "loc": [
+      "彰化縣",
+      "雲林縣",
+      "台南市",
+      "屏東縣",
+      "台中市",
+      "新北市"
+    ],
+    "ref": "食安連環爆",
+    "options": [
+      {
+        "text": "主管官員下台負責",
+        "result": "民怨稍平，政策延續中斷",
+        "weight": 2,
+        "effects": {
+          "trust": 1,
+          "stability": -1
+        },
+        "local": {
+          "wealth": -4
+        }
+      },
+      {
+        "text": "修法加重刑責",
+        "result": "嚇阻力提升，業者人人自危",
+        "weight": 2,
+        "effects": {
+          "trust": 2,
+          "gdp": -1
+        },
+        "local": {
+          "wealth": -4
+        }
+      },
+      {
+        "text": "推動產地認證標章",
+        "result": "短期無感，長期重建信心",
+        "weight": 1.5,
+        "effects": {
+          "gdp": -1,
+          "trust": -1
+        },
+        "local": {
+          "wealth": -3
+        },
+        "over": {
+          "days": 720,
+          "effects": {
+            "trust": 2,
+            "wealth": 1
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "eco_n_export_record",
+    "cat": "economy",
+    "tier": "news",
+    "title": "外銷訂單創歷史新高",
+    "desc": "電子與資通訊產品出口暢旺，{county}科技廠商加班趕工。",
+    "rate": 1.5,
+    "cooldown": 240,
+    "loc": [
+      "新竹市",
+      "台中市",
+      "桃園市",
+      "台南市"
+    ],
+    "mods": [
+      {
+        "stat": "tech",
+        "k": 0.8
+      }
+    ],
+    "effects": {
+      "gdp": 1,
+      "tech": 0.3
+    },
+    "local": {
+      "wealth": 1
+    }
+  },
+  {
+    "id": "eco_n_rate_hike",
+    "cat": "economy",
+    "tier": "news",
+    "title": "央行宣布升息半碼",
+    "desc": "為抑制通膨與房市過熱，央行升息，房貸族每月負擔增加。",
+    "rate": 1.5,
+    "cooldown": 300,
+    "loc": "random",
+    "effects": {
+      "gdp": -0.5,
+      "wealth": -0.5
+    }
+  },
+  {
+    "id": "eco_n_rate_cut",
+    "cat": "economy",
+    "tier": "news",
+    "title": "央行降息刺激景氣",
+    "desc": "景氣疲軟，央行宣布降息，資金行情帶動股市與房市。",
+    "rate": 1.5,
+    "cooldown": 300,
+    "loc": "random",
+    "mods": [
+      {
+        "stat": "gdp",
+        "k": -1
+      }
+    ],
+    "effects": {
+      "gdp": 0.5,
+      "wealth": 0.3,
+      "stability": -0.3
+    }
+  },
+  {
+    "id": "eco_n_stock_high",
+    "cat": "economy",
+    "tier": "news",
+    "title": "台股站上歷史新高",
+    "desc": "權值股領軍上攻，成交量爆大，股民笑開懷。",
+    "rate": 1.5,
+    "cooldown": 240,
+    "loc": "random",
+    "mods": [
+      {
+        "stat": "gdp",
+        "k": 1
+      }
+    ],
+    "effects": {
+      "gdp": 0.5,
+      "wealth": 0.8
+    }
+  },
+  {
+    "id": "eco_n_unemployment",
+    "cat": "economy",
+    "tier": "news",
+    "title": "失業率意外攀升",
+    "desc": "最新失業率創近年新高，中高齡與青年族群受衝擊最深。",
+    "rate": 1.5,
+    "cooldown": 240,
+    "loc": "random",
+    "mods": [
+      {
+        "stat": "gdp",
+        "k": -1
+      }
+    ],
+    "effects": {
+      "wealth": -0.8,
+      "stability": -0.5
+    }
+  },
+  {
+    "id": "eco_n_births_low",
+    "cat": "economy",
+    "tier": "news",
+    "title": "新生兒數再創新低",
+    "desc": "年度出生數再寫新低，產科診所與幼兒園陸續關門。",
+    "rate": 1.5,
+    "cooldown": 365,
+    "loc": "random",
+    "mods": [
+      {
+        "stat": "demo",
+        "k": -0.5
+      }
+    ],
+    "effects": {
+      "demo": -1
+    }
+  },
+  {
+    "id": "eco_n_foreign_talent",
+    "cat": "economy",
+    "tier": "news",
+    "title": "外籍專業人才創新高",
+    "desc": "就業金卡持有人數突破新高，科技業吸引國際人才。",
+    "rate": 1,
+    "cooldown": 240,
+    "loc": "random",
+    "effects": {
+      "tech": 0.5,
+      "demo": 0.5,
+      "intl": 0.3
+    }
+  },
+  {
+    "id": "eco_n_new_immigrant",
+    "cat": "economy",
+    "tier": "news",
+    "title": "新住民二代嶄露頭角",
+    "desc": "{county}新住民二代在國際競賽奪牌，多元文化受關注。",
+    "rate": 1,
+    "cooldown": 240,
+    "loc": [
+      "桃園市",
+      "新北市",
+      "彰化縣",
+      "屏東縣",
+      "台中市"
+    ],
+    "effects": {
+      "demo": 0.3
+    },
+    "local": {
+      "stability": 1
+    }
+  },
+  {
+    "id": "eco_n_oil_price",
+    "cat": "economy",
+    "tier": "news",
+    "title": "國際油價大漲",
+    "desc": "國際油價飆升，國內油價連漲數週，運輸業成本上揚。",
+    "rate": 1.5,
+    "cooldown": 240,
+    "loc": "world",
+    "effects": {
+      "wealth": -0.8,
+      "gdp": -0.5
+    }
+  },
+  {
+    "id": "eco_n_egg_shortage",
+    "cat": "economy",
+    "tier": "news",
+    "title": "蛋荒再現",
+    "desc": "產地供蛋不足，賣場雞蛋限購，民眾排隊搶購。",
+    "rate": 1,
+    "cooldown": 365,
+    "loc": "random",
+    "effects": {
+      "wealth": -0.3,
+      "trust": -0.5
+    }
+  },
+  {
+    "id": "eco_n_tech_bonus",
+    "cat": "economy",
+    "tier": "news",
+    "title": "科技業豐厚分紅",
+    "desc": "{county}科技大廠發放高額分紅，周邊房價與餐飲跟漲。",
+    "rate": 1.5,
+    "cooldown": 240,
+    "loc": [
+      "新竹市",
+      "新竹縣",
+      "台南市"
+    ],
+    "mods": [
+      {
+        "stat": "tech",
+        "k": 1
+      }
+    ],
+    "effects": {
+      "wealth": 0.3
+    },
+    "local": {
+      "wealth": 2
+    }
+  },
+  {
+    "id": "eco_n_real_wage",
+    "cat": "economy",
+    "tier": "news",
+    "title": "實質薪資負成長",
+    "desc": "物價漲幅超越薪資漲幅，上班族荷包實質縮水。",
+    "rate": 1.5,
+    "cooldown": 240,
+    "loc": "random",
+    "mods": [
+      {
+        "stat": "wealth",
+        "k": -0.8
+      }
+    ],
+    "effects": {
+      "wealth": -0.8,
+      "trust": -0.3
+    }
+  },
+  {
+    "id": "eco_n_rural_revival",
+    "cat": "economy",
+    "tier": "news",
+    "title": "青年返鄉創業",
+    "desc": "{county}青年返鄉經營農場與民宿，帶動地方創生。",
+    "rate": 1.5,
+    "cooldown": 240,
+    "loc": [
+      "嘉義縣",
+      "屏東縣",
+      "雲林縣",
+      "台東縣",
+      "南投縣",
+      "苗栗縣",
+      "花蓮縣"
+    ],
+    "effects": {
+      "demo": 0.3
+    },
+    "local": {
+      "wealth": 1.5,
+      "stability": 0.5
+    }
+  },
+  {
+    "id": "eco_n_startup",
+    "cat": "economy",
+    "tier": "news",
+    "title": "新創獲國際大筆投資",
+    "desc": "本土新創獲國際創投大額注資，估值突破十億美元。",
+    "rate": 1,
+    "cooldown": 240,
+    "loc": "random",
+    "effects": {
+      "tech": 0.8,
+      "intl": 0.3
+    }
+  },
+  {
+    "id": "eco_n_aging",
+    "cat": "economy",
+    "tier": "news",
+    "title": "扶老比再創新高",
+    "desc": "高齡人口持續攀升，每三位工作人口須扶養一位長者。",
+    "rate": 1.5,
+    "cooldown": 365,
+    "loc": "random",
+    "mods": [
+      {
+        "stat": "elapsed",
+        "k": 1
+      }
+    ],
+    "effects": {
+      "demo": -1
+    }
+  },
+  {
+    "id": "eco_n_tourism_boom",
+    "cat": "economy",
+    "tier": "news",
+    "title": "國際旅客人數創新高",
+    "desc": "{county}觀光景點湧入國際旅客，飯店住房率大增。",
+    "rate": 1.5,
+    "cooldown": 240,
+    "loc": [
+      "台北市",
+      "台中市",
+      "高雄市",
+      "花蓮縣",
+      "澎湖縣",
+      "屏東縣",
+      "台南市"
+    ],
+    "effects": {
+      "gdp": 0.3,
+      "intl": 0.3
+    },
+    "local": {
+      "wealth": 1.5
+    }
+  }
+]

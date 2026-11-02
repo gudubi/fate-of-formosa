@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#03090f" />
+  <meta name="description" content="三十年，一座島。你是看不見的手。" />
+  <title>上帝之手：台灣</title>
+  <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-48.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+</head>
+<body>
+  <canvas id="gl"></canvas>
+  <div id="labels"></div>
+
+  <div id="hud" hidden>
+    <header id="topbar">
+      <div class="clock">
+        <div id="date"></div>
+        <div id="time"></div>
+      </div>
+      <div id="speed" class="seg">
+        <button data-speed="0" title="暫停（空白鍵）" aria-label="暫停"><svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+        <button data-speed="1" title="1 倍速（1）" aria-label="1 倍速"><svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg></button>
+        <button data-speed="2" title="2 倍速（2）" aria-label="2 倍速"><svg viewBox="0 0 24 24"><path d="M3 5l9 7-9 7zM12 5l9 7-9 7z"/></svg></button>
+        <button data-speed="3" title="4 倍速（3）" aria-label="4 倍速"><svg viewBox="0 0 24 24"><path d="M1 5l7 7-7 7zM8.5 5l7 7-7 7zM16 5l7 7-7 7z"/></svg></button>
+      </div>
+      <div id="divine" title="神力：干預事件需要消耗，隨時間累積"></div>
+      <div class="tools">
+        <button id="btnOverview" title="全島視角" aria-label="全島視角"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+        <button id="btnMute" title="音效" aria-label="音效"></button>
+        <button id="btnMenu" title="選單" aria-label="選單"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      </div>
+      <div id="progress"><div></div></div>
+    </header>
+
+    <div id="panels" class="collapsed">
+      <nav id="tabs">
+        <button data-tab="stats" class="on">數值</button>
+        <button data-tab="feed">事件<span id="badge" hidden></span></button>
+        <button data-tab="layers">圖層</button>
+      </nav>
+      <div id="mini"></div>
+      <section id="stats" class="panel on"></section>
+      <section id="feed" class="panel">
+        <h3>待決事件</h3>
+        <div id="pendingList"><p class="empty">目前沒有待決事件</p></div>
+        <h3>大事紀</h3>
+        <div id="logList"></div>
+      </section>
+      <section id="layers" class="panel"></section>
+    </div>
+
+    <div id="ticker"><span class="tag">快訊</span><div id="tickerText"></div></div>
+    <div id="countyCard" hidden></div>
+    <div id="toasts"></div>
+    <div id="accel" hidden></div>
+  </div>
+
+  <div id="modal" hidden><div class="card" role="dialog" aria-modal="true"></div></div>
+  <div id="menuDlg" hidden><div class="card"></div></div>
+  <div id="ending" hidden><div class="card"></div></div>
+
+  <div id="title">
+    <div class="title-inner">
+      <div class="kicker">台北時間 <span id="titleClock"></span></div>
+      <h1>上帝之手<span>台灣</span></h1>
+      <p class="sub">三十年，一座島。你是看不見的手。</p>
+      <div class="btns">
+        <button id="btnNew" class="primary" disabled>地圖生成中…</button>
+        <button id="btnContinue" hidden>繼續上一局</button>
+      </div>
+      <details class="howto">
+        <summary>怎麼玩</summary>
+        <ul>
+          <li>遊戲從<b>此刻的真實時間</b>開始，時間會逐漸加速，一局橫跨 30 年（標準速度約 1 小時）。</li>
+          <li>島上每天都可能發生事件。地圖冒出的<b>泡泡</b>可以點開干預；重大事件會暫停時間等你決定。</li>
+          <li>干預需要消耗<b>神力</b>，越違逆天意越貴。選擇「順其自然」則依事件機率決定，重大事件順其自然可回復 1 點神力。</li>
+          <li>撐過 30 年而社會不崩潰、經濟不枯竭、兩岸不開戰，即為守護成功。結局由你的選擇與天意共同寫成。</li>
+          <li>本遊戲不涉及任何政黨，只呈現整座島的整體狀態。</li>
+        </ul>
+      </details>
+      <details class="howto credits">
+        <summary>開發工具與資源來源</summary>
+        <dl>
+          <dt>開發工具</dt>
+          <dd>
+            <a href="https://threejs.org/" target="_blank" rel="noopener">Three.js</a>、
+            <a href="https://vite.dev/" target="_blank" rel="noopener">Vite</a>、
+            <a href="https://www.typescriptlang.org/" target="_blank" rel="noopener">TypeScript</a>、
+            <a href="https://d3js.org/d3-geo" target="_blank" rel="noopener">d3-geo</a>、
+            <a href="https://github.com/topojson/topojson-client" target="_blank" rel="noopener">topojson-client</a>
+          </dd>
+          <dd>
+            程式協作：<a href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude Code</a>
+            ・圖像：<a href="https://openai.com/codex/" target="_blank" rel="noopener">Codex</a>
+          </dd>
+          <dt>地圖資料</dt>
+          <dd>縣市界線：<a href="https://data.gov.tw/dataset/7442" target="_blank" rel="noopener">內政部國土測繪中心</a>（政府資料開放授權條款第 1 版），經 <a href="https://github.com/dkaoster/taiwan-atlas" target="_blank" rel="noopener">taiwan-atlas</a>（MIT，© Daniel Kao）簡化</dd>
+          <dd>周邊地區：<a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a>（公眾領域），經 <a href="https://github.com/topojson/world-atlas" target="_blank" rel="noopener">world-atlas</a> 整理</dd>
+          <dd>地形：依主要山脈稜線近似建模</dd>
+          <dt>音效</dt>
+          <dd>以 Web Audio API 即時合成</dd>
+        </dl>
+      </details>
+      <p class="author">作者 <a href="https://gudubi.com" target="_blank" rel="noopener">gudubi.com</a>・<a href="mailto:gudubi@gudubi.com">gudubi@gudubi.com</a></p>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
