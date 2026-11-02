@@ -603,7 +603,7 @@ function openModal(uid: number) {
         <div class="pvs">${optionPreview(o)}</div>
       </button>`).join('')}</div>
     <div class="ev-foot">
-      <span class="note">點選項＝以神力干預 ｜ 目前神力 ${e.s.divine}${isMajor ? ' ｜ 順其自然 +1 神力' : ' ｜ 不會倒數，可以慢慢想'}<br>▲▼ 為影響方向與幅度，虛線框為長期影響</span>
+      <span class="note">點選項＝以命運干預 ｜ 目前命運 ${e.s.divine}${isMajor ? ' ｜ 順其自然 +1 命運' : ' ｜ 不會倒數，可以慢慢想'}<br>▲▼ 為影響方向與幅度，虛線框為長期影響</span>
       ${isMajor ? '' : '<button class="btn" id="mLater">稍後</button>'}
       <button class="btn fate" id="mFate">順其自然</button>
     </div>`;
@@ -779,7 +779,7 @@ function showEnding(end: Ending) {
         milestones: ms.map(m => m.title), seed: e.s.seed,
         stats: STAT_ORDER.map(k => ({ label: STAT_META[k].label, value: STAT_META[k].lean ? describeLean(e.s.stats[k]) : String(Math.round(e.s.stats[k])) })),
       }, `/assets/endings/${end.id}.webp`, '/assets/icon-192.png');
-      await shareOrDownload(blob, `上帝之手-${end.title}-${end.score}.png`, `我在《上帝之手：台灣》守護了 ${years} 年，結局「${end.title}」，守護指數 ${end.score}。`);
+      await shareOrDownload(blob, `命運之手-${end.title}-${end.score}.png`, `我在《命運之手：台灣》守護了 ${years} 年，結局「${end.title}」，守護指數 ${end.score}。`);
     } finally { btn.disabled = false; }
   };
 }

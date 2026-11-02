@@ -10,7 +10,7 @@ export const DAY_MS = 86_400_000;
 export const TW_OFFSET = 8 * 3_600_000;
 export const YEARS = 30;
 export const DIVINE_MAX = 25;
-export const DIVINE_EVERY = 24; // 每 N 天 +1 神力
+export const DIVINE_EVERY = 24; // 每 N 天 +1 命運
 
 /** 各層級每年平均事件數 */
 const TIER_RATE: Record<Tier, number> = { news: 26, general: 12, major: 2.4 };
@@ -507,7 +507,7 @@ export class Engine {
     return w.map(x => x / t);
   }
 
-  /** 干預某選項的神力花費：影響越大、越違逆天意越貴 */
+  /** 干預某選項的命運花費：影響越大、越要扭轉天意越貴 */
   cost(def: EventDef, i: number): number {
     const o = def.options![i];
     if (o.cost !== undefined) return o.cost;
@@ -520,7 +520,7 @@ export class Engine {
     return clamp(Math.round(base), 1, 12);
   }
 
-  /** 結算事件。option 為 null 表示交給天意；intervene 時扣除神力 */
+  /** 結算事件。option 為 null 表示交給天意；intervene 時扣除命運 */
   resolve(uid: number, option: number | null): LogEntry | null {
     const s = this.s;
     const p = s.pending.find(x => x.uid === uid);

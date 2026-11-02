@@ -85,7 +85,7 @@ export interface OptionDef {
   policy?: Policy[];
   /** 事件鏈 */
   follow?: FollowUp[];
-  /** 干預此選項的神力花費；省略則依影響力與機率自動計算 */
+  /** 干預此選項的命運花費；省略則依影響力與機率自動計算 */
   cost?: number;
   /** 觸發結局（僅引擎內建事件使用） */
   ending?: EndingId;

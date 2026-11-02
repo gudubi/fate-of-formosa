@@ -106,7 +106,7 @@ export async function renderShareCard(d: ShareData, endingImg: string, icon: str
   if (ic) ctx.drawImage(ic, x, H - 140, 84, 84);
   ctx.fillStyle = '#ffffff';
   ctx.font = `800 40px ${font}`;
-  ctx.fillText('上帝之手：台灣', x + 104, H - 92);
+  ctx.fillText('命運之手：台灣', x + 104, H - 92);
   ctx.fillStyle = '#8fa3b5';
   ctx.font = `400 24px ${font}`;
   ctx.fillText(`種子 ${d.seed}・gudubi.com`, x + 104, H - 56);
