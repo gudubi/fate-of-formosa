@@ -28,11 +28,12 @@ function label(k: string): string {
 
 function chip(k: string, v: number, long: boolean): string {
   if (Math.abs(v) < 0.3) return '';
-  if (k === 'govToPop' || k === 'popToGov') return `<span class="pv l">${label(k)}靠攏</span>`;
+  if (k === 'govToPop' || k === 'popToGov') return `<span class="pv lean">${label(k)}靠攏</span>`;
   const meta = STAT_META[k as StatKey];
-  if (meta?.lean) return `<span class="pv l${long ? ' long' : ''}">${meta.short}${v > 0 ? '→獨' : '→統'}</span>`;
+  if (meta?.lean) return `<span class="pv lean${long ? ' long' : ''}">${meta.short}${v > 0 ? '→獨' : '→統'}</span>`;
   const bad = k === 'tension' || k === 'dep' ? v > 0 : v < 0;
-  return `<span class="pv ${bad ? 'n' : 'p'}${long ? ' long' : ''}">${label(k)}${arrows(v)}</span>`;
+  // 類別名稱刻意不用 p／n：選項內的機率條已使用 .p
+  return `<span class="pv ${bad ? 'bad' : 'good'}${long ? ' long' : ''}">${label(k)}${arrows(v)}</span>`;
 }
 
 /** 回傳選項下方的預覽標籤 HTML */
