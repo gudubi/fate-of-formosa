@@ -14,6 +14,9 @@ export const DIVINE_EVERY = 24; // 每 N 天 +1 命運
 
 /** 各層級每年平均事件數 */
 const TIER_RATE: Record<Tier, number> = { news: 26, general: 15, major: 2.4 };
+/** 重大事件配速：剩餘件數 × 此倍率 ÷ 剩餘年數，下限 MAJOR_RATE_MIN 次／年 */
+const MAJOR_PACE = 0.85;
+const MAJOR_RATE_MIN = 0.8;
 const DEFAULT_COOLDOWN: Record<Tier, number> = { news: 365, general: 365, major: 900 };
 /** 一般事件不倒數；同時待決超過此數時，最舊的一件交給天意 */
 export const MAX_PENDING = 5;
@@ -348,7 +351,7 @@ export class Engine {
     for (const tier of ['news', 'general', 'major'] as Tier[]) {
       const roll = this.rng.next(), u = this.rng.next();
       if (tier === 'major' && (this.blocking() || s.day < 20)) continue;
-      if (roll < TIER_RATE[tier] / 365) {
+      if (roll < (tier === 'major' ? this.majorRate() : TIER_RATE[tier]) / 365) {
         const def = this.draw(tier, u);
         if (def) this.fire(def);
       }
@@ -369,6 +372,18 @@ export class Engine {
     if (s.day >= s.endDay && !s.ended) this.end('timeup');
     s.rng = this.rng.s;
     s.fateRng = this.fate.s;
+  }
+
+  /**
+   * 重大事件每年頻率：同一局不重複，事件池有限，
+   * 依「尚未出現的件數 ÷ 剩餘年數」調節，讓三十年都分得到重大事件，不會前二十年就用完
+   */
+  private majorRate(): number {
+    const s = this.s;
+    const left = this.byTier.major.filter(d => d.rate > 0 && !s.once.includes(d.id)).length;
+    const years = Math.max(1, (s.endDay - s.day) / 365.25);
+    // 倍率略小於 1：有些事件要到後期才符合條件，前面先留一點空間
+    return clamp(left * MAJOR_PACE / years, MAJOR_RATE_MIN, TIER_RATE.major);
   }
 
   /** 每日的數值連動：各數值緩慢趨向由其他數值決定的平衡點 */
@@ -395,7 +410,7 @@ export class Engine {
       - (st.tech - 80) * 0.05 - (st.intl - 50) * 0.05 - h.dep) * 0.004, 0, 100);
 
     relax('gdp', 0.3 * st.tech + 0.15 * st.intl + 0.15 * st.stability + 0.15 * (100 - st.tension)
-      - 0.15 * (h.dep - 40) + 0.1 * st.demo + 0.15 * st.trust + h.econ * 22 - 6 + pol('gdp'), 0.0025);
+      - 0.15 * (h.dep - 40) + 0.1 * st.demo + 0.15 * st.trust + h.econ * 22 - 4 + pol('gdp'), 0.0025);
     relax('trust', 20 + 0.25 * st.stability + 0.25 * st.wealth - gap * 0.25 + pol('trust'), 0.003);
     relax('tension', 40 + st.govLean * 0.4 + st.popLean * 0.1 + h.stance * 30
       - (st.defense - 50) * 0.05 - (st.intl - 50) * 0.05 + pol('tension'), 0.004);
@@ -423,7 +438,7 @@ export class Engine {
         + (avgOf(c, 'stability') - c.stability) * 0.004
         + (0.35 * c.wealth + 0.3 * st.trust - (st.tension - 50) * 0.25 - (h.dep - 50) * 0.25 + 23 + h.mood * 22
           - Math.abs(st.govLean - c.popLean) * 0.35 + pol('stability') - c.stability) * 0.004,
-      wealth: c.wealth + (st.gdp * 0.85 + 5 + c.wealthOffset + pol('wealth') - c.wealth) * 0.0015,
+      wealth: c.wealth + (st.gdp * 0.85 + 6 + c.wealthOffset + pol('wealth') - c.wealth) * 0.0015,
     }));
     cs.forEach((c, i) => {
       c.popLean = clamp(next[i].popLean, -100, 100);
