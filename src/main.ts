@@ -1089,6 +1089,9 @@ async function prepareIntroFlashes(untilTw: number) {
     for (const h of arr) if (h.k === 'event' && h.y >= 1912) list.push({ ts: Date.UTC(h.y, mm - 1, dd), text: `${h.y}・${h.t}` });
   }));
   introEvents = list.filter(x => x.ts <= untilTw).sort((a, b) => a.ts - b.ts);
+  // 最後一行固定為開局提示，不讓跑動停在某一則歷史事件上；開場減速階段距開局 30 天時約剩 2 秒
+  const last = introEvents[introEvents.length - 1]?.ts ?? 0;
+  introEvents.push({ ts: Math.max(untilTw - 30 * DAY_MS, last + 1), text: '遊戲即將開始...' });
 }
 /** 回傳目前要顯示的大事；換字至少間隔 0.45 秒，高速時只挑最近經過的一件 */
 function introFlash(): string {
