@@ -249,7 +249,7 @@ function refreshTop() {
   const status = e.blocking() || openUid !== null ? '<b>等待你的決定</b>' : userPaused ? '<b>暫停中</b>' : '';
   $('time').innerHTML = phase === 'intro' ? '&nbsp;' : rate < 3600 * 6
     ? `${timeStr(gameTw)} 台北時間 ${status}`
-    : `第 ${year} 年 · ${SPEEDS[speed]} 天/秒 · 守護 <b class="gs">${e.score()}</b> ${status}`;
+    : `第 ${year} 年 · ${SPEEDS[speed]} 天/秒 · 成果 <b class="gs">${e.score()}</b> ${status}`;
   ($('progress').firstElementChild as HTMLElement).style.width = `${(e.s.day / e.s.endDay) * 100}%`;
   $('divine').innerHTML = `${HAND_ICON}<span>${e.s.divine}</span><small style="opacity:.6">/${DIVINE_MAX}</small>`;
   document.querySelectorAll<HTMLButtonElement>('#speed button').forEach(b => {
@@ -796,10 +796,10 @@ function openReview() {
       const fmtV = (v: number) => (m.lean ? `${v > 0 ? '+' : ''}${Math.round(v)}` : String(Math.round(v)));
       return `<div><span>${m.label}</span><b>${fmtV(a)} → ${fmtV(b)}</b>${Math.abs(d) >= 1 ? `<i class="${good}">${d > 0 ? '▲' : '▼'}${Math.abs(Math.round(d))}</i>` : ''}</div>`;
     }).join('')}</div>
-    <p class="rv-line">這五年發生 ${events.length} 件事件，你出手干預了 <b>${acted}</b> 次，守護指數目前 <b>${e.score()}</b>。</p>
+    <p class="rv-line">這五年發生 ${events.length} 件事件，你出手干預了 <b>${acted}</b> 次，成果指數目前 <b>${e.score()}</b>。</p>
     ${majors.length ? `<div class="rv-major"><div class="w-title">這五年的重大事件</div>${majors.map(l =>
       `<div>${shortDate(l.day)}・${esc(l.title)}・<span>${esc(l.optionText ?? '')}</span>${l.intervened ? '<span class="tag-int">✋</span>' : ''}</div>`).join('')}</div>` : ''}
-    <div class="menu-btns"><button class="btn primary" id="rvOk">繼續守護</button></div>`;
+    <div class="menu-btns"><button class="btn primary" id="rvOk">繼續前進</button></div>`;
   $('reviewDlg').hidden = false;
   $('rvOk').onclick = closeReview;
 }
@@ -940,14 +940,14 @@ function showEnding(end: Ending) {
     score: end.score, title: end.title, years: +years, seed: e.s.seed, code: e.s.code, survived: end.survived,
     at: new Date().toISOString(), milestones: ms.length,
   });
-  const kicker = `${end.survived ? '守護之路' : '終局'}・${shortDate(end.day)}・第 ${years} 年`;
+  const kicker = `${end.survived ? '尾聲' : '終局'}・${shortDate(end.day)}・第 ${years} 年`;
   const rec = buildEnding({
     s: e.s, end, baseline: base, kicker, milestones: ms.map(m => m.title),
     eggs: eggsThisGame(e).map(d => ({ title: d.title.replaceAll('{county}', ''), stars: d.egg!.stars })),
   });
   saveEnding(rec);
   card.innerHTML = `${endingShotHtml(rec, BASE)}
-    <div class="menu-btns"><button class="btn primary" id="eShare">分享結果</button><button class="btn" id="eNew">再守護一次</button><button class="btn" id="eView">回到地圖</button></div>
+    <div class="menu-btns"><button class="btn primary" id="eShare">分享結果</button><button class="btn" id="eNew">再玩一局</button><button class="btn" id="eView">回到地圖</button></div>
     <details class="end-more"><summary>完整數據與走勢圖</summary>
       ${endingGridHtml(rec, rank ? `<div>本機紀錄<b>第 ${rank} 名</b></div>` : '')}
       <canvas id="endChart"></canvas>
@@ -982,7 +982,7 @@ function showEnding(end: Ending) {
         milestones: ms.map(m => m.title), code: e.s.code ?? String(e.s.seed),
         stats: STAT_ORDER.map(k => ({ label: STAT_META[k].label, value: STAT_META[k].lean ? describeLean(e.s.stats[k]) : String(Math.round(e.s.stats[k])) })),
       }, `${BASE}assets/endings/${end.id}.webp`, `${BASE}assets/icon-192.png`);
-      await shareOrDownload(blob, `命運之手-${end.title}-${end.score}.png`, `我在《命運之手：台灣》守護了 ${years} 年，結局「${end.title}」，守護指數 ${end.score}。${e.s.code ? `種子碼 ${e.s.code}，一起來挑戰同一個世界：${seedLink(e.s.code)}` : ''}`);
+      await shareOrDownload(blob, `命運之手-${end.title}-${end.score}.png`, `我在《命運之手：台灣》走過了 ${years} 年，結局「${end.title}」，成果指數 ${end.score}。${e.s.code ? `種子碼 ${e.s.code}，一起來挑戰同一個世界：${seedLink(e.s.code)}` : ''}`);
     } finally { btn.disabled = false; }
   };
 }
@@ -1204,7 +1204,7 @@ function renderEndArchive() {
   const list = loadEndings();
   const box = $('endArchive') as HTMLDetailsElement;
   box.innerHTML = list.length ? `<summary>過往結局</summary><ul>${list.map((r, i) =>
-    `<li data-i="${i}" title="重看這個結局"><b>${esc(r.title)}</b>守護指數 ${r.score}・${esc(r.years)} 年<small>${new Date(r.at).toLocaleDateString('zh-TW')}</small></li>`).join('')}</ul>` : '';
+    `<li data-i="${i}" title="重看這個結局"><b>${esc(r.title)}</b>成果指數 ${r.score}・${esc(r.years)} 年<small>${new Date(r.at).toLocaleDateString('zh-TW')}</small></li>`).join('')}</ul>` : '';
   box.querySelectorAll<HTMLElement>('li[data-i]').forEach(li => li.onclick = () => openArchived(list[Number(li.dataset.i)]));
   box.hidden = !list.length;
   box.classList.toggle('is-open', box.open);

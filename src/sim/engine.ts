@@ -153,8 +153,8 @@ export interface Milestone { id: string; title: string; desc: string }
 
 /** 里程碑：check 回傳 true 的連續天數達 days 即達成 */
 const MILESTONES: (Milestone & { days: number; check: (e: Engine) => boolean })[] = [
-  { id: 'term', title: '撐過第一個任期', desc: '守護島嶼滿 4 年', days: 1, check: e => e.s.day >= 1461 },
-  { id: 'decade', title: '十年守護', desc: '守護島嶼滿 10 年', days: 1, check: e => e.s.day >= 3652 },
+  { id: 'term', title: '撐過第一個任期', desc: '島嶼走過 4 年', days: 1, check: e => e.s.day >= 1461 },
+  { id: 'decade', title: '走過十年', desc: '島嶼走過 10 年', days: 1, check: e => e.s.day >= 3652 },
   { id: 'calm', title: '風平浪靜', desc: '兩岸緊張度連續 2 年不高於 30', days: 730, check: e => e.s.stats.tension <= 30 },
   { id: 'settled', title: '安居樂業', desc: '社會狀態連續 5 年不低於 65', days: 1826, check: e => e.s.stats.stability >= 65 },
   { id: 'rich', title: '藏富於民', desc: '人民財富達到 72', days: 1, check: e => e.s.stats.wealth >= 72 },
@@ -168,7 +168,7 @@ const MILESTONES: (Milestone & { days: number; check: (e: Engine) => boolean })[
 ];
 export const MILESTONE_LIST: Milestone[] = MILESTONES.map(({ id, title, desc }) => ({ id, title, desc }));
 
-/** 守護指數：結局評分與即時顯示共用；緊張與依賴是對稱的兩種外部風險 */
+/** 成果指數：結局評分與即時顯示共用；緊張與依賴是對稱的兩種外部風險 */
 export function guardianScore(st: Record<StatKey, number>, dep: number): number {
   return Math.round((st.stability + st.wealth + st.gdp + st.trust + st.intl) / 5
     - Math.max(0, st.tension - 50) * 0.5 - Math.max(0, dep - 50) * 0.5 + st.demo * 0.1);
@@ -717,7 +717,7 @@ export class Engine {
     return this.s.eggs.filter(id => !this.defs.get(id)?.chainOnly).length;
   }
 
-  /** 目前的守護指數 */
+  /** 目前的成果指數 */
   score() { return guardianScore(this.s.stats, this.s.hidden.dep); }
 
   /**
@@ -788,7 +788,7 @@ export class Engine {
           現狀的三十年: '三十年來，島嶼始終在兩端之間找到平衡。',
           平凡的日子: '沒有奇蹟，也沒有崩塌，日子就這樣一天天過去。',
         };
-        text = `${flavor[title]}三十年過去，你守護這座島嶼走到了今天。政府路線${leanDesc}，`
+        text = `${flavor[title]}三十年過去，你陪著這座島嶼走到了今天。政府路線${leanDesc}，`
           + `社會${st.stability >= 60 ? '安穩' : st.stability >= 35 ? '時有波瀾' : '動盪不安'}，`
           + `人民${st.wealth >= 60 ? '富足' : st.wealth >= 40 ? '小康' : '困頓'}。`;
         break;

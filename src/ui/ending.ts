@@ -116,7 +116,7 @@ export function buildEnding({ s, end, baseline, kicker, milestones, eggs }: Buil
   const diff = end.score - baseline.score;
   if (iv > 0) hand += `若沒有你，平行世界裡的島嶼${baseline.ended && baseline.ended.day <= end.day && baseline.ended.id !== 'timeup'
     ? `會在第 ${(baseline.ended.day / 365.25).toFixed(1)} 年走向「${baseline.ended.title}」`
-    : '同樣會走到這一天'}，守護指數 ${baseline.score}；${diff > 0 ? `你讓它好了 ${diff} 分` : diff < 0 ? `你的出手讓它差了 ${-diff} 分` : '你的出手幾乎沒有改變結果'}。`;
+    : '同樣會走到這一天'}，成果指數 ${baseline.score}；${diff > 0 ? `你讓它好了 ${diff} 分` : diff < 0 ? `你的出手讓它差了 ${-diff} 分` : '你的出手幾乎沒有改變結果'}。`;
   // 時間走完的結局文字已描述政府路線
   if (end.id !== 'timeup') hand += `此刻政府路線${describeLean(s.stats.govLean)}，民意${describeLean(s.stats.popLean)}。`;
   recap.push(hand);
@@ -148,9 +148,9 @@ export function endingShotHtml(r: EndingRecord, base: string) {
     </div>
     <p class="end-text">${esc(r.text)}</p>
     <div class="end-score">
-      <div class="main">守護指數<b>${r.score}</b></div>
-      <div>平行世界<b>${r.baseline}<small class="${diff > 0 ? 'up' : diff < 0 ? 'down' : ''}">${diff > 0 ? '+' : ''}${diff}</small></b></div>
-      <div>守護<b>${esc(r.years)}<small>年</small></b></div>
+      <div class="main">成果指數<b>${r.score}</b></div>
+      <div>平行世界<b>${r.baseline}<small class="${diff > 0 ? 'up' : diff < 0 ? 'down' : ''}">${diff > 0 ? '+' : diff === 0 ? '±' : ''}${diff}</small></b></div>
+      <div>走過<b>${esc(r.years)}<small>年</small></b></div>
       <div>出手<b>${r.interventions}<small>次</small></b></div>
     </div>
     <div class="end-sec">回顧</div>

@@ -65,9 +65,9 @@ export async function renderShareCard(d: ShareData, endingImg: string, icon: str
   // 分數列
   y += 30;
   const boxes: [string, string][] = [
-    ['守護指數', String(d.score)],
+    ['成果指數', String(d.score)],
     ['無人干預的平行世界', d.baseline === null ? '—' : String(d.baseline)],
-    ['守護年數', d.years],
+    ['走過年數', d.years],
     ['出手干預', `${d.interventions} 次`],
   ];
   const bw = (W - x * 2 - 36) / 4;
