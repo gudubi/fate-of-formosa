@@ -237,7 +237,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 /* ---------- 對話框 ---------- */
 #modal, #menuDlg, #ending, #reviewDlg, #dexDlg { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 16px; background: rgba(0,0,0,.35); }
 #modal .card, #menuDlg .card, #ending .card, #reviewDlg .card, #dexDlg .card {
-  width: min(560px, 100%); max-height: calc(100% - 24px); overflow-y: auto; border-radius: 18px;
+  width: min(560px, 100%); max-height: calc(100% - 24px); overflow-y: auto; overflow-x: hidden; border-radius: 18px;
   background: var(--glass-hi); border: 1px solid var(--line); box-shadow: 0 20px 60px rgba(0,0,0,.6);
   backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); animation: cardIn .35s ease-out;
 }
@@ -262,7 +262,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .opt .cost { color: var(--gold); font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 3px; white-space: nowrap; }
 .opt .cost svg { width: 14px; height: 14px; }
 .opt.roll { border-color: #fff; background: rgba(255,255,255,.16); }
-.opt.picked { border-color: var(--c); box-shadow: 0 0 0 2px var(--c) inset; }
+.opt.picked { border-color: var(--c); box-shadow: 0 0 0 2px var(--c) inset; z-index: 1; }
+.opt.picked:disabled, .opt.chosen:disabled { opacity: 1; cursor: default; }
+.opt.unpicked:disabled { opacity: .35; transition: opacity .4s; }
 
 /* 出手干預特效 */
 .opt.chosen { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold) inset, 0 0 24px rgba(255,211,107,.45); animation: chosenPulse 1.2s ease-out; }
@@ -282,6 +284,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .cost-fly { position: fixed; z-index: 61; pointer-events: none; display: flex; align-items: center; gap: 3px;
   color: var(--gold); font-weight: 800; font-size: 16px; text-shadow: 0 0 10px rgba(255,211,107,.8); }
 .cost-fly svg { width: 16px; height: 16px; }
+.fate-orb { position: fixed; z-index: 62; width: 22px; height: 22px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, #fffbe8 0%, #ffe39a 35%, rgba(255,211,107,0) 70%); box-shadow: 0 0 18px 6px rgba(255,211,107,.55); }
 
 /* ---------- 彩蛋 ---------- */
 .bubble.egg { border-color: var(--gold); box-shadow: 0 0 0 0 var(--gold), 0 0 18px rgba(255,211,107,.8); }

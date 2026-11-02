@@ -648,6 +648,8 @@ function openModal(uid: number) {
   const card = $('modal').querySelector('.card') as HTMLElement;
   card.style.setProperty('--c', c.color);
   card.classList.toggle('egg', !!d.egg);
+  // 上一個事件的出手光爆停在放大狀態，留著會撐開卡片寬度
+  card.classList.remove('divine-burst');
   const isMajor = p.tier === 'major';
   // 彩蛋優先用自己的插圖（後續事件沿用母事件），沒有圖時退回分類插圖
   const eggArt = d.egg ? `url('${BASE}assets/eggs/${parents().get(d.id) ?? d.id}.webp'), ` : '';
@@ -699,11 +701,11 @@ function choose(uid: number, i: number | null) {
   if (i === null) statsHold = true;
   const res = e.resolve(uid, i);
   if (!res) { statsHold = false; card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); return; }
-  if (res.intervened) interveneFx(card, i!, cost, p);
   card.querySelectorAll<HTMLButtonElement>('.opt, .btn').forEach(b => b.disabled = true);
   const opts = [...card.querySelectorAll<HTMLElement>('.opt')];
   const finish = () => {
     opts[res.option]?.classList.add('picked');
+    promoteOption(card, res.option);
     statsHold = false;
     if (!res.intervened) sfx.play('resolve');
     const foot = card.querySelector('.ev-foot')!;
@@ -725,53 +727,96 @@ function choose(uid: number, i: number | null) {
       else { opts.forEach(o => o.classList.remove('roll')); finish(); }
     };
     spin();
-  } else finish();
+  } else interveneFx(card, i!, cost, p, finish);
 }
 
-/** 出手干預的特效：金色光爆、光點四散、命運飛向計數器、地圖金色漣漪 */
-function interveneFx(card: HTMLElement, i: number, cost: number, p: Pending) {
+/** 結算後選中的選項移到最上方，其餘往下移並淡化（FLIP 動畫） */
+function promoteOption(card: HTMLElement, idx: number) {
+  const list = card.querySelector<HTMLElement>('.opts');
+  if (!list) return;
+  const opts = [...list.querySelectorAll<HTMLElement>('.opt')];
+  const picked = opts[idx];
+  if (!picked) return;
+  opts.forEach(o => o.classList.toggle('unpicked', o !== picked));
+  const before = new Map(opts.map(o => [o, o.getBoundingClientRect().top]));
+  list.prepend(picked);
+  if (reducedMotion()) return;
+  for (const o of opts) {
+    const dy = before.get(o)! - o.getBoundingClientRect().top;
+    if (Math.abs(dy) > 0.5) o.animate([{ transform: `translateY(${dy}px)` }, { transform: 'translateY(0)' }],
+      { duration: 560, easing: 'cubic-bezier(.2,.8,.2,1)' });
+  }
+}
+
+/** 出手干預的特效：命運計數器飛出光芒，沿弧線落到選項上爆開，接著呼叫 done 結算畫面 */
+function interveneFx(card: HTMLElement, i: number, cost: number, p: Pending, done: () => void) {
   sfx.play('intervene');
   const opt = card.querySelectorAll<HTMLElement>('.opt')[i];
-  const cr = card.getBoundingClientRect(), or = opt.getBoundingClientRect();
-  const cx = or.left + or.width / 2, cy = or.top + or.height / 2;
-  card.style.setProperty('--bx', `${cx - cr.left}px`);
-  card.style.setProperty('--by', `${cy - cr.top + card.scrollTop}px`);
-  card.classList.remove('divine-burst'); void card.offsetWidth; card.classList.add('divine-burst');
-  opt.classList.add('chosen');
-
-  const gold = new THREE.Color('#ffd36b');
-  const { x, y } = locXY(p.county, p.point);
-  map.ripple(x, y, gold, p.county !== null ? 55 : 110, 6);
-  map.highlight(p.county, gold, 5);
   const dv = $('divine');
+  refreshHud();
   dv.classList.remove('bump'); void dv.offsetWidth; dv.classList.add('bump');
-  if (reducedMotion()) return;
-
-  // 光點從選項向外散開
-  for (let k = 0; k < 22; k++) {
-    const sp = document.createElement('span');
-    sp.className = 'spark';
-    sp.style.left = `${cx}px`; sp.style.top = `${cy}px`;
-    document.body.appendChild(sp);
-    const ang = Math.random() * Math.PI * 2, dist = 60 + Math.random() * 140;
-    sp.animate([
-      { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
-      { transform: `translate(calc(-50% + ${Math.cos(ang) * dist}px), calc(-50% + ${Math.sin(ang) * dist}px)) scale(0.2)`, opacity: 0 },
-    ], { duration: 600 + Math.random() * 500, easing: 'cubic-bezier(.2,.7,.3,1)' }).onfinish = () => sp.remove();
-  }
-  // 花費的命運從選項飛向頂列計數器
-  const costEl = opt.querySelector<HTMLElement>('.cost')!.getBoundingClientRect();
   const dr = dv.getBoundingClientRect();
+  const sx = dr.left + dr.width / 2, sy = dr.top + dr.height / 2;
+
+  // 抵達選項：金色光爆、光點四散、地圖金色漣漪
+  const impact = () => {
+    const cr = card.getBoundingClientRect(), or = opt.getBoundingClientRect();
+    const cx = or.left + or.width / 2, cy = or.top + or.height / 2;
+    card.style.setProperty('--bx', `${cx - cr.left}px`);
+    card.style.setProperty('--by', `${cy - cr.top + card.scrollTop}px`);
+    card.classList.remove('divine-burst'); void card.offsetWidth; card.classList.add('divine-burst');
+    setTimeout(() => card.classList.remove('divine-burst'), 1200);
+    opt.classList.add('chosen');
+    const gold = new THREE.Color('#ffd36b');
+    const { x, y } = locXY(p.county, p.point);
+    map.ripple(x, y, gold, p.county !== null ? 55 : 110, 6);
+    map.highlight(p.county, gold, 5);
+    if (reducedMotion()) return done();
+    for (let k = 0; k < 22; k++) {
+      const sp = document.createElement('span');
+      sp.className = 'spark';
+      sp.style.left = `${cx}px`; sp.style.top = `${cy}px`;
+      document.body.appendChild(sp);
+      const ang = Math.random() * Math.PI * 2, dist = 60 + Math.random() * 140;
+      sp.animate([
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+        { transform: `translate(calc(-50% + ${Math.cos(ang) * dist}px), calc(-50% + ${Math.sin(ang) * dist}px)) scale(0.2)`, opacity: 0 },
+      ], { duration: 600 + Math.random() * 500, easing: 'cubic-bezier(.2,.7,.3,1)' }).onfinish = () => sp.remove();
+    }
+    setTimeout(done, 420);
+  };
+  if (reducedMotion()) return impact();
+
+  // 花費的命運從計數器下方浮出淡去
   const fly = document.createElement('span');
   fly.className = 'cost-fly';
   fly.innerHTML = `${HAND_ICON}−${cost}`;
-  fly.style.left = `${costEl.left}px`; fly.style.top = `${costEl.top}px`;
+  fly.style.left = `${dr.left}px`; fly.style.top = `${dr.bottom + 2}px`;
   document.body.appendChild(fly);
   fly.animate([
-    { transform: 'translate(0, 0) scale(1)', opacity: 1 },
-    { transform: 'translate(0, -16px) scale(1.25)', opacity: 1, offset: 0.25 },
-    { transform: `translate(${dr.left - costEl.left}px, ${dr.top - costEl.top}px) scale(0.7)`, opacity: 0 },
-  ], { duration: 950, easing: 'cubic-bezier(.4,0,.2,1)' }).onfinish = () => fly.remove();
+    { transform: 'translateY(-6px)', opacity: 0 },
+    { transform: 'translateY(0)', opacity: 1, offset: 0.2 },
+    { transform: 'translateY(14px)', opacity: 0 },
+  ], { duration: 1100, easing: 'ease-out' }).onfinish = () => fly.remove();
+
+  // 光芒：一顆主光球帶著拖尾光點，沿二次貝茲弧線飛向選項
+  const or = opt.getBoundingClientRect();
+  const tx = or.left + or.width / 2, ty = or.top + or.height / 2;
+  const qx = (sx + tx) / 2 - (ty - sy) * 0.3, qy = (sy + ty) / 2 + (tx - sx) * 0.3;
+  const frames = Array.from({ length: 17 }, (_, k) => {
+    const t = k / 16, u = 1 - t;
+    const x = u * u * sx + 2 * u * t * qx + t * t * tx, y = u * u * sy + 2 * u * t * qy + t * t * ty;
+    return { transform: `translate(calc(-50% + ${x - sx}px), calc(-50% + ${y - sy}px)) scale(${1 + 0.5 * Math.sin(Math.PI * t)})`, offset: t };
+  });
+  for (let k = 0; k < 8; k++) {
+    const el = document.createElement('span');
+    el.className = k === 0 ? 'fate-orb' : 'spark';
+    el.style.left = `${sx}px`; el.style.top = `${sy}px`;
+    if (k) el.style.opacity = String(1 - k * 0.1);
+    document.body.appendChild(el);
+    const a = el.animate(frames, { duration: 650, delay: k * 40, easing: 'cubic-bezier(.45,0,.25,1)', fill: 'backwards' });
+    a.onfinish = () => { el.remove(); if (k === 0) impact(); };
+  }
 }
 
 // ---------- 五年回顧 ----------
