@@ -2,6 +2,8 @@
   "name": "taiwan-gods-hand",
   "private": true,
   "version": "0.1.0",
+  "license": "MIT",
+  "author": "gudubi <gudubi@gudubi.com> (https://gudubi.com)",
   "type": "module",
   "scripts": {
     "dev": "vite --host",

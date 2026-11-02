@@ -66,3 +66,7 @@ docs/ASSET_PROMPTS.md  圖片素材提示詞
 | 周邊國家 | Natural Earth，經 [world-atlas](https://github.com/topojson/world-atlas) 整理 | 公眾領域 |
 
 地形是依主要山脈稜線（中央、雪山、玉山、阿里山、海岸山脈等）近似建模，並非真實 DEM。
+
+## 授權
+
+程式碼以 [MIT License](LICENSE) 釋出。地圖資料依各來源授權使用，詳見上方「資料來源」與 LICENSE。
