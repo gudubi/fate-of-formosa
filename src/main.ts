@@ -369,7 +369,9 @@ function refreshLayer() {
 // ---------- 事件列表 ----------
 function deltaChips(d?: Partial<Record<StatKey, number>>) {
   if (!d) return '';
-  return Object.entries(d).map(([k, v]) => {
+  // 與選項預覽一致：上升在前、統獨方向居中、下降在後
+  const rank = (k: string, v: number) => (STAT_META[k as StatKey].lean ? 0 : v > 0 ? 1 : -1);
+  return Object.entries(d).sort(([ka, va], [kb, vb]) => rank(kb, vb!) - rank(ka, va!)).map(([k, v]) => {
     const m = STAT_META[k as StatKey];
     const good = m.lean ? 'l' : (m.danger === 'high' ? v! < 0 : v! > 0) ? 'p' : 'n';
     return `<span class="chip-d ${good}">${m.short}${v! > 0 ? '+' : ''}${v}</span>`;

@@ -36,14 +36,22 @@ function chip(k: string, v: number, long: boolean): string {
   return `<span class="pv ${bad ? 'bad' : 'good'}${long ? ' long' : ''}">${label(k)}${arrows(v)}</span>`;
 }
 
-/** 回傳選項下方的預覽標籤 HTML */
+/** 排序用：上升 1、只有方向（統獨、靠攏）0、下降 -1 */
+function direction(k: string, v: number): number {
+  if (k === 'govToPop' || k === 'popToGov' || STAT_META[k as StatKey]?.lean) return 0;
+  return v > 0 ? 1 : -1;
+}
+
+/** 回傳選項下方的預覽標籤 HTML：上升一律在前、下降一律在後，同方向時立即影響在長期影響之前 */
 export function optionPreview(o: OptionDef): string {
   if (o.ending) return '<span class="pv warn">歷史將就此轉折</span>';
   const { now, later } = collect(o);
-  const parts = [
-    ...Object.entries(now).map(([k, v]) => chip(k, v!, false)),
-    ...Object.entries(later).map(([k, v]) => chip(k, v!, true)),
-  ].filter(Boolean);
+  const items = [
+    ...Object.entries(now).map(([k, v]) => ({ k, v: v!, long: false })),
+    ...Object.entries(later).map(([k, v]) => ({ k, v: v!, long: true })),
+  ].filter(x => Math.abs(x.v) >= 0.3);
+  items.sort((a, b) => direction(b.k, b.v) - direction(a.k, a.v) || Number(a.long) - Number(b.long));
+  const parts = items.map(x => chip(x.k, x.v, x.long));
   if (o.follow?.length) parts.push('<span class="pv warn">可能引發後續</span>');
   return parts.join('');
 }
