@@ -933,7 +933,7 @@ function showEnding(end: Ending) {
   const card = $('ending').querySelector('.card') as HTMLElement;
   const years = (end.day / 365.25).toFixed(1);
   const intervened = e.s.interventions;
-  // 平行世界：同一個種子全程順其自然，量化玩家這一局造成的差別
+  // 若不出手：同一個種子全程順其自然，量化玩家這一局造成的差別
   const base = Engine.baseline(ALL_EVENTS, COUNTIES, e.s, end.day);
   const ms = MILESTONE_LIST.filter(m => e.s.achieved.includes(m.id));
   const rank = addRecord({
@@ -952,7 +952,7 @@ function showEnding(end: Ending) {
       ${endingGridHtml(rec, rank ? `<div>本機紀錄<b>第 ${rank} 名</b></div>` : '')}
       <canvas id="endChart"></canvas>
       <div class="chart-keys"></div>
-      <p class="chart-note">實線為你的這一局，虛線為無人干預的平行世界</p>
+      <p class="chart-note">實線是你的這一局；虛線是遇上同樣事件、但你完全不出手時的走勢</p>
     </details>`;
   $('ending').classList.remove('archive');
   card.scrollTop = 0;

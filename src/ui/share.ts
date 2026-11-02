@@ -66,7 +66,7 @@ export async function renderShareCard(d: ShareData, endingImg: string, icon: str
   y += 30;
   const boxes: [string, string][] = [
     ['成果指數', String(d.score)],
-    ['無人干預的平行世界', d.baseline === null ? '—' : String(d.baseline)],
+    ['若不出手', d.baseline === null ? '—' : String(d.baseline)],
     ['走過年數', d.years],
     ['出手干預', `${d.interventions} 次`],
   ];
@@ -77,7 +77,7 @@ export async function renderShareCard(d: ShareData, endingImg: string, icon: str
     ctx.fillRect(bx, y, bw, 130);
     ctx.fillStyle = '#8fa3b5';
     ctx.font = `400 22px ${font}`;
-    ctx.fillText(k.length > 6 ? '平行世界' : k, bx + 18, y + 40);
+    ctx.fillText(k, bx + 18, y + 40);
     ctx.fillStyle = i === 0 ? '#ffd36b' : '#ffffff';
     ctx.font = `800 54px ${font}`;
     ctx.fillText(v, bx + 18, y + 105);

@@ -114,9 +114,10 @@ export function buildEnding({ s, end, baseline, kicker, milestones, eggs }: Buil
     : `你一共出手 ${iv} 次，` + (perYear < 1 ? '多半靜觀其變，只在關鍵時刻推一把。'
       : perYear < 3 ? '在需要的時候果斷介入。' : '幾乎每一次風浪裡都有你的身影。');
   const diff = end.score - baseline.score;
-  if (iv > 0) hand += `若沒有你，平行世界裡的島嶼${baseline.ended && baseline.ended.day <= end.day && baseline.ended.id !== 'timeup'
-    ? `會在第 ${(baseline.ended.day / 365.25).toFixed(1)} 年走向「${baseline.ended.title}」`
-    : '同樣會走到這一天'}，成果指數 ${baseline.score}；${diff > 0 ? `你讓它好了 ${diff} 分` : diff < 0 ? `你的出手讓它差了 ${-diff} 分` : '你的出手幾乎沒有改變結果'}。`;
+  // 對照組：同一個種子碼、同樣的事件與運氣，但全程不出手
+  if (iv > 0) hand += `如果你一次都沒出手，遇上同樣的事件與運氣，這座島${baseline.ended && baseline.ended.day <= end.day && baseline.ended.id !== 'timeup'
+    ? `會在第 ${(baseline.ended.day / 365.25).toFixed(1)} 年走向「${baseline.ended.title}」，`
+    : '會'}得到 ${baseline.score} 分；${diff > 0 ? `你的出手讓它多了 ${diff} 分` : diff < 0 ? `你的出手反而讓它少了 ${-diff} 分` : '你的出手幾乎沒有改變結果'}。`;
   // 時間走完的結局文字已描述政府路線
   if (end.id !== 'timeup') hand += `此刻政府路線${describeLean(s.stats.govLean)}，民意${describeLean(s.stats.popLean)}。`;
   recap.push(hand);
@@ -139,7 +140,6 @@ export function buildEnding({ s, end, baseline, kicker, milestones, eggs }: Buil
 
 /** 截圖區塊（結局畫面與過往結局共用） */
 export function endingShotHtml(r: EndingRecord, base: string) {
-  const diff = r.score - r.baseline;
   const val = (k: StatKey) => r.stats[STAT_ORDER.indexOf(k)];
   return `<div class="end-shot">
     <div class="end-hero" style="background-image: url('${base}assets/endings/${r.endId}.webp')">
@@ -149,7 +149,7 @@ export function endingShotHtml(r: EndingRecord, base: string) {
     <p class="end-text">${esc(r.text)}</p>
     <div class="end-score">
       <div class="main">成果指數<b>${r.score}</b></div>
-      <div>平行世界<b>${r.baseline}<small class="${diff > 0 ? 'up' : diff < 0 ? 'down' : ''}">${diff > 0 ? '+' : diff === 0 ? '±' : ''}${diff}</small></b></div>
+      <div>若不出手<b>${r.baseline}</b></div>
       <div>走過<b>${esc(r.years)}<small>年</small></b></div>
       <div>出手<b>${r.interventions}<small>次</small></b></div>
     </div>
