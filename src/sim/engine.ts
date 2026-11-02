@@ -17,6 +17,10 @@ const TIER_RATE: Record<Tier, number> = { news: 26, general: 12, major: 2.4 };
 const DEFAULT_COOLDOWN: Record<Tier, number> = { news: 365, general: 365, major: 900 };
 /** 一般事件不倒數；同時待決超過此數時，最舊的一件交給天意 */
 export const MAX_PENDING = 5;
+/** 每局最多出現幾個彩蛋（不含彩蛋的後續事件），讓稀有事件保持稀有 */
+export const EGG_CAP = 3;
+/** 彩蛋每年平均發生次數（不和一般事件搶同一個抽籤池，稀有度才穩定） */
+const EGG_RATE = 0.048;
 /** 每五年一次回顧 */
 export const REVIEW_DAYS = 1826;
 /** 事件選項的影響倍率：讓每個選擇的後果更明顯（快訊不受影響） */
@@ -116,6 +120,8 @@ export interface GameState {
   streak: Record<string, number>;
   /** 已完成的五年回顧次數 */
   reviews: number;
+  /** 本局遇到的彩蛋事件 id（依發生順序，含後續事件） */
+  eggs: string[];
   cooldown: Record<string, number>;
   once: string[];
   ongoing: { perDay: Effects; days: number }[];
@@ -152,6 +158,9 @@ const MILESTONES: (Milestone & { days: number; check: (e: Engine) => boolean })[
   { id: 'youth', title: '人口回春', desc: '第 5 年後人口活力回到 50', days: 1, check: e => e.s.day > 1826 && e.s.stats.demo >= 50 },
   { id: 'trust', title: '民心所向', desc: '政府信任度達到 75', days: 1, check: e => e.s.stats.trust >= 75 },
   { id: 'wuwei', title: '無為而治', desc: '前 10 年完全不出手干預', days: 1, check: e => e.s.day >= 3652 && e.s.interventions === 0 },
+  { id: 'not_alone', title: '我們並不孤單', desc: '收到來自深空的規律訊號', days: 1, check: e => e.s.eggs.includes('egg_alien_signal') },
+  { id: 'sea_guest', title: '海上的訪客', desc: '鯨群游進台灣海峽', days: 1, check: e => e.s.eggs.includes('egg_whales_strait') },
+  { id: 'lucky', title: '奇遇連連', desc: '同一局遇到 3 個彩蛋', days: 1, check: e => e.eggCount() >= 3 },
 ];
 export const MILESTONE_LIST: Milestone[] = MILESTONES.map(({ id, title, desc }) => ({ id, title, desc }));
 
@@ -170,6 +179,8 @@ const twMidnight = (tw: number) => Math.floor(tw / DAY_MS) * DAY_MS;
 export class Engine {
   readonly defs = new Map<string, EventDef>();
   private byTier: Record<Tier, EventDef[]> = { news: [], general: [], major: [] };
+  /** 彩蛋另外抽：rate 只代表彩蛋之間的相對權重 */
+  private eggPool: EventDef[] = [];
   rng: Rng;
   fate: Rng;
   hooks: Partial<EngineHooks> = {};
@@ -177,7 +188,8 @@ export class Engine {
   constructor(events: EventDef[], public s: GameState) {
     for (const d of [...SYSTEM_EVENTS, ...events]) {
       this.defs.set(d.id, d);
-      if (!d.chainOnly) this.byTier[d.tier].push(d);
+      if (d.chainOnly) continue;
+      if (d.egg) this.eggPool.push(d); else this.byTier[d.tier].push(d);
     }
     s.fateRng ??= (s.seed ^ 0x9e3779b9) >>> 0;
     this.rng = new Rng(s.rng);
@@ -193,6 +205,7 @@ export class Engine {
     s.achieved ??= [];
     s.streak ??= {};
     s.reviews ??= Math.floor(s.day / REVIEW_DAYS);
+    s.eggs ??= [];
     s.pending = s.pending.filter(p => defs.has(p.eventId));
     for (const p of s.pending) p.expiresDay = Infinity;
     s.scheduled = s.scheduled.filter(x => defs.has(x.id));
@@ -233,7 +246,7 @@ export class Engine {
         tension: 45, trust: 50, defense: 45, tech: 80, demo: 40,
       },
       counties, hidden: { econ: 0, stance: 0, identity: 0, mood: 0, dep: 40 }, policies: [], divine: 5,
-      interventions: 0, achieved: [], streak: {}, reviews: 0,
+      interventions: 0, achieved: [], streak: {}, reviews: 0, eggs: [],
       cooldown: {}, once: [], ongoing: [], scheduled: [], pending: [], history: [], log: [], uid: 1,
       lowStab: 0, lowEcon: 0, ended: null,
     };
@@ -340,6 +353,14 @@ export class Engine {
       }
     }
 
+    // 彩蛋：同樣每天固定抽兩個亂數，維持同種子玩家的事件節奏一致
+    const eggRoll = this.rng.next(), eggU = this.rng.next();
+    if (eggRoll < EGG_RATE / 365 && !this.blocking() && s.day >= 20) {
+      const pool = this.eggPool.filter(d => this.eligible(d));
+      const i = pickWith(eggU, pool.map(d => d.rate * this.modFactor(d.mods)));
+      if (i >= 0) this.fire(pool[i]);
+    }
+
     this.systemChecks();
     this.checkMilestones();
 
@@ -369,7 +390,7 @@ export class Engine {
     // 經濟依賴度：與兩岸緊張度完全鏡像（同一起點、相反斜率、同樣的影響與門檻），
     // 偏向獨立推高緊張、偏向統一推高依賴，兩端各有代價
     // 斜率略大於緊張度，用以抵銷事件層面施壓事件較多的落差（以 tools/simulate.ts 的偏統／偏獨機器人校準）
-    h.dep = clamp(h.dep + (40 - st.govLean * 0.5 - st.popLean * 0.1 - h.stance * 30
+    h.dep = clamp(h.dep + (40 - st.govLean * 0.55 - st.popLean * 0.1 - h.stance * 30
       - (st.tech - 80) * 0.05 - (st.intl - 50) * 0.05 - h.dep) * 0.004, 0, 100);
 
     relax('gdp', 0.3 * st.tech + 0.15 * st.intl + 0.15 * st.stability + 0.15 * (100 - st.tension)
@@ -441,7 +462,8 @@ export class Engine {
   private eligible(d: EventDef): boolean {
     const s = this.s;
     if ((s.cooldown[d.id] ?? 0) > s.day) return false;
-    if (d.once && s.once.includes(d.id)) return false;
+    if ((d.once || Engine.oncePerGame(d)) && s.once.includes(d.id)) return false;
+    if (d.egg && !d.chainOnly && this.eggCount() >= EGG_CAP) return false;
     if (s.pending.some(p => p.eventId === d.id)) return false;
     for (const [k, op, v] of d.cond ?? []) {
       const x = this.read(k);
@@ -494,7 +516,10 @@ export class Engine {
   private fire(def: EventDef) {
     const s = this.s;
     s.cooldown[def.id] = s.day + (def.cooldown ?? DEFAULT_COOLDOWN[def.tier]);
-    if (def.once) s.once.push(def.id);
+    // 重大事件同一局只出現一次（含事件鏈排程的後續重大事件）
+    if (Engine.oncePerGame(def) && s.once.includes(def.id)) return;
+    if ((def.once || Engine.oncePerGame(def)) && !s.once.includes(def.id)) s.once.push(def.id);
+    if (def.egg) s.eggs.push(def.id);
     const loc = this.locate(def);
     const opts = def.options ?? [];
 
@@ -661,6 +686,16 @@ export class Engine {
     }
   }
 
+  /** 重大事件一局只出現一次；選舉、危機、宣告等系統事件（sys_）依規則可重複 */
+  static oncePerGame(d: EventDef): boolean {
+    return d.tier === 'major' && !d.id.startsWith('sys_');
+  }
+
+  /** 本局已出現的彩蛋數（不含後續事件） */
+  eggCount(): number {
+    return this.s.eggs.filter(id => !this.defs.get(id)?.chainOnly).length;
+  }
+
   /** 目前的守護指數 */
   score() { return guardianScore(this.s.stats, this.s.hidden.dep); }
 
@@ -738,6 +773,9 @@ export class Engine {
         break;
       }
     }
+    // 這局遇過的彩蛋，在結局留下一句話
+    const epilogues = s.eggs.map(x => this.defs.get(x)?.egg?.epilogue).filter((x): x is string => !!x);
+    if (epilogues.length) text += [...new Set(epilogues)].join('');
     const survived = id !== 'war' && id !== 'collapse' && id !== 'bankrupt';
     s.ended = { id, day: s.day, title, text, score, survived };
     s.history.push({ day: s.day, s: STAT_ORDER.map(k => +s.stats[k].toFixed(1)) });

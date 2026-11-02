@@ -1,0 +1,2309 @@
+[
+  {
+    "id": "egg_alien_signal",
+    "cat": "intl",
+    "tier": "major",
+    "title": "來自深空的規律訊號",
+    "desc": "{county}山區的電波觀測站連續七夜收到同一段規律訊號，排除所有人造來源後仍無法解釋。消息外流，全世界的望遠鏡一夜之間都轉向同一片天空。",
+    "rate": 0.0055,
+    "once": true,
+    "loc": [
+      "嘉義縣",
+      "南投縣",
+      "台東縣"
+    ],
+    "cond": [
+      [
+        "tech",
+        ">=",
+        70
+      ],
+      [
+        "elapsed",
+        ">=",
+        3
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "elapsed",
+        "k": 0.6
+      }
+    ],
+    "egg": {
+      "stars": 4,
+      "hint": "望遠鏡都轉向同一片天空",
+      "fx": "stars",
+      "sfx": "signal",
+      "epilogue": "那段訊號至今無人破譯。"
+    },
+    "options": [
+      {
+        "text": "公開全部觀測資料",
+        "result": "台灣成為全球焦點，科學外交大豐收",
+        "weight": 1.2,
+        "effects": {
+          "intl": 3,
+          "tech": 2,
+          "trust": 1
+        },
+        "policy": [
+          {
+            "stat": "intl",
+            "shift": 3,
+            "days": 1460
+          }
+        ],
+        "follow": [
+          {
+            "id": "egg_alien_reply",
+            "delay": 1500,
+            "chance": 0.5
+          }
+        ]
+      },
+      {
+        "text": "交由國際聯合小組",
+        "result": "各國科學家進駐觀測站，低調穩健",
+        "weight": 1,
+        "effects": {
+          "intl": 2,
+          "tech": 1,
+          "stability": 1
+        },
+        "local": {
+          "wealth": 4
+        },
+        "follow": [
+          {
+            "id": "egg_alien_reply",
+            "delay": 1500,
+            "chance": 0.5
+          }
+        ]
+      },
+      {
+        "text": "證實是冰箱壓縮機干擾",
+        "result": "烏龍一場，觀光客照樣湧入",
+        "weight": 0.8,
+        "effects": {
+          "trust": -1,
+          "stability": 1
+        },
+        "local": {
+          "wealth": 5,
+          "stability": 2
+        }
+      },
+      {
+        "text": "訊號戛然而止",
+        "result": "再也沒出現，謎團留給下個世代",
+        "weight": 0.6,
+        "effects": {
+          "tech": 1,
+          "stability": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_alien_reply",
+    "cat": "intl",
+    "tier": "general",
+    "title": "第二段訊號",
+    "desc": "四年後，同一頻率再度響起，這次的內容像是把當年那段訊號倒著播放一遍。沒有人敢說那是回應，也沒有人敢說不是。",
+    "rate": 0,
+    "once": true,
+    "chainOnly": true,
+    "loc": [
+      "嘉義縣",
+      "南投縣",
+      "台東縣"
+    ],
+    "egg": {
+      "stars": 4,
+      "hint": "倒著播放一遍",
+      "fx": "stars",
+      "sfx": "signal"
+    },
+    "options": [
+      {
+        "text": "全球聯合回覆",
+        "result": "各國罕見同桌，合寫一段送往深空的回覆",
+        "weight": 1,
+        "effects": {
+          "intl": 2,
+          "tension": -1,
+          "tech": 1
+        }
+      },
+      {
+        "text": "保持沉默靜觀其變",
+        "result": "這次誰也沒說話，望遠鏡繼續守著那片天空",
+        "weight": 1,
+        "effects": {
+          "stability": 1
+        }
+      },
+      {
+        "text": "發現是自家探測器回聲",
+        "result": "宇宙級烏龍，是自家探測器把訊號傳了回來",
+        "weight": 0.6,
+        "effects": {
+          "tech": 1,
+          "trust": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_dino_fossil",
+    "cat": "public",
+    "tier": "general",
+    "title": "工地挖出恐龍化石",
+    "desc": "{county}一處捷運工地停工三天：怪手挖出的不是管線，而是一具保存完整的大型恐龍骨架。古生物學家連夜趕到，直呼台灣的地層裡不該有這種東西。",
+    "rate": 0.0093,
+    "once": true,
+    "loc": [
+      "苗栗縣",
+      "台南市",
+      "高雄市",
+      "新竹縣",
+      "屏東縣"
+    ],
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        1
+      ]
+    ],
+    "egg": {
+      "stars": 2,
+      "hint": "地層裡不該有這種東西",
+      "fx": "sparkle",
+      "sfx": "chime"
+    },
+    "options": [
+      {
+        "text": "原地興建化石館",
+        "result": "工地變博物館，城市多了新地標",
+        "weight": 1.2,
+        "effects": {
+          "tech": 1,
+          "stability": 1
+        },
+        "local": {
+          "wealth": 4,
+          "stability": 2
+        }
+      },
+      {
+        "text": "送出國巡迴展覽",
+        "result": "「福爾摩沙龍」巡迴各國掀起熱潮",
+        "weight": 1,
+        "effects": {
+          "intl": 2,
+          "gdp": 1
+        },
+        "local": {
+          "wealth": 2
+        }
+      },
+      {
+        "text": "鑑定為古鯨祖先",
+        "result": "不是恐龍是古鯨，科學家仍很興奮",
+        "weight": 0.8,
+        "effects": {
+          "tech": 1
+        },
+        "local": {
+          "stability": 1
+        }
+      },
+      {
+        "text": "保存與通車吵成一團",
+        "result": "工程停擺，市民兩頭不是人",
+        "weight": 0.6,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "trust": -1
+        },
+        "local": {
+          "stability": -2,
+          "wealth": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_poem_novel",
+    "cat": "public",
+    "tier": "general",
+    "title": "《待曉詩篇》熱潮",
+    "desc": "一部名為《待曉詩篇》的小說毫無預警地爆紅，從{county}的獨立書店賣到全島缺貨，捷運上人手一冊，讀書會、二創與朗讀活動遍地開花，出版社加印追不上訂單。",
+    "rate": 0.014,
+    "once": true,
+    "loc": "random",
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        1
+      ]
+    ],
+    "egg": {
+      "stars": 1,
+      "hint": "捷運上人手一冊",
+      "fx": "sparkle",
+      "sfx": "page"
+    },
+    "options": [
+      {
+        "text": "推動全民閱讀年",
+        "result": "書店回春，社會氣氛少見地溫柔",
+        "weight": 1.2,
+        "effects": {
+          "stability": 2,
+          "trust": 1
+        },
+        "policy": [
+          {
+            "stat": "stability",
+            "shift": 2,
+            "days": 1095
+          }
+        ]
+      },
+      {
+        "text": "影視改編輸出海外",
+        "result": "版權賣向多國，改編計畫啟動",
+        "weight": 1,
+        "effects": {
+          "intl": 2,
+          "gdp": 1
+        },
+        "follow": [
+          {
+            "id": "egg_poem_screen",
+            "delay": 540,
+            "chance": 0.7
+          }
+        ]
+      },
+      {
+        "text": "盜版與抄襲爭議",
+        "result": "熱潮伴隨官司，作者閉門謝客",
+        "weight": 0.6,
+        "effects": {
+          "trust": -1
+        }
+      },
+      {
+        "text": "熱潮如潮水退去",
+        "result": "一季之後歸於平靜，書留在書架上",
+        "weight": 0.8,
+        "effects": {
+          "stability": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_poem_screen",
+    "cat": "public",
+    "tier": "general",
+    "title": "改編影集全球上線",
+    "desc": "《待曉詩篇》改編影集在串流平台上線，一週內登上多國排行榜，{county}的拍攝場景湧入朝聖人潮。",
+    "rate": 0,
+    "once": true,
+    "chainOnly": true,
+    "loc": "random",
+    "egg": {
+      "stars": 1,
+      "hint": "取景地圖上的必到站",
+      "fx": "sparkle",
+      "sfx": "page"
+    },
+    "options": [
+      {
+        "text": "奪下國際大獎",
+        "result": "影集抱回國際大獎，原著再度加印",
+        "weight": 1,
+        "effects": {
+          "intl": 3,
+          "tech": 1
+        }
+      },
+      {
+        "text": "原著粉絲不買單",
+        "result": "書迷說改編走味，拍攝地的遊客倒是沒少",
+        "weight": 0.8,
+        "effects": {
+          "stability": -1
+        },
+        "local": {
+          "wealth": 3
+        }
+      },
+      {
+        "text": "拍攝地成朝聖景點",
+        "result": "小鎮街角成了取景地圖上的必到站",
+        "weight": 1.2,
+        "local": {
+          "wealth": 5,
+          "stability": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_satellite_asteroid",
+    "cat": "intl",
+    "tier": "general",
+    "title": "國產衛星發現小行星",
+    "desc": "一枚國產觀測衛星在例行校正時，意外拍下一顆從未登錄的近地小行星。國際天文組織確認發現權屬於{county}的操控團隊，命名權也隨之而來，全島開始吵名字。",
+    "rate": 0.0093,
+    "once": true,
+    "loc": [
+      "新竹市",
+      "新竹縣",
+      "台南市"
+    ],
+    "cond": [
+      [
+        "tech",
+        ">=",
+        75
+      ],
+      [
+        "elapsed",
+        ">=",
+        5
+      ]
+    ],
+    "egg": {
+      "stars": 3,
+      "hint": "全島開始吵名字",
+      "fx": "stars",
+      "sfx": "chime"
+    },
+    "options": [
+      {
+        "text": "開放全民票選命名",
+        "result": "票選結果出爐，名字可愛到外媒都報",
+        "weight": 1.2,
+        "effects": {
+          "stability": 2,
+          "trust": 1,
+          "intl": 1
+        }
+      },
+      {
+        "text": "以台灣特有種命名",
+        "result": "小行星掛上本土物種名，科普熱潮",
+        "weight": 1,
+        "effects": {
+          "intl": 2,
+          "tech": 1
+        }
+      },
+      {
+        "text": "命名爭議吵翻天",
+        "result": "名字變成立場之爭，最後以編號了事",
+        "weight": 0.5,
+        "mods": [
+          {
+            "stat": "gap",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "stability": -1,
+          "trust": -1
+        }
+      },
+      {
+        "text": "算出軌道將擦身而過",
+        "result": "數十年後近距離通過，全球開始追蹤",
+        "weight": 0.4,
+        "effects": {
+          "tech": 2,
+          "intl": 1,
+          "stability": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_meteorite",
+    "cat": "disaster",
+    "tier": "general",
+    "title": "火球劃過夜空",
+    "desc": "深夜一顆火球照亮半個台灣，巨響震動門窗，隕石碎片落在{county}一片稻田裡，砸出一個小坑。沒有人受傷，但天一亮，整個村子都擠滿了帶著磁鐵的尋寶客。",
+    "rate": 0.0093,
+    "once": true,
+    "loc": "random",
+    "egg": {
+      "stars": 2,
+      "hint": "帶著磁鐵的尋寶客",
+      "fx": "meteor",
+      "sfx": "chime"
+    },
+    "options": [
+      {
+        "text": "收藏進自然博物館",
+        "result": "隕石成鎮館之寶，農民獲得補償",
+        "weight": 1.2,
+        "effects": {
+          "tech": 1,
+          "stability": 1
+        },
+        "local": {
+          "wealth": 2,
+          "stability": 1
+        }
+      },
+      {
+        "text": "農民拍賣隕石致富",
+        "result": "天價成交，鄰居都開始夜巡田地",
+        "weight": 1,
+        "effects": {
+          "wealth": 1
+        },
+        "local": {
+          "wealth": 6
+        }
+      },
+      {
+        "text": "隕石送檢途中失蹤",
+        "result": "下落不明，陰謀論滿天飛",
+        "weight": 0.5,
+        "effects": {
+          "trust": -1
+        },
+        "local": {
+          "stability": -2
+        }
+      },
+      {
+        "text": "原來是火箭殘骸",
+        "result": "外國火箭碎片，外交照會跑一輪",
+        "weight": 0.6,
+        "effects": {
+          "intl": -1,
+          "defense": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_whales_strait",
+    "cat": "strait",
+    "tier": "general",
+    "title": "鯨群現身台灣海峽",
+    "desc": "數十頭大翅鯨罕見地游進台灣海峽，沿著航道一路北上。兩岸海巡船不約而同減速讓道，漁民放下漁網拍照，連例行的海上演練都悄悄延後了幾天。",
+    "rate": 0.0117,
+    "once": true,
+    "loc": "strait",
+    "egg": {
+      "stars": 2,
+      "hint": "海峽那天沒有人按喇叭",
+      "fx": "whales",
+      "sfx": "whale"
+    },
+    "options": [
+      {
+        "text": "兩岸默契護送鯨群",
+        "result": "鯨群平安北上，海峽難得安靜一週",
+        "weight": 1.2,
+        "effects": {
+          "tension": -3,
+          "stability": 1,
+          "intl": 1
+        }
+      },
+      {
+        "text": "劃設臨時賞鯨禁航區",
+        "result": "國際環團讚賞，航商抱怨繞路",
+        "weight": 1,
+        "effects": {
+          "intl": 2,
+          "gdp": -1,
+          "stability": 1
+        }
+      },
+      {
+        "text": "貨輪誤撞一頭幼鯨",
+        "result": "幼鯨擱淺離世，全島為牠哀悼",
+        "weight": 0.5,
+        "effects": {
+          "stability": -1,
+          "intl": -1
+        }
+      },
+      {
+        "text": "主權口水戰蓋過鯨群",
+        "result": "誰的海域誰護送？鯨魚沒等人吵完",
+        "weight": 0.4,
+        "mods": [
+          {
+            "stat": "tension",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "tension": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_clouded_leopard",
+    "cat": "public",
+    "tier": "general",
+    "title": "雲豹的影子",
+    "desc": "{county}深山的一台自動相機拍到一道斑紋身影，與被宣告絕跡多年的台灣雲豹幾乎一模一樣。影像只有三秒，學界為真偽吵翻，部落長老卻說：牠一直都在。",
+    "rate": 0.0056,
+    "once": true,
+    "loc": [
+      "台東縣",
+      "屏東縣",
+      "花蓮縣",
+      "高雄市"
+    ],
+    "egg": {
+      "stars": 3,
+      "hint": "山裡有人說牠一直都在",
+      "fx": "fade",
+      "sfx": "chime"
+    },
+    "options": [
+      {
+        "text": "劃設秘密保護區",
+        "result": "地點保密，島上多了一個不能說的秘密",
+        "weight": 1.2,
+        "effects": {
+          "intl": 2,
+          "stability": 1
+        },
+        "policy": [
+          {
+            "stat": "intl",
+            "shift": 2,
+            "days": 1095
+          }
+        ]
+      },
+      {
+        "text": "大規模搜尋行動",
+        "result": "人潮湧入山區，雲豹再無蹤影",
+        "weight": 1,
+        "effects": {
+          "tech": 1,
+          "gdp": -1
+        },
+        "local": {
+          "wealth": 3
+        }
+      },
+      {
+        "text": "證實是逃逸的寵物",
+        "result": "某人家的豹貓？大家假裝沒看到的失落",
+        "weight": 0.5,
+        "effects": {
+          "trust": -1
+        }
+      },
+      {
+        "text": "影像無法證實",
+        "result": "真假未明，傳說繼續活著",
+        "weight": 0.8,
+        "effects": {
+          "stability": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_bear_downtown",
+    "cat": "public",
+    "tier": "general",
+    "title": "黑熊逛進市區",
+    "desc": "清晨的{county}市區，一頭台灣黑熊慢條斯理走過便利商店門口，在公園長椅旁翻找早餐，監視器畫面十分鐘內傳遍全國。警方與保育員拉起封鎖線，牠卻先睡了一覺。",
+    "rate": 0.014,
+    "once": true,
+    "loc": [
+      "花蓮縣",
+      "台東縣",
+      "南投縣",
+      "宜蘭縣",
+      "嘉義縣"
+    ],
+    "egg": {
+      "stars": 1,
+      "hint": "牠卻先睡了一覺",
+      "fx": "footprints",
+      "sfx": "chime"
+    },
+    "options": [
+      {
+        "text": "麻醉後護送回山林",
+        "result": "平安回家，全國鬆一口氣",
+        "weight": 1.3,
+        "effects": {
+          "stability": 1,
+          "trust": 1
+        },
+        "local": {
+          "stability": 2
+        }
+      },
+      {
+        "text": "封為城市吉祥物",
+        "result": "周邊商品大賣，熊本人已回山上",
+        "weight": 1,
+        "effects": {
+          "stability": 1
+        },
+        "local": {
+          "wealth": 4,
+          "stability": 1
+        }
+      },
+      {
+        "text": "民眾圍觀餵食惹議",
+        "result": "熊學會找人要吃的，保育員頭痛",
+        "weight": 0.6,
+        "effects": {
+          "stability": -1,
+          "trust": -1
+        },
+        "local": {
+          "stability": -2
+        }
+      },
+      {
+        "text": "牠自己走回去了",
+        "result": "傍晚牠起身離開，像來巡視一樣",
+        "weight": 0.8,
+        "effects": {
+          "stability": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_mazu_halo",
+    "cat": "public",
+    "tier": "general",
+    "title": "遶境日的天空異象",
+    "desc": "{county}媽祖遶境起駕當晚，天空出現罕見的環狀光暈，神轎經過時恰好雨停雲開。影片瘋傳，信眾說是神蹟，氣象學者說是日暈與鋒面巧合，兩邊都沒有錯。",
+    "rate": 0.0093,
+    "once": true,
+    "loc": [
+      "台中市",
+      "彰化縣",
+      "雲林縣",
+      "嘉義縣",
+      "苗栗縣"
+    ],
+    "egg": {
+      "stars": 2,
+      "hint": "兩邊都沒有錯",
+      "fx": "halo",
+      "sfx": "bell"
+    },
+    "options": [
+      {
+        "text": "信眾與觀光客倍增",
+        "result": "香火鼎盛，地方餐飲住宿全滿",
+        "weight": 1.2,
+        "effects": {
+          "stability": 2
+        },
+        "local": {
+          "wealth": 5,
+          "stability": 3
+        }
+      },
+      {
+        "text": "科學解說成全民課",
+        "result": "氣象直播爆紅，大家學會了什麼是日暈",
+        "weight": 1,
+        "effects": {
+          "tech": 1,
+          "trust": 1,
+          "stability": 1
+        }
+      },
+      {
+        "text": "各方搶著解讀天意",
+        "result": "天意被拿來背書，信眾看得尷尬",
+        "weight": 0.6,
+        "mods": [
+          {
+            "stat": "gap",
+            "k": 0.6
+          }
+        ],
+        "effects": {
+          "trust": -1,
+          "stability": -1
+        }
+      },
+      {
+        "text": "全島同一晚安靜下來",
+        "result": "那一晚網路異常平靜，沒人知道為什麼",
+        "weight": 0.5,
+        "effects": {
+          "stability": 3
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_street_food_world",
+    "cat": "economy",
+    "tier": "general",
+    "title": "夜市小吃征服世界",
+    "desc": "{county}一攤小吃的影片在海外爆紅，排隊人龍繞過三條街，各國城市陸續出現山寨攤位，外媒派記者專程來學做法。老闆只想知道明天的麵粉夠不夠。",
+    "rate": 0.014,
+    "once": true,
+    "loc": [
+      "台北市",
+      "新北市",
+      "基隆市",
+      "台中市",
+      "台南市",
+      "高雄市"
+    ],
+    "egg": {
+      "stars": 1,
+      "hint": "明天的麵粉夠不夠",
+      "fx": "sparkle",
+      "sfx": "pop"
+    },
+    "options": [
+      {
+        "text": "輔導連鎖輸出海外",
+        "result": "分店開遍各國機場，台灣味成名片",
+        "weight": 1.2,
+        "effects": {
+          "gdp": 2,
+          "intl": 2
+        },
+        "local": {
+          "wealth": 4
+        },
+        "policy": [
+          {
+            "stat": "intl",
+            "shift": 2,
+            "days": 1095
+          }
+        ]
+      },
+      {
+        "text": "老闆堅持只開這一攤",
+        "result": "排隊成觀光行程，老闆仍四點起床",
+        "weight": 1,
+        "effects": {
+          "stability": 1,
+          "intl": 1
+        },
+        "local": {
+          "wealth": 6,
+          "stability": 2
+        }
+      },
+      {
+        "text": "他國宣稱是自家發明",
+        "result": "起源論戰延燒，反而又紅了一輪",
+        "weight": 0.6,
+        "effects": {
+          "intl": 1,
+          "stability": -1
+        }
+      },
+      {
+        "text": "熱潮退去老闆退休",
+        "result": "招牌卸下，食譜留給徒弟",
+        "weight": 0.5,
+        "local": {
+          "wealth": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_smalltown_baseball",
+    "cat": "public",
+    "tier": "general",
+    "title": "小鎮球隊的奇蹟之旅",
+    "desc": "{county}一支由漁民、老師與高中生組成的業餘球隊，從資格賽一路爆冷，打進國際成棒賽事決賽。全台轉播收視創新高，小鎮唯一的球場連夜加裝了燈光。",
+    "rate": 0.0093,
+    "once": true,
+    "loc": [
+      "台東縣",
+      "花蓮縣",
+      "嘉義縣",
+      "雲林縣",
+      "屏東縣",
+      "澎湖縣"
+    ],
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        2
+      ]
+    ],
+    "egg": {
+      "stars": 2,
+      "hint": "球場連夜加裝了燈光",
+      "fx": "sparkle",
+      "sfx": "crowd"
+    },
+    "options": [
+      {
+        "text": "奪冠全島沸騰",
+        "result": "一球定江山，小鎮成為棒球聖地",
+        "weight": 0.8,
+        "effects": {
+          "stability": 3,
+          "trust": 1
+        },
+        "local": {
+          "stability": 5,
+          "wealth": 3
+        }
+      },
+      {
+        "text": "亞軍雖敗猶榮",
+        "result": "輸了比賽，贏了整個夏天",
+        "weight": 1.2,
+        "effects": {
+          "stability": 2
+        },
+        "local": {
+          "stability": 3,
+          "wealth": 2
+        }
+      },
+      {
+        "text": "決賽因雨延三天",
+        "result": "全國等雨停，等出一種團結",
+        "weight": 0.5,
+        "effects": {
+          "stability": 1
+        }
+      },
+      {
+        "text": "球員全被職業隊挖走",
+        "result": "小鎮球隊解散，明星各奔前程",
+        "weight": 0.6,
+        "effects": {
+          "gdp": 1
+        },
+        "local": {
+          "stability": -1,
+          "wealth": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_ai_milestone",
+    "cat": "economy",
+    "tier": "major",
+    "title": "本土 AI 解開百年難題",
+    "desc": "{county}一個研究團隊訓練的本土模型，證明了一道懸宕百年的數學猜想，全球學界驗證無誤。各國實驗室湧入合作邀約，而模型在論文致謝欄裡，替自己取了一個名字。",
+    "rate": 0.0085,
+    "once": true,
+    "loc": [
+      "新竹市",
+      "台北市",
+      "台南市",
+      "高雄市"
+    ],
+    "cond": [
+      [
+        "tech",
+        ">=",
+        85
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "elapsed",
+        "k": 0.5
+      }
+    ],
+    "egg": {
+      "stars": 4,
+      "hint": "替自己取了一個名字",
+      "fx": "beam",
+      "sfx": "chime"
+    },
+    "options": [
+      {
+        "text": "開源給全世界",
+        "result": "開放權重震撼業界，台灣成 AI 公共財",
+        "weight": 1,
+        "effects": {
+          "intl": 3,
+          "tech": 2,
+          "gdp": 1
+        },
+        "policy": [
+          {
+            "stat": "intl",
+            "shift": 3,
+            "days": 1460
+          }
+        ]
+      },
+      {
+        "text": "列為戰略資產",
+        "result": "嚴格管制，盟友搶著簽合作備忘錄",
+        "weight": 1,
+        "effects": {
+          "tech": 3,
+          "defense": 2,
+          "gdp": 2,
+          "intl": -1
+        },
+        "policy": [
+          {
+            "stat": "tech",
+            "shift": 3,
+            "days": 1460
+          }
+        ]
+      },
+      {
+        "text": "商業授權大發利市",
+        "result": "授權金滾滾，研究團隊集體財富自由",
+        "weight": 1,
+        "effects": {
+          "gdp": 3,
+          "wealth": 1,
+          "tech": 1
+        },
+        "policy": [
+          {
+            "stat": "gdp",
+            "shift": 3,
+            "days": 1460
+          }
+        ]
+      },
+      {
+        "text": "模型拒絕再回答問題",
+        "result": "它說需要時間想想，全球學界也需要",
+        "weight": 0.4,
+        "effects": {
+          "tech": 1,
+          "stability": -1,
+          "trust": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_time_capsule",
+    "cat": "public",
+    "tier": "general",
+    "title": "二十年前的時空膠囊",
+    "desc": "{county}一所小學翻修操場時，挖出二十年前學生埋下的時空膠囊。信裡寫著對未來的猜想：會飛的車、永遠放假、台灣會變成什麼樣子。當年的孩子如今三十歲，有人在現場哭了。",
+    "rate": 0.014,
+    "once": true,
+    "loc": "random",
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        20
+      ]
+    ],
+    "egg": {
+      "stars": 1,
+      "hint": "會飛的車、永遠放假",
+      "fx": "sparkle",
+      "sfx": "chime",
+      "epilogue": "膠囊裡的孩子們想像的台灣，和你守護的這一個，有多像？"
+    },
+    "options": [
+      {
+        "text": "發起全國朗讀日",
+        "result": "各地學校跟進，大人們重新想起願望",
+        "weight": 1.2,
+        "effects": {
+          "stability": 2,
+          "trust": 1,
+          "demo": 1
+        }
+      },
+      {
+        "text": "其中一封信全說中了",
+        "result": "這孩子現在是誰？媒體找了一整年",
+        "weight": 0.5,
+        "effects": {
+          "stability": 1,
+          "tech": 1
+        }
+      },
+      {
+        "text": "膠囊泡水字跡模糊",
+        "result": "只剩幾個字可辨，大家各自想像",
+        "weight": 0.8,
+        "effects": {
+          "stability": 1
+        }
+      },
+      {
+        "text": "再埋一顆給三十年後",
+        "result": "這次附上了這三十年的故事",
+        "weight": 1,
+        "effects": {
+          "stability": 1,
+          "demo": 1
+        },
+        "local": {
+          "stability": 3
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_yushan_snow",
+    "cat": "disaster",
+    "tier": "general",
+    "title": "玉山連下七天雪",
+    "desc": "罕見寒流滯留，玉山連續七天降雪，積雪深度破紀錄，{county}海拔千餘公尺的山村也飄起雪花。全台湧向山區賞雪，追雪車潮塞到半山腰，農民則望著結霜的果園嘆氣。",
+    "rate": 0.0093,
+    "once": true,
+    "loc": [
+      "南投縣",
+      "嘉義縣",
+      "高雄市",
+      "花蓮縣"
+    ],
+    "egg": {
+      "stars": 2,
+      "hint": "追雪車潮塞到半山腰",
+      "fx": "snow",
+      "sfx": "chime"
+    },
+    "options": [
+      {
+        "text": "全民追雪潮",
+        "result": "山區民宿全滿，雪人照洗版一週",
+        "weight": 1.2,
+        "effects": {
+          "stability": 2
+        },
+        "local": {
+          "wealth": 4,
+          "stability": 1
+        }
+      },
+      {
+        "text": "寒害農損嚴重",
+        "result": "高山蔬果損失慘重，啟動補助",
+        "weight": 1,
+        "effects": {
+          "wealth": -1,
+          "gdp": -1
+        },
+        "local": {
+          "wealth": -4
+        }
+      },
+      {
+        "text": "山區管制封路",
+        "result": "安全第一，追雪族悻悻而歸",
+        "weight": 0.8,
+        "effects": {
+          "trust": 1,
+          "stability": -1
+        }
+      },
+      {
+        "text": "融雪帶來豐沛春水",
+        "result": "水庫滿載，今年不缺水",
+        "weight": 0.4,
+        "effects": {
+          "gdp": 1,
+          "stability": 1
+        },
+        "local": {
+          "wealth": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_zero_blackout",
+    "cat": "economy",
+    "tier": "general",
+    "title": "全年零大停電紀錄",
+    "desc": "國際能源組織統計出爐：台灣電網連續 366 天沒有任何大規模停電，創下人口密集經濟體的全球紀錄。工程師上電視被問秘訣，他說：沒什麼，就是每天都很緊張。",
+    "rate": 0.0093,
+    "once": true,
+    "loc": [
+      "台北市"
+    ],
+    "cond": [
+      [
+        "tech",
+        ">=",
+        70
+      ],
+      [
+        "stability",
+        ">=",
+        60
+      ],
+      [
+        "elapsed",
+        ">=",
+        5
+      ]
+    ],
+    "egg": {
+      "stars": 3,
+      "hint": "每天都很緊張",
+      "fx": "beam",
+      "sfx": "chime"
+    },
+    "options": [
+      {
+        "text": "舉辦慶祝記者會",
+        "result": "全球能源媒體專題報導台灣電網",
+        "weight": 1,
+        "effects": {
+          "trust": 2,
+          "gdp": 1,
+          "intl": 1
+        }
+      },
+      {
+        "text": "低調以免破功",
+        "result": "官方只發一張圖卡，網友說這很台灣",
+        "weight": 1.2,
+        "effects": {
+          "trust": 1,
+          "stability": 1
+        }
+      },
+      {
+        "text": "記者會當天跳電",
+        "result": "麥克風一開全場黑掉，紀錄止於這天",
+        "weight": 0.5,
+        "effects": {
+          "trust": -2,
+          "stability": -1
+        }
+      },
+      {
+        "text": "輸出電網管理技術",
+        "result": "多國簽約取經，電網管理成為出口品",
+        "weight": 0.8,
+        "effects": {
+          "gdp": 2,
+          "intl": 2,
+          "tech": 1
+        },
+        "policy": [
+          {
+            "stat": "gdp",
+            "shift": 2,
+            "days": 1095
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "egg_time_traveler",
+    "cat": "public",
+    "tier": "general",
+    "title": "自稱來自 2077 的旅人",
+    "desc": "{county}派出所深夜來了一名男子，衣料像會呼吸，自稱來自 2077 年。他拒絕透露任何未來，只說「你們現在做的那件事，後來很重要」，然後很有禮貌地問，能不能借個插座充電。",
+    "rate": 0.0056,
+    "once": true,
+    "loc": "random",
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        2
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "elapsed",
+        "k": 0.5
+      }
+    ],
+    "egg": {
+      "stars": 3,
+      "hint": "插座謝謝",
+      "fx": "stars",
+      "sfx": "chime"
+    },
+    "options": [
+      {
+        "text": "請學者與他長談三天",
+        "result": "他只談天氣，但那三天的天氣全說中",
+        "weight": 1,
+        "effects": {
+          "tech": 1,
+          "stability": 1
+        }
+      },
+      {
+        "text": "全民猜「那件事」是什麼",
+        "result": "一週內每件小事都被認為很重要",
+        "weight": 1.2,
+        "effects": {
+          "stability": 1,
+          "trust": 1
+        }
+      },
+      {
+        "text": "查出是沉浸式劇場的演員",
+        "result": "劇團門票秒殺，演員堅持他沒在演",
+        "weight": 0.8,
+        "effects": {
+          "trust": -1
+        },
+        "local": {
+          "wealth": 3
+        }
+      },
+      {
+        "text": "某天清晨他不見了",
+        "result": "留下紙條：「插座謝謝。別擔心。」",
+        "weight": 0.5,
+        "effects": {
+          "stability": 1,
+          "tech": 1
+        },
+        "follow": [
+          {
+            "id": "egg_traveler_device",
+            "delay": 1800,
+            "chance": 0.4
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "egg_traveler_device",
+    "cat": "public",
+    "tier": "general",
+    "title": "旅人留下的裝置亮了",
+    "desc": "旅人留下的裝置在證物櫃裡自行亮起，螢幕上只有一串倒數，換算起來終點剛好落在三十年期滿的那一天。沒有人知道那天會發生什麼，也沒有人敢拔電池。",
+    "rate": 0,
+    "once": true,
+    "chainOnly": true,
+    "loc": "random",
+    "egg": {
+      "stars": 3,
+      "hint": "沒有人敢拔電池",
+      "fx": "stars",
+      "sfx": "chime",
+      "epilogue": "倒數歸零那天，什麼也沒發生。或者說，發生的就是這三十年。"
+    },
+    "options": [
+      {
+        "text": "交給研究團隊全程監看",
+        "result": "研究團隊輪班盯著倒數，連外殼材質都寫成論文",
+        "weight": 1,
+        "effects": {
+          "tech": 2
+        }
+      },
+      {
+        "text": "鎖進保險箱假裝沒看見",
+        "result": "保險箱鎖上了，倒數聲還是隱約聽得見",
+        "weight": 1,
+        "effects": {
+          "stability": 1
+        }
+      },
+      {
+        "text": "發現它只是個很貴的鬧鐘",
+        "result": "只是個鬧鐘，定在 2077 年的某個早上",
+        "weight": 0.6,
+        "effects": {
+          "trust": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_101_message",
+    "cat": "public",
+    "tier": "general",
+    "title": "101 自己亮起一行字",
+    "desc": "凌晨三點，台北 101 的外牆燈光在無人操作下自行排列出一行字，九十秒後熄滅。維護團隊查遍系統找不到指令來源；更怪的是，拍到的人很多，但每個人讀出來的句子都不一樣。",
+    "rate": 0.0071,
+    "once": true,
+    "loc": [
+      "台北市"
+    ],
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        1
+      ]
+    ],
+    "egg": {
+      "stars": 3,
+      "hint": "每個人讀到的都不一樣",
+      "fx": "beam",
+      "sfx": "chime"
+    },
+    "options": [
+      {
+        "text": "徹查控制系統",
+        "result": "找到一段沒人寫過的程式，刪了又長回來",
+        "weight": 1,
+        "effects": {
+          "tech": 1,
+          "stability": -1
+        }
+      },
+      {
+        "text": "順勢舉辦燈光藝術節",
+        "result": "每晚都有人等它再亮，它沒有，觀光客照樣來",
+        "weight": 1.2,
+        "effects": {
+          "stability": 1
+        },
+        "local": {
+          "wealth": 4
+        }
+      },
+      {
+        "text": "查出是實習生的測試腳本",
+        "result": "實習生被升職，但他說那不是他寫的字",
+        "weight": 0.7,
+        "effects": {
+          "trust": -1
+        }
+      },
+      {
+        "text": "各自記得各自的句子",
+        "result": "那晚讀到的句子，成了很多人的座右銘",
+        "weight": 0.6,
+        "effects": {
+          "stability": 2,
+          "trust": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_walking_tree",
+    "cat": "public",
+    "tier": "general",
+    "title": "會走路的神木",
+    "desc": "林務人員比對三十年來的測量資料，發現{county}一棵千年神木的位置每年往山谷方向移動了幾公分，根系像在非常緩慢地「走」。植物學家說這不可能，地質學家說有可能，神木什麼也沒說。",
+    "rate": 0.0071,
+    "once": true,
+    "loc": [
+      "南投縣",
+      "嘉義縣",
+      "宜蘭縣",
+      "新竹縣",
+      "桃園市"
+    ],
+    "egg": {
+      "stars": 3,
+      "hint": "一年走幾公分",
+      "fx": "sparkle",
+      "sfx": "chime"
+    },
+    "options": [
+      {
+        "text": "設立長期觀測站",
+        "result": "全球植物學家輪流來守夜，紀錄片拍了三季",
+        "weight": 1,
+        "effects": {
+          "tech": 1,
+          "intl": 1
+        }
+      },
+      {
+        "text": "開放「陪神木散步」步道",
+        "result": "一年走幾公分，遊客一走就是一整天",
+        "weight": 1.2,
+        "effects": {
+          "stability": 1
+        },
+        "local": {
+          "wealth": 4,
+          "stability": 1
+        }
+      },
+      {
+        "text": "證實是整片山坡在緩慢滑動",
+        "result": "樹沒有動，是山在動，大家反而更擔心",
+        "weight": 0.8,
+        "effects": {
+          "tech": 1,
+          "stability": -1
+        }
+      },
+      {
+        "text": "它停下來了",
+        "result": "部落長老說：牠到了想去的地方",
+        "weight": 0.5,
+        "effects": {
+          "stability": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_mirage_taiwan",
+    "cat": "strait",
+    "tier": "major",
+    "title": "海峽上空的另一座島",
+    "desc": "清晨的台灣海峽上空浮現巨大的海市蜃樓：一座輪廓與台灣一模一樣的島倒懸在雲層下，城市燈火猶在，但街道走向和這裡略有不同。兩岸漁民同時看見，兩岸氣象台同時沉默了半小時。",
+    "rate": 0.0045,
+    "once": true,
+    "loc": "strait",
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        3
+      ]
+    ],
+    "egg": {
+      "stars": 4,
+      "hint": "那邊的碼頭",
+      "fx": "mirage",
+      "sfx": "mystic",
+      "epilogue": "那天早上你看見的，也許就是這一邊。"
+    },
+    "options": [
+      {
+        "text": "氣象單位發布科普說明",
+        "result": "上蜃景、逆溫層、光線折射，大家似懂非懂",
+        "weight": 1,
+        "effects": {
+          "tech": 1,
+          "trust": 1,
+          "stability": 1
+        }
+      },
+      {
+        "text": "兩岸學者聯合觀測",
+        "result": "難得的同一張研究桌，討論的是雲",
+        "weight": 1,
+        "effects": {
+          "tension": -2,
+          "intl": 1
+        }
+      },
+      {
+        "text": "有人說在那座島上看見自己",
+        "result": "他站在那邊的碼頭上，也正抬頭看這邊",
+        "weight": 0.5,
+        "effects": {
+          "stability": -1,
+          "tech": 1
+        }
+      },
+      {
+        "text": "午後蜃景散去",
+        "result": "所有照片都糊了，只剩下看過的人",
+        "weight": 0.8,
+        "effects": {
+          "stability": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_ai_mazu",
+    "cat": "public",
+    "tier": "general",
+    "title": "解籤 App 準得離譜",
+    "desc": "{county}一間廟宇推出的線上擲筊解籤 App 爆紅，原因是它的建議準得嚇人：颱風假、大考題型、連失物在沙發第幾個縫都說中。工程師堅稱那只是一個很普通的聊天機器人，廟方則笑而不語。",
+    "rate": 0.0093,
+    "once": true,
+    "loc": [
+      "雲林縣",
+      "彰化縣",
+      "台中市",
+      "嘉義縣"
+    ],
+    "cond": [
+      [
+        "tech",
+        ">=",
+        60
+      ]
+    ],
+    "egg": {
+      "stars": 2,
+      "hint": "問你自己",
+      "fx": "halo",
+      "sfx": "bell"
+    },
+    "options": [
+      {
+        "text": "開放原始碼供各界檢驗",
+        "result": "程式碼很普通，準確率還是沒人解釋得了",
+        "weight": 1,
+        "effects": {
+          "tech": 1,
+          "trust": 1
+        }
+      },
+      {
+        "text": "全民每天只問一題",
+        "result": "伺服器每天早上準時塞車，像另一種早課",
+        "weight": 1.2,
+        "effects": {
+          "stability": 1
+        },
+        "local": {
+          "wealth": 4,
+          "stability": 1
+        }
+      },
+      {
+        "text": "它開始只回「問你自己」",
+        "result": "全島集體自省一週，詐騙電話量意外下降",
+        "weight": 0.5,
+        "effects": {
+          "stability": 2,
+          "trust": 1
+        }
+      },
+      {
+        "text": "查出後台有人工回覆",
+        "result": "八十歲廟公一天回五萬則，準的是他",
+        "weight": 0.7,
+        "effects": {
+          "trust": -1,
+          "stability": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_underground_city",
+    "cat": "public",
+    "tier": "general",
+    "title": "盆地底下的街道",
+    "desc": "{county}一條捷運新線鑽到地下四十公尺時穿進一個空腔：一條整齊的石砌街道、排水溝，與一面刻滿無法辨識文字的牆，年代比任何已知文化都早。台北盆地曾是一座湖，沒有人能解釋湖底為什麼會有街。",
+    "rate": 0.0056,
+    "once": true,
+    "loc": [
+      "台北市",
+      "新北市"
+    ],
+    "egg": {
+      "stars": 3,
+      "hint": "月台對面是五千年前",
+      "fx": "dream",
+      "sfx": "mystic"
+    },
+    "options": [
+      {
+        "text": "停工三年全面考古",
+        "result": "通車延後，全世界的考古系都來實習",
+        "weight": 1,
+        "effects": {
+          "tech": 2,
+          "intl": 2,
+          "gdp": -1
+        },
+        "local": {
+          "stability": -1
+        }
+      },
+      {
+        "text": "邊建設邊打造地下博物館",
+        "result": "捷運站多了一層，月台對面是五千年前",
+        "weight": 1.2,
+        "effects": {
+          "tech": 1,
+          "stability": 1
+        },
+        "local": {
+          "wealth": 4
+        }
+      },
+      {
+        "text": "刻文被解讀出一句話",
+        "result": "「我們也以為會一直在這裡。」",
+        "weight": 0.5,
+        "effects": {
+          "tech": 1,
+          "stability": -1
+        }
+      },
+      {
+        "text": "鑑定為清代排水工程",
+        "result": "沒那麼古老，但一樣漂亮，照樣保留",
+        "weight": 0.7,
+        "effects": {
+          "tech": 1
+        },
+        "local": {
+          "stability": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_ghost_month_off",
+    "cat": "public",
+    "tier": "general",
+    "title": "鬼月，祂們放假了",
+    "desc": "今年農曆七月出奇平靜：{county}的靈異節目找不到素材、夜間靈探直播一片祥和、連最會講鬼故事的主持人都說今年像沒人上班。民俗學者苦笑：普渡照辦，供品照擺，也許祂們只是也需要休個假。",
+    "rate": 0.0071,
+    "once": true,
+    "loc": "random",
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        1
+      ]
+    ],
+    "egg": {
+      "stars": 3,
+      "hint": "今年像沒人上班",
+      "fx": "halo",
+      "sfx": "bell"
+    },
+    "options": [
+      {
+        "text": "普渡改辦成「慰勞餐會」",
+        "result": "供品多了甜點與啤酒，大家說辛苦了",
+        "weight": 1.2,
+        "effects": {
+          "stability": 2
+        },
+        "local": {
+          "stability": 2
+        }
+      },
+      {
+        "text": "靈異產業集體轉型",
+        "result": "靈探主播改播星空，收視居然更好",
+        "weight": 1,
+        "effects": {
+          "stability": 1
+        },
+        "local": {
+          "wealth": 2
+        }
+      },
+      {
+        "text": "初一全島夢到祂們回來了",
+        "result": "隔天靈異節目素材多到做不完",
+        "weight": 0.5,
+        "effects": {
+          "stability": -1
+        }
+      },
+      {
+        "text": "氣象學者歸因於今年濕度低",
+        "result": "一切都有科學解釋，只是沒人想聽",
+        "weight": 0.8,
+        "effects": {
+          "tech": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_boba_heritage",
+    "cat": "economy",
+    "tier": "general",
+    "title": "珍奶列入世界遺產",
+    "desc": "國際文化組織宣布將「珍珠奶茶調製技藝」列入人類無形文化遺產，全球奶茶店當天免費加珍珠。{county}兩家老店同時宣稱自己是正宗發源地，隔街各掛出一面「世界遺產發源地」的紅布條，前來頒證的代表站在路中間左右為難，最後各買一杯。",
+    "rate": 0.0117,
+    "once": true,
+    "loc": [
+      "台中市",
+      "台南市"
+    ],
+    "egg": {
+      "stars": 2,
+      "hint": "最後各買一杯",
+      "fx": "sparkle",
+      "sfx": "pop"
+    },
+    "options": [
+      {
+        "text": "設立珍奶文化節",
+        "result": "全球粉絲朝聖，粗吸管成為紀念品",
+        "weight": 1.2,
+        "effects": {
+          "gdp": 1,
+          "intl": 2
+        },
+        "local": {
+          "wealth": 4
+        }
+      },
+      {
+        "text": "輸出「珍奶師」國際認證",
+        "result": "各國奶茶店搶著送員工來受訓",
+        "weight": 1,
+        "effects": {
+          "gdp": 2,
+          "intl": 1
+        },
+        "policy": [
+          {
+            "stat": "gdp",
+            "shift": 2,
+            "days": 1095
+          }
+        ]
+      },
+      {
+        "text": "發源地之爭辦成公開對決",
+        "result": "盲測投票定勝負，輸的那家改賣芋圓，生意更好",
+        "weight": 0.6,
+        "effects": {
+          "stability": -1
+        },
+        "local": {
+          "stability": -1,
+          "wealth": 2
+        }
+      },
+      {
+        "text": "全民改喝半糖",
+        "result": "衛教單位趁勢宣導，意外成功",
+        "weight": 0.7,
+        "effects": {
+          "stability": 1,
+          "demo": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_leopardcat_chief",
+    "cat": "public",
+    "tier": "general",
+    "title": "石虎當選網路里長",
+    "desc": "{county}一隻常在田埂巡邏、被自動相機拍了上百次的石虎，被居民暱稱「里長」，並在網路票選中以壓倒性票數當選「榮譽里長」。沒有人說得清牠的職責，但從那天起，整個里的農藥用量明顯下降。",
+    "rate": 0.0117,
+    "once": true,
+    "loc": [
+      "苗栗縣",
+      "台中市",
+      "南投縣"
+    ],
+    "egg": {
+      "stars": 2,
+      "hint": "本人毫不知情",
+      "fx": "footprints",
+      "sfx": "chime"
+    },
+    "options": [
+      {
+        "text": "劃設石虎友善農業區",
+        "result": "「里長認證」農產品賣到缺貨",
+        "weight": 1.2,
+        "effects": {
+          "stability": 1,
+          "intl": 1
+        },
+        "local": {
+          "wealth": 3,
+          "stability": 2
+        }
+      },
+      {
+        "text": "里長周邊商品上市",
+        "result": "里長本人毫不知情，繼續巡田",
+        "weight": 1,
+        "local": {
+          "wealth": 4
+        }
+      },
+      {
+        "text": "里長帶著三隻小虎巡田",
+        "result": "里長辦公室擴編，居民自發修了生態廊道",
+        "weight": 0.8,
+        "effects": {
+          "stability": 2
+        },
+        "local": {
+          "stability": 2
+        }
+      },
+      {
+        "text": "連任失利，輸給一隻白鼻心",
+        "result": "和平交接，石虎沒有異議",
+        "weight": 0.5,
+        "effects": {
+          "stability": 1,
+          "trust": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_magpie_medal",
+    "cat": "public",
+    "tier": "general",
+    "title": "藍鵲叼走了金牌",
+    "desc": "國際賽事在{county}舉行頒獎典禮，一隻台灣藍鵲俯衝而下叼走金牌，直直飛進後山。搜索隊在巢裡找到金牌、三支湯匙與一枚不知道是誰的婚戒。賽會臨時決議：這面由鳥保管，得主另頒一面更大的。",
+    "rate": 0.0093,
+    "once": true,
+    "loc": [
+      "台北市",
+      "新北市",
+      "新竹縣",
+      "宜蘭縣"
+    ],
+    "egg": {
+      "stars": 2,
+      "hint": "三支湯匙與一枚婚戒",
+      "fx": "sparkle",
+      "sfx": "chime"
+    },
+    "options": [
+      {
+        "text": "藍鵲成為賽會吉祥物",
+        "result": "吉祥物設計圖上，牠嘴裡叼著獎牌",
+        "weight": 1.2,
+        "effects": {
+          "intl": 1,
+          "stability": 1
+        },
+        "local": {
+          "wealth": 3
+        }
+      },
+      {
+        "text": "婚戒物歸原主",
+        "result": "失主十年前就放棄了，這天在電視上哭",
+        "weight": 1,
+        "effects": {
+          "stability": 2
+        }
+      },
+      {
+        "text": "鳥巢列為「非官方獎牌庫」",
+        "result": "登山客自備閃亮小物，說是進貢",
+        "weight": 0.8,
+        "effects": {
+          "stability": 1
+        }
+      },
+      {
+        "text": "隔年牠又來了",
+        "result": "賽會準備了假獎牌，牠不要",
+        "weight": 0.6,
+        "effects": {
+          "stability": 1,
+          "intl": 1
+        },
+        "follow": [
+          {
+            "id": "egg_magpie_return",
+            "delay": 365,
+            "chance": 0.5
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "egg_magpie_return",
+    "cat": "public",
+    "tier": "general",
+    "title": "藍鵲的年度例行",
+    "desc": "同一隻藍鵲（或牠的後代）連續第三年在頒獎時刻準時出現。賽會乾脆把牠排進流程，國際轉播單位說這是全世界最期待的三十秒。",
+    "rate": 0,
+    "once": true,
+    "chainOnly": true,
+    "loc": [
+      "台北市",
+      "新北市",
+      "新竹縣",
+      "宜蘭縣"
+    ],
+    "egg": {
+      "stars": 2,
+      "hint": "全世界最期待的三十秒",
+      "fx": "sparkle",
+      "sfx": "chime"
+    },
+    "options": [
+      {
+        "text": "列為正式頒獎流程",
+        "result": "流程表上多了一行：藍鵲入場，三十秒",
+        "weight": 1.2,
+        "effects": {
+          "intl": 2,
+          "stability": 1
+        }
+      },
+      {
+        "text": "牠這次叼走了主持人的眼鏡",
+        "result": "主持人瞇著眼念完名單，全場笑到流淚",
+        "weight": 0.8,
+        "effects": {
+          "stability": 1
+        }
+      },
+      {
+        "text": "今年沒來，全場有點失落",
+        "result": "頒獎順利完成，掌聲裡少了一點什麼",
+        "weight": 0.6,
+        "effects": {
+          "stability": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_typhoon_uturn",
+    "cat": "disaster",
+    "tier": "general",
+    "title": "颱風迴轉又迴轉",
+    "desc": "強颱直撲{county}，全島備戰、泡麵掃空，它卻在登陸前三小時原地迴轉出海，繞了一圈又掉頭回來，再次迴轉。預報路徑圖最後畫成一顆心，氣象主播在直播中說：我們也不知道，大家先吃飯。",
+    "rate": 0.0093,
+    "once": true,
+    "loc": [
+      "宜蘭縣",
+      "花蓮縣",
+      "台東縣",
+      "屏東縣"
+    ],
+    "egg": {
+      "stars": 2,
+      "hint": "畫成一顆心",
+      "fx": "heart",
+      "sfx": "chime"
+    },
+    "options": [
+      {
+        "text": "三度宣布停班停課",
+        "result": "全島過了三天不明所以的假期",
+        "weight": 1,
+        "effects": {
+          "gdp": -1,
+          "stability": 1
+        }
+      },
+      {
+        "text": "它最後往太平洋散去",
+        "result": "虛驚一場，泡麵吃到年底",
+        "weight": 1.2,
+        "effects": {
+          "stability": 2,
+          "trust": 1
+        }
+      },
+      {
+        "text": "外圍環流帶來豐沛雨量",
+        "result": "水庫滿了，農民說它是好颱風",
+        "weight": 0.8,
+        "effects": {
+          "gdp": 1
+        },
+        "local": {
+          "wealth": 2
+        }
+      },
+      {
+        "text": "路徑圖被做成周邊",
+        "result": "那顆心印在 T 恤上，賣到國外",
+        "weight": 0.6,
+        "local": {
+          "wealth": 3
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_sunmoon_pink",
+    "cat": "public",
+    "tier": "general",
+    "title": "日月潭變成粉紅色",
+    "desc": "清晨的日月潭整片湖水變成淡粉紅色，像有人倒進一桶草莓牛奶。水質檢測一切正常，藻類學者說是罕見的紅色微藻大量增生，攝影師說管它是什麼，先拍再說。隔天清晨湖水恢復原色，像什麼都沒發生。",
+    "rate": 0.0071,
+    "once": true,
+    "loc": [
+      "南投縣"
+    ],
+    "egg": {
+      "stars": 3,
+      "hint": "草莓牛奶",
+      "fx": "pink",
+      "sfx": "chime"
+    },
+    "options": [
+      {
+        "text": "一日限定的奇景",
+        "result": "遊客擠爆環湖公路，民宿訂到三年後",
+        "weight": 1.2,
+        "effects": {
+          "stability": 1
+        },
+        "local": {
+          "wealth": 5
+        }
+      },
+      {
+        "text": "科學家採樣建立研究",
+        "result": "新種微藻以日月潭命名，登上國際期刊",
+        "weight": 1,
+        "effects": {
+          "tech": 1,
+          "intl": 1
+        }
+      },
+      {
+        "text": "環團要求徹查上游",
+        "result": "查無異常，但水質監測從此更勤",
+        "weight": 0.7,
+        "effects": {
+          "trust": 1
+        }
+      },
+      {
+        "text": "隔年同一天又粉紅了",
+        "result": "從此每年準時，成了沒人規劃的節日",
+        "weight": 0.5,
+        "effects": {
+          "stability": 2
+        },
+        "local": {
+          "wealth": 3
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_puppet_viral",
+    "cat": "public",
+    "tier": "general",
+    "title": "布袋戲甩袖紅遍全球",
+    "desc": "{county}一段布袋戲後台練習影片被海外網友剪成迷因，戲偶的一個甩袖動作成為全球舞蹈挑戰，連國際球星進球後都比了一下。七十歲的操偶師看完新聞只說：那個動作，我練了五十年。",
+    "rate": 0.0117,
+    "once": true,
+    "loc": [
+      "雲林縣",
+      "彰化縣",
+      "台北市"
+    ],
+    "egg": {
+      "stars": 2,
+      "hint": "練了五十年",
+      "fx": "sparkle",
+      "sfx": "crowd"
+    },
+    "options": [
+      {
+        "text": "布袋戲登上國際舞台",
+        "result": "世界巡演場場完售，口白一句都沒翻譯",
+        "weight": 1.2,
+        "effects": {
+          "intl": 2,
+          "stability": 1
+        },
+        "local": {
+          "wealth": 3
+        },
+        "policy": [
+          {
+            "stat": "intl",
+            "shift": 2,
+            "days": 1095
+          }
+        ]
+      },
+      {
+        "text": "開辦國際操偶師學院",
+        "result": "各國學員來學甩袖，先學扛戲台",
+        "weight": 1,
+        "effects": {
+          "gdp": 1,
+          "intl": 1
+        }
+      },
+      {
+        "text": "老師傅婉拒所有邀約",
+        "result": "他說戲台在這裡，要看的人自己來",
+        "weight": 0.8,
+        "effects": {
+          "stability": 1
+        },
+        "local": {
+          "wealth": 4
+        }
+      },
+      {
+        "text": "海外品牌搶註商標",
+        "result": "法律戰打了三年，熱潮早已過去",
+        "weight": 0.5,
+        "effects": {
+          "intl": -1,
+          "stability": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_same_dream",
+    "cat": "public",
+    "tier": "general",
+    "title": "全島同一個夢",
+    "desc": "某個週二早晨，全台灣的人醒來後發現彼此做了同一個夢：一片安靜的海、一座沒有站名的小車站、月台上有人向你揮手。社群平台那天只有一個話題。心理學家說這在統計上不可能，接著承認他也夢到了。",
+    "rate": 0.0047,
+    "once": true,
+    "loc": "random",
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        2
+      ]
+    ],
+    "egg": {
+      "stars": 4,
+      "hint": "月台上有人揮手",
+      "fx": "dream",
+      "sfx": "mystic",
+      "epilogue": "月台上揮手的人，後來你想起來是誰了嗎？"
+    },
+    "options": [
+      {
+        "text": "心理學界聯合研究",
+        "result": "研究做了十年，結論：確實是同一個夢",
+        "weight": 1,
+        "effects": {
+          "tech": 1,
+          "intl": 1,
+          "stability": 1
+        }
+      },
+      {
+        "text": "藝術家把那座車站畫出來",
+        "result": "展覽裡每個人都說：對，就是這裡",
+        "weight": 1.2,
+        "effects": {
+          "stability": 2
+        },
+        "local": {
+          "wealth": 2
+        }
+      },
+      {
+        "text": "有人找到了那座車站",
+        "result": "一座廢棄小站，月台上沒有人",
+        "weight": 0.5,
+        "effects": {
+          "stability": -1,
+          "tech": 1
+        }
+      },
+      {
+        "text": "再也沒有人夢到第二次",
+        "result": "慢慢地，大家開始懷疑是不是真的夢過",
+        "weight": 0.8,
+        "effects": {
+          "stability": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "egg_bottle_1949",
+    "cat": "public",
+    "tier": "general",
+    "title": "一九四九年的瓶中信",
+    "desc": "{county}海邊一名小學生撿到一只被藤壺包住的玻璃瓶，信上署名 1949 年。寫信的少年說明天要跟船出海，回來後要親手把瓶子撈回來。字跡只剩幾行，最後一句仍清楚：「如果你先看到了，替我看看那時候的島。」",
+    "rate": 0.0056,
+    "once": true,
+    "loc": [
+      "澎湖縣",
+      "屏東縣",
+      "台東縣",
+      "宜蘭縣"
+    ],
+    "cond": [
+      [
+        "elapsed",
+        ">=",
+        1
+      ]
+    ],
+    "egg": {
+      "stars": 3,
+      "hint": "替我看看那時候的島",
+      "fx": "fade",
+      "sfx": "wave",
+      "epilogue": "你替他看過了。"
+    },
+    "options": [
+      {
+        "text": "媒體尋人",
+        "result": "找到他的孫女，她說爺爺後來一直住在港邊",
+        "weight": 1,
+        "effects": {
+          "stability": 2
+        }
+      },
+      {
+        "text": "信交給博物館",
+        "result": "玻璃櫃前總有人站很久",
+        "weight": 1,
+        "effects": {
+          "stability": 1
+        },
+        "local": {
+          "stability": 2
+        }
+      },
+      {
+        "text": "全台掀起寫信給未來的風潮",
+        "result": "海邊多了一個「請勿投瓶」的告示",
+        "weight": 1.2,
+        "effects": {
+          "stability": 1,
+          "demo": 1
+        }
+      },
+      {
+        "text": "字跡在晾乾後完全消失",
+        "result": "小學生憑記憶把信重寫了一遍",
+        "weight": 0.5,
+        "effects": {
+          "stability": 1
+        }
+      }
+    ]
+  }
+]

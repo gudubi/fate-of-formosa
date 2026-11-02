@@ -19,6 +19,8 @@ import { addRecord, loadRecords } from './ui/records';
 import { renderShareCard, shareOrDownload } from './ui/share';
 import { randomCode, normalizeCode, codeToSeed } from './sim/seed';
 import { animateDetails } from './ui/collapse';
+import { recordEgg, eggParents, dexHtml, dexDetailHtml, dexProgress } from './ui/eggs';
+import type { EventDef } from './sim/types';
 
 const SPEEDS = [0, 4, 8, 16];       // 天／秒
 // 開場：日期從中華民國建立（1912-01-01）開始以遊戲速度跳動，
@@ -560,7 +562,7 @@ function toast(html: string, color: string, ms = 4200) {
 function addBubble(p: Pending) {
   const d = eng!.defs.get(p.eventId)!;
   const el = document.createElement('button');
-  el.className = `bubble ${p.tier === 'major' ? 'major' : ''}`;
+  el.className = `bubble ${p.tier === 'major' ? 'major' : ''} ${d.egg ? 'egg' : ''} ${d.egg?.fx === 'fade' ? 'ghost' : ''}`;
   el.style.setProperty('--c', CAT_META[d.cat].color);
   el.innerHTML = iconSvg(d.cat, p.tier === 'major' ? 22 : 18);
   el.title = eng!.text(d.title, p);
@@ -588,6 +590,7 @@ function attachHooks(e: Engine) {
       const { x, y } = locXY(p.county, p.point);
       map.ripple(x, y, catColor(d.cat), 26, 5);
       map.highlight(p.county, catColor(d.cat), 4);
+      if (d.egg) { eggFx(d, p); refreshFeed(); return; }
       sfx.play(d.cat);
       const idle = performance.now() - lastInteract > 6000;
       // 4 倍速時一般事件太密集，只在 1、2 倍速自動移動鏡頭
@@ -602,7 +605,7 @@ function attachHooks(e: Engine) {
       map.ripple(x, y, catColor(d.cat), p.county !== null ? 34 : 80, 8);
       map.highlight(p.county, catColor(d.cat), 8);
       sfx.play('major');
-      setTimeout(() => sfx.play(d.cat), 400);
+      if (d.egg) eggFx(d, p, false); else setTimeout(() => sfx.play(d.cat), 400);
       if (settings.cam !== 'off') map.flyTo(x, y, zoom * (isMobile() ? 1.35 : 1), 1.3, 0.85);
       // 若已有對話框開著，關閉時會自動接著打開這一件
       setTimeout(() => {
@@ -611,6 +614,11 @@ function attachHooks(e: Engine) {
     },
     resolved: (l, p) => {
       removeBubble(p.uid);
+      const rd = e.defs.get(l.eventId);
+      if (rd?.egg) {
+        const fresh = recordEgg(l.eventId, l.option, e.s.code, parents(), true);
+        if (fresh && !rd.chainOnly) setTimeout(() => toast(`<div class="t">✦ 彩蛋圖鑑解鎖：${esc(l.title)}</div><div>標題畫面的「彩蛋圖鑑」可以回味</div>`, '#ffd36b', 5200), 600);
+      }
       if (openUid !== p.uid) {
         toast(`<div class="t">${esc(l.title)}・${esc(l.optionText ?? '')}</div><div>${esc(l.result ?? '')}</div>${deltaChips(l.deltas)}`, CAT_META[l.cat].color);
       }
@@ -638,11 +646,14 @@ function openModal(uid: number) {
   const costs = d.options!.map((_, i) => e.cost(d, i));
   const card = $('modal').querySelector('.card') as HTMLElement;
   card.style.setProperty('--c', c.color);
+  card.classList.toggle('egg', !!d.egg);
   const isMajor = p.tier === 'major';
+  // 彩蛋優先用自己的插圖（後續事件沿用母事件），沒有圖時退回分類插圖
+  const eggArt = d.egg ? `url('${BASE}assets/eggs/${parents().get(d.id) ?? d.id}.webp'), ` : '';
   card.innerHTML = `
-    <div class="ev-hero" style="background-image:radial-gradient(120% 140% at 20% 0%, ${c.color}, transparent 60%), url('${BASE}assets/events/${d.cat}.webp')"><span class="ic">${iconSvg(d.cat, 40)}</span></div>
+    <div class="ev-hero" style="background-image:${eggArt}radial-gradient(120% 140% at 20% 0%, ${c.color}, transparent 60%), url('${BASE}assets/events/${d.cat}.webp')"><span class="ic">${d.egg ? '✦' : iconSvg(d.cat, 40)}</span></div>
     <div class="ev-head">
-      <div class="ev-kind"><span class="pill">${c.label}</span><span>${isMajor ? '重大事件' : '事件'} · ${esc(e.placeName(p))} · ${shortDate(e.s.day)}</span></div>
+      <div class="ev-kind">${d.egg ? `<span class="pill egg-pill">✦ 稀有事件 ${'★'.repeat(d.egg.stars)}</span>` : ''}<span class="pill">${c.label}</span><span>${isMajor ? '重大事件' : '事件'} · ${esc(e.placeName(p))} · ${shortDate(e.s.day)}</span></div>
       <div class="ev-title">${esc(e.text(d.title, p))}</div>
     </div>
     <div class="ev-desc">${esc(e.text(d.desc, p))}</div>
@@ -799,6 +810,100 @@ function closeReview() {
   save();
 }
 
+// ---------- 彩蛋 ----------
+let parentMap: Map<string, string> | null = null;
+/** 後續事件 → 母事件 */
+function parents() { return parentMap ??= eggParents(eng?.defs.values() ?? []); }
+
+/** 本局遇到的彩蛋（不含後續事件，依發生順序） */
+function eggsThisGame(e: Engine): EventDef[] {
+  return e.s.eggs.map(id => e.defs.get(id)!).filter(d => d && !d.chainOnly);
+}
+
+/** 特定彩蛋的地標位置（經緯度） */
+const EGG_SPOTS: Record<string, [number, number]> = {
+  egg_yushan_snow: [120.957, 23.47],   // 玉山
+  egg_sunmoon_pink: [120.916, 23.866], // 日月潭
+  egg_101_message: [121.5645, 25.034], // 台北 101
+};
+
+/** 彩蛋發生時的音效與地圖特效；camera=false 時不移動鏡頭（重大事件由呼叫端處理） */
+function eggFx(d: EventDef, p: Pending, camera = true) {
+  const egg = d.egg!;
+  sfx.play('egg_chime');
+  const voice = egg.sfx;
+  if (voice && voice !== 'chime') setTimeout(() => sfx.play(`egg_${voice}`), 500);
+  let { x, y, zoom } = locXY(p.county, p.point);
+  const spot = EGG_SPOTS[parents().get(d.id) ?? d.id];
+  if (spot) [x, y] = lonLatToKm(spot[0], spot[1]);
+  const gold = new THREE.Color('#ffd36b');
+  map.ripple(x, y, gold, 40, 6);
+  const fx = map.fx;
+  switch (egg.fx) {
+    case 'stars': fx.stars(x, y); break;
+    case 'meteor': fx.meteor(x, y); break;
+    case 'snow': fx.snow(x, y); fx.halo(x, y, '#ffffff'); break;
+    case 'halo': fx.halo(x, y); break;
+    case 'whales': fx.whales(x, y); break;
+    case 'footprints': fx.footprints(x + 38, y - 14, x, y); break;
+    case 'mirage': fx.mirage(x, y); break;
+    case 'pink': fx.halo(x, y, '#ff8fc8'); map.highlight(p.county, new THREE.Color('#ff8fc8'), 9); map.ripple(x, y, new THREE.Color('#ff8fc8'), 30, 7); break;
+    case 'heart': fx.heart(x + 150, y); break;
+    case 'beam': fx.beam(x, y); break;
+    case 'dream': dreamOverlay(); fx.stars(x, y); break;
+    case 'fade': fx.sparkle(x, y, '#cfe8ff'); break;
+    default: fx.sparkle(x, y);
+  }
+  // 彩蛋值得一看：除非關閉事件鏡頭，否則移過去
+  if (camera && settings.cam !== 'off' && openUid === null) {
+    const far = egg.fx === 'mirage' || egg.fx === 'heart' || egg.fx === 'stars' || egg.fx === 'meteor';
+    map.flyTo(egg.fx === 'heart' ? x + 150 : x, y, far ? Math.max(zoom, 520) : (isMobile() ? 300 : 240), 1.6, far ? 0.95 : 0.8);
+  }
+}
+
+/** 全島同一個夢：畫面暗下、柔光暈染幾秒 */
+function dreamOverlay() {
+  if (reducedMotion()) return;
+  const el = document.createElement('div');
+  el.className = 'dream-fx';
+  document.body.appendChild(el);
+  el.animate([{ opacity: 0 }, { opacity: 1, offset: 0.25 }, { opacity: 1, offset: 0.7 }, { opacity: 0 }], { duration: 7000, easing: 'ease-in-out' })
+    .onfinish = () => el.remove();
+}
+
+function openDex() {
+  sfx.unlock();
+  sfx.play('click');
+  showDexList();
+  $('dexDlg').hidden = false;
+}
+function showDexList(scrollTo?: string) {
+  const card = $('dexDlg').querySelector('.card') as HTMLElement;
+  card.innerHTML = dexHtml(ALL_EVENTS, BASE);
+  $('dexClose').onclick = closeDex;
+  card.querySelectorAll<HTMLElement>('.dex-card[data-id]').forEach(el => el.onclick = () => showDexDetail(el.dataset.id!));
+  // 從詳細頁返回時捲回原本那張卡片
+  if (scrollTo) card.querySelector<HTMLElement>(`[data-id="${scrollTo}"]`)?.scrollIntoView({ block: 'center' });
+  else card.scrollTop = 0;
+}
+function showDexDetail(id: string) {
+  sfx.play('click');
+  const card = $('dexDlg').querySelector('.card') as HTMLElement;
+  card.innerHTML = dexDetailHtml(id, ALL_EVENTS, BASE);
+  card.scrollTop = 0;
+  const back = () => { sfx.play('click'); showDexList(id); };
+  $('dexBack').onclick = back;
+  $('dexBack2').onclick = back;
+}
+function closeDex() {
+  sfx.play('click');
+  $('dexDlg').hidden = true;
+}
+function refreshDexButton() {
+  const { got, total } = dexProgress(ALL_EVENTS);
+  $('btnDex').textContent = `彩蛋圖鑑 ${got} / ${total}`;
+}
+
 // ---------- 縣市卡 ----------
 function showCounty(i: number | null) {
   selCounty = i;
@@ -852,6 +957,7 @@ function showEnding(end: Ending) {
       ${STAT_ORDER.map(k => `<div>${STAT_META[k].label}<b>${STAT_META[k].lean ? describeLean(e.s.stats[k]) : Math.round(e.s.stats[k])}</b></div>`).join('')}
     </div>
     ${ms.length ? `<div class="end-ms">🏅 ${ms.map(m => esc(m.title)).join('、')}</div>` : ''}
+    ${eggsThisGame(e).length ? `<div class="end-eggs">✦ 本局奇遇：${eggsThisGame(e).map(d => `${esc(d.title.replaceAll('{county}', ''))}<small>${'★'.repeat(d.egg!.stars)}</small>`).join('、')}</div>` : ''}
     <canvas id="endChart"></canvas>
     <div class="chart-keys"></div>
     <p class="chart-note">實線為你的這一局，虛線為無人干預的平行世界</p>
@@ -1055,6 +1161,7 @@ function toTitle() {
   $('title').hidden = false;
   $('btnContinue').hidden = !loadSave();
   renderRecords();
+  refreshDexButton();
   setCode(randomCode());
   map.controls.autoRotate = !reducedMotion();
   map.overview(true);
@@ -1118,6 +1225,8 @@ function bindInput() {
   $('btnMenu').onclick = openMenu;
   $('btnNew').onclick = () => newGame(true);
   $('btnContinue').onclick = continueGame;
+  $('btnDex').onclick = openDex;
+  $('dexDlg').onclick = ev => { if (ev.target === $('dexDlg')) closeDex(); };
   document.querySelectorAll<HTMLDetailsElement>('#title details').forEach(d => animateDetails(d, reducedMotion));
   $('btnSeedRandom').onclick = () => { sfx.unlock(); sfx.play('click'); setCode(randomCode()); };
   $('btnSeedCopy').onclick = async () => {
@@ -1194,6 +1303,7 @@ async function boot() {
   bindInput();
   refreshMute();
   renderRecords();
+  refreshDexButton();
   // 從分享連結進來（?seed=XXXXXX）時直接帶入種子碼
   setCode(seedFromUrl() || randomCode());
   const btn = $<HTMLButtonElement>('btnNew');

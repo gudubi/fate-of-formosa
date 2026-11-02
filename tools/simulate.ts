@@ -11,6 +11,7 @@ const errs = validateEvents(ALL_EVENTS);
 if (errs.length) { console.log('資料錯誤：\n' + errs.join('\n')); process.exit(1); }
 
 const N = Number(process.argv[2] ?? 300);
+const EGGS_ONLY = process.argv.includes("--eggs");
 const START = Date.UTC(2026, 10, 2, 13, 0);
 
 /** 機器人：回傳要干預的選項索引，或 null 交給天意 */
@@ -66,6 +67,8 @@ const eventCount: Record<string, number> = {};
 const endings: Record<string, number> = {};
 const titles: Record<string, number> = {};
 const finals: number[][] = [];
+const eggHist: number[] = [];
+const eggSeen: Record<string, number> = {};
 let endYears = 0;
 for (let g = 0; g < N; g++) {
   const s = play(1000 + g, BOTS.不干預, { tier: tierCount, ev: eventCount });
@@ -73,6 +76,9 @@ for (let g = 0; g < N; g++) {
   titles[s.ended!.title] = (titles[s.ended!.title] ?? 0) + 1;
   endYears += s.day / 365.25 / N;
   finals.push([...STAT_ORDER.map(k => s.stats[k]), s.hidden.dep]);
+  const parentsOnly = s.eggs.filter(id => !ALL_EVENTS.find(d => d.id === id)?.chainOnly);
+  eggHist[parentsOnly.length] = (eggHist[parentsOnly.length] ?? 0) + 1;
+  for (const id of parentsOnly) eggSeen[id] = (eggSeen[id] ?? 0) + 1;
 }
 
 const pct = (n: number, d = N) => `${((n / d) * 100).toFixed(1)}%`;
@@ -89,8 +95,19 @@ console.log('\n數值         終局平均   終局標準差');
 });
 const sorted = Object.entries(eventCount).sort((a, b) => b[1] - a[1]);
 console.log('\n最常見事件：', sorted.slice(0, 10).map(([k, v]) => `${k}:${(v / N).toFixed(1)}`).join(' '));
-const never = ALL_EVENTS.filter(d => !eventCount[d.id]).map(d => d.id);
+const never = ALL_EVENTS.filter(d => !eventCount[d.id] && !d.egg).map(d => d.id);
 console.log(`從未發生（${never.length}）：`, never.join(' '));
+
+// ---- 彩蛋 ----
+const eggDefs = ALL_EVENTS.filter(d => d.egg && !d.chainOnly);
+const avgEggs = Object.entries(eggHist).reduce((a, [k, v]) => a + Number(k) * (v ?? 0), 0) / N;
+console.log(`
+彩蛋：每局平均 ${avgEggs.toFixed(2)} 個；分布 ` + [...eggHist.keys()].map(k => `${k} 個 ${pct(eggHist[k] ?? 0)}`).join('  '));
+console.log('各彩蛋出現率：' + eggDefs.map(d => `${d.title.replaceAll('{county}', '')} ${pct(eggSeen[d.id] ?? 0)}`).join('、'));
+const neverEgg = eggDefs.filter(d => !eggSeen[d.id]).map(d => d.id);
+if (neverEgg.length) console.log('從未出現的彩蛋：', neverEgg.join(' '));
+
+if (EGGS_ONLY) process.exit(0);
 
 // ---- 玩法比較 ----
 const M = Math.max(60, Math.round(N / 2));

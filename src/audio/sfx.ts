@@ -1,10 +1,12 @@
 // 音效全部以 Web Audio 即時合成：免授權、免下載、檔案體積為零。
 // 若 public/audio/<name>.mp3 存在，會優先播放該檔案（可替換為 CC0 音效）。
-import type { Category } from '../sim/types';
+import type { Category, EggSfx } from '../sim/types';
 
-export type SfxName = Category | 'click' | 'major' | 'resolve' | 'divine' | 'warn' | 'ending' | 'news' | 'start' | 'tick' | 'intervene';
+export type SfxName = Category | 'click' | 'major' | 'resolve' | 'divine' | 'warn' | 'ending' | 'news' | 'start' | 'tick' | 'intervene'
+  | `egg_${EggSfx}`;
 
 const FILE_SFX: SfxName[] = ['click', 'major', 'resolve', 'divine', 'warn', 'ending', 'news', 'start', 'tick', 'intervene',
+  'egg_chime', 'egg_signal', 'egg_whale', 'egg_page', 'egg_pop', 'egg_wave', 'egg_crowd', 'egg_bell', 'egg_mystic',
   'disaster', 'strait', 'politics', 'public', 'intl', 'economy'];
 
 class Sfx {
@@ -150,6 +152,45 @@ class Sfx {
         this.noiseBurst(1.5, 300, { gain: 0.25 });
         break;
       case 'resolve': this.tone(523.3, 0.3, { gain: 0.07 }); this.tone(784, 0.4, { gain: 0.06, at: 0.08 }); break;
+      // ---- 彩蛋事件 ----
+      case 'egg_chime': // 稀有事件：閃亮的上行琶音
+        [1046.5, 1318.5, 1568, 2093, 2637].forEach((f, k) => this.tone(f, 0.9, { gain: 0.05, at: k * 0.07, type: 'triangle' }));
+        break;
+      case 'egg_signal': // 深空訊號：規律的低頻脈衝
+        for (let k = 0; k < 6; k++) this.tone(k % 3 === 2 ? 330 : 220, 0.18, { gain: 0.08, at: k * 0.28, type: 'square' });
+        this.tone(55, 2.2, { gain: 0.15, attack: 0.3 });
+        break;
+      case 'egg_whale': // 鯨鳴：緩慢滑音
+        this.tone(180, 1.6, { gain: 0.12, glide: 420, attack: 0.3 });
+        this.tone(260, 1.8, { gain: 0.08, glide: 140, at: 1.1, attack: 0.3 });
+        this.noiseBurst(2.2, 300, { gain: 0.15, attack: 0.6 });
+        break;
+      case 'egg_page': // 翻書頁
+        this.noiseBurst(0.18, 3200, { gain: 0.35, type: 'highpass', attack: 0.01 });
+        this.noiseBurst(0.22, 2400, { gain: 0.25, type: 'highpass', at: 0.16, attack: 0.02 });
+        this.tone(784, 0.6, { gain: 0.04, at: 0.3 });
+        break;
+      case 'egg_pop': // 吸管戳破封膜
+        this.noiseBurst(0.05, 1800, { gain: 0.6, type: 'bandpass', q: 2, attack: 0.002 });
+        this.tone(620, 0.12, { gain: 0.12, glide: 260, at: 0.03 });
+        this.tone(1318.5, 0.5, { gain: 0.04, at: 0.15 });
+        break;
+      case 'egg_wave': // 海浪
+        this.noiseBurst(2.4, 600, { gain: 0.45, attack: 0.9 });
+        this.noiseBurst(2.0, 900, { gain: 0.25, at: 1.4, attack: 0.7 });
+        break;
+      case 'egg_crowd': // 歡呼
+        this.noiseBurst(1.6, 1100, { gain: 0.5, type: 'bandpass', q: 0.6, attack: 0.25 });
+        [523.3, 659.3, 784].forEach((f, k) => this.tone(f, 0.5, { gain: 0.05, at: 0.1 + k * 0.08, type: 'triangle' }));
+        break;
+      case 'egg_bell': // 廟鐘
+        this.tone(196, 3, { gain: 0.18 }); this.tone(196 * 2.4, 2.2, { gain: 0.06 }); this.tone(196 * 5.4, 1.2, { gain: 0.03 });
+        break;
+      case 'egg_mystic': // 詭譎：不和諧的長音與低語般的雜訊
+        this.tone(233, 3, { gain: 0.07, attack: 0.8 }); this.tone(247, 3, { gain: 0.07, attack: 0.8 });
+        this.tone(370, 2.6, { gain: 0.04, at: 0.6, attack: 0.8 });
+        this.noiseBurst(3, 700, { gain: 0.12, type: 'bandpass', q: 3, attack: 1.2 });
+        break;
       case 'intervene': // 出手干預：低沉一擊＋上升的光之和弦
         this.tone(73.4, 1.4, { gain: 0.35, glide: 55 });
         this.noiseBurst(0.6, 2400, { gain: 0.2, type: 'bandpass', q: 0.6, attack: 0.15 });

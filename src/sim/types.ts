@@ -123,8 +123,40 @@ export interface EventDef {
   local?: Partial<Record<CountyStatKey, number>>;
   /** 同一事件的其他寫法，發生時隨機挑一個（避免重複出現同一句） */
   variants?: { title: string; desc?: string }[];
+  /** 彩蛋事件（稀有、每局有上限、會記入彩蛋圖鑑） */
+  egg?: EggInfo;
   /** 歷史參考（僅供設計者，不顯示） */
   ref?: string;
+}
+
+/** 彩蛋發生時的地圖特效 */
+export type EggFx =
+  | 'stars'      // 夜空星點閃爍
+  | 'meteor'     // 火球劃過天際
+  | 'snow'       // 山頭降雪
+  | 'halo'       // 縣市上空光暈
+  | 'whales'     // 海峽中游動的鯨群
+  | 'footprints' // 一串腳印走進市區再走回去
+  | 'mirage'     // 海峽上空倒懸的島嶼輪廓
+  | 'pink'       // 湖面染成粉紅
+  | 'heart'      // 颱風路徑畫成一顆心
+  | 'beam'       // 地標射出光束
+  | 'dream'      // 畫面暗下、柔光暈染
+  | 'fade'       // 泡泡閃現後淡出
+  | 'sparkle';   // 金色光點（預設）
+
+/** 彩蛋發生時的音效 */
+export type EggSfx = 'chime' | 'signal' | 'whale' | 'page' | 'pop' | 'wave' | 'crowd' | 'bell' | 'mystic';
+
+export interface EggInfo {
+  /** 稀有度 1–4 顆星（4 為傳說級） */
+  stars: 1 | 2 | 3 | 4;
+  /** 圖鑑中未解鎖時顯示的謎語提示 */
+  hint: string;
+  fx?: EggFx;
+  sfx?: EggSfx;
+  /** 這局曾經發生時，結局文字附加的一句 */
+  epilogue?: string;
 }
 
 export type EndingId =

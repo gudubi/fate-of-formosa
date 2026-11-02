@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { MapControls } from 'three/examples/jsm/controls/MapControls.js';
 import { GEO, RASTER, RW, RH, GRID, GW, GH, heightAt, rasterAt, type Raster } from '../map/mapData';
 import { MAP_EXTENT } from '../map/projection';
+import { EggEffects } from './eggFx';
 
 const BASE = 1.0;       // 陸地底座高度（公里）
 const EXAG = 5;         // 地形垂直誇張倍率
@@ -125,6 +126,8 @@ export class MapScene {
   private v3 = new THREE.Vector3();
   /** 減少動態：鏡頭移動改為瞬間到位 */
   reducedMotion = false;
+  /** 彩蛋事件的地圖特效 */
+  readonly fx: EggEffects;
 
   /** 載入預先算好的地圖柵格後建立場景 */
   static async create(canvas: HTMLCanvasElement, raster: Raster) {
@@ -148,6 +151,7 @@ export class MapScene {
     this.colorTex = new THREE.DataTexture(this.colorData, MAX_ID, 1, THREE.RGBAFormat);
     this.colorTex.needsUpdate = true;
 
+    this.fx = new EggEffects(this.scene, (x, y) => this.surfaceY(x, y));
     this.scene.add(new THREE.HemisphereLight(0xbfd4ff, 0x0b1a22, 1.2));
     const sun = new THREE.DirectionalLight(0xffffff, 1.3);
     sun.position.set(-300, 600, -350);
@@ -409,6 +413,7 @@ export class MapScene {
       t.x = cx; t.z = cz; this.camera.position.x += dx; this.camera.position.z += dz;
     }
 
+    this.fx.update(dt);
     for (const r of this.ripples) {
       r.age += dt;
       r.mat.uniforms.t.value = r.age;

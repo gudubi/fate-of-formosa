@@ -21,9 +21,23 @@ const r2 = (n: number) => Math.round(n * 100) / 100;
 const r1 = (n: number) => Math.round(n * 10) / 10;
 const P = (c: number[]) => { const p = proj(c as [number, number])!; return [r2(p[0]), r2(p[1])]; };
 
-/** Ramer–Douglas–Peucker 簡化（tol 公里） */
+/** Ramer–Douglas–Peucker 簡化（tol 公里）。封閉環（首尾同點）先在離起點最遠處切成兩段再各自簡化 */
 function simplify(pts: number[][], tol: number): number[][] {
   if (pts.length < 4) return pts;
+  const [fx, fy] = pts[0], [lx, ly] = pts[pts.length - 1];
+  if (fx === lx && fy === ly) {
+    let far = 1, fd = -1;
+    for (let i = 1; i < pts.length - 1; i++) {
+      const d = Math.hypot(pts[i][0] - fx, pts[i][1] - fy);
+      if (d > fd) { fd = d; far = i; }
+    }
+    const a = simplifyOpen(pts.slice(0, far + 1), tol), b = simplifyOpen(pts.slice(far), tol);
+    return [...a, ...b.slice(1)];
+  }
+  return simplifyOpen(pts, tol);
+}
+function simplifyOpen(pts: number[][], tol: number): number[][] {
+  if (pts.length < 3) return pts;
   const keep = new Uint8Array(pts.length);
   keep[0] = keep[pts.length - 1] = 1;
   const stack: [number, number][] = [[0, pts.length - 1]];
