@@ -432,7 +432,7 @@ function refreshFeed() {
   const e = eng!;
   const pend = [...e.s.pending].sort((a, b) => (a.tier === 'major' ? -1 : 0) - (b.tier === 'major' ? -1 : 0));
   const general = pend.filter(p => p.tier !== 'major').length;
-  $('pendingList').innerHTML = pend.length ? `<p class="queue">事件不會倒數，慢慢想。待決 ${general}/${MAX_PENDING}，再多一件時最舊的交給天意。</p>` + pend.map(p => {
+  $('pendingList').innerHTML = pend.length ? `<p class="queue">事件不會倒數，慢慢想。待決 ${general}/${MAX_PENDING}，再多一件時最舊的交給自然命運。</p>` + pend.map(p => {
     const d = e.defs.get(p.eventId)!, c = CAT_META[d.cat];
     const waited = e.s.day - p.createdDay;
     return `<div class="ev pend ${p.tier === 'major' ? 'major' : ''}" data-uid="${p.uid}" style="--c:${c.color}"><span class="ic">${iconSvg(d.cat)}</span>
@@ -661,7 +661,7 @@ function openModal(uid: number) {
     <div class="opts">${d.options!.map((o, i) => `
       <button class="opt" data-i="${i}" ${e.s.divine < costs[i] ? 'disabled' : ''}>
         <div class="p" style="width:${probs[i] * 100}%"></div>
-        <div class="row"><span class="tx">${esc(o.text)}</span><span class="pr">天意 ${Math.round(probs[i] * 100)}%</span>
+        <div class="row"><span class="tx">${esc(o.text)}</span><span class="pr">自然命運 ${Math.round(probs[i] * 100)}%</span>
         <span class="cost">${HAND_ICON}${costs[i]}</span></div>
         <div class="pvs">${optionPreview(o)}</div>
       </button>`).join('')}</div>
@@ -709,13 +709,13 @@ function choose(uid: number, i: number | null) {
     const foot = card.querySelector('.ev-foot')!;
     const opt = e.defs.get(p.eventId)!.options![res.option];
     const lasting = lastingNote(opt, d => (d >= 365 ? `約 ${Math.round(d / 365)} 年` : `${d} 天`));
-    foot.insertAdjacentHTML('beforebegin', `<div class="result"><b>${res.intervened ? '✋ 你出手了：' : '天意：'}${esc(res.optionText ?? '')}</b><br>${esc(res.result ?? '')}<div>${deltaChips(res.deltas)}</div>${lasting ? `<div class="lasting">⏳ ${esc(lasting)}</div>` : ''}</div>`);
+    foot.insertAdjacentHTML('beforebegin', `<div class="result"><b>${res.intervened ? '✋ 你出手了：' : '自然命運：'}${esc(res.optionText ?? '')}</b><br>${esc(res.result ?? '')}<div>${deltaChips(res.deltas)}</div>${lasting ? `<div class="lasting">⏳ ${esc(lasting)}</div>` : ''}</div>`);
     foot.innerHTML = `<span class="note"></span><button class="btn primary" id="mOk">繼續</button>`;
     $('mOk').onclick = () => { sfx.play('click'); closeModal(isMajor); };
     refreshHud();
   };
   if (i === null) {
-    // 擲骰動畫：在選項間跳動後停在天意結果
+    // 擲骰動畫：在選項間跳動後停在自然命運的結果
     let step = 0;
     const total = 10 + opts.length + res.option;
     const spin = () => {

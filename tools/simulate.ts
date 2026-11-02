@@ -14,7 +14,7 @@ const N = Number(process.argv[2] ?? 300);
 const EGGS_ONLY = process.argv.includes("--eggs");
 const START = Date.UTC(2026, 10, 2, 13, 0);
 
-/** 機器人：回傳要干預的選項索引，或 null 交給天意 */
+/** 機器人：回傳要干預的選項索引，或 null 交給自然命運 */
 type Bot = (e: Engine, d: EventDef) => number | null;
 
 const leanPush = (o: OptionDef) => (o.effects?.govLean ?? 0) + (o.effects?.popLean ?? 0) * 0.5;

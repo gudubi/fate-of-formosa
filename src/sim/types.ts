@@ -73,7 +73,7 @@ export interface OptionDef {
   result?: string;
   /** 不干預時的基礎權重 */
   weight: number;
-  /** 權重修正：讓當下局勢影響「天意」 */
+  /** 權重修正：讓當下局勢影響「自然命運」 */
   mods?: Mod[];
   /** 立即效果 */
   effects?: Effects;

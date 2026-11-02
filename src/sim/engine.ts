@@ -18,7 +18,7 @@ const TIER_RATE: Record<Tier, number> = { news: 26, general: 15, major: 2.4 };
 const MAJOR_PACE = 0.85;
 const MAJOR_RATE_MIN = 0.8;
 const DEFAULT_COOLDOWN: Record<Tier, number> = { news: 365, general: 365, major: 900 };
-/** 一般事件不倒數；同時待決超過此數時，最舊的一件交給天意 */
+/** 一般事件不倒數；同時待決超過此數時，最舊的一件交給自然命運 */
 export const MAX_PENDING = 5;
 /** 每局最多出現幾個彩蛋（不含彩蛋的後續事件），讓稀有事件保持稀有 */
 export const EGG_CAP = 3;
@@ -102,7 +102,7 @@ export interface GameState {
   code?: string;
   /** 世界亂數：事件何時發生、發生什麼、背景因子 */
   rng: number;
-  /** 天意亂數：順其自然的結果、事件鏈機率。與世界亂數分開，玩家的選擇不會打亂事件節奏 */
+  /** 自然命運亂數：順其自然的結果、事件鏈機率。與世界亂數分開，玩家的選擇不會打亂事件節奏 */
   fateRng: number;
   /** 開局時刻（台北時間 ms） */
   startTw: number;
@@ -581,7 +581,7 @@ export class Engine {
     return w.map(x => x / t);
   }
 
-  /** 干預某選項的命運花費：影響越大、越要扭轉天意越貴 */
+  /** 干預某選項的命運花費：影響越大、越要扭轉自然命運越貴 */
   cost(def: EventDef, i: number): number {
     const o = def.options![i];
     if (o.cost !== undefined) return o.cost;
@@ -594,7 +594,7 @@ export class Engine {
     return clamp(Math.round(base), 1, 12);
   }
 
-  /** 結算事件。option 為 null 表示交給天意；intervene 時扣除命運 */
+  /** 結算事件。option 為 null 表示交給自然命運；intervene 時扣除命運 */
   resolve(uid: number, option: number | null): LogEntry | null {
     const s = this.s;
     const p = s.pending.find(x => x.uid === uid);
