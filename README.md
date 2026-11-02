@@ -1,4 +1,4 @@
-# 命運之手：台灣
+# 命運之手：台灣（Fate of Formosa）
 
 作者：[gudubi.com](https://gudubi.com)（gudubi@gudubi.com）
 
