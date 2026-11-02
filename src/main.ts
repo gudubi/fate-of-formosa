@@ -1033,7 +1033,8 @@ function openMenu() {
       <button class="btn primary" id="mResume">繼續</button>
       <button class="btn" id="mSaveQuit">存檔並回到標題</button>
       <button class="btn" id="mRestart">放棄本局，重新開始</button>
-    </div>`;
+    </div>
+    <p class="author menu-author">作者 gudubi・<a href="mailto:gudubi@gudubi.com">gudubi@gudubi.com</a><br>官網 <a href="https://gudubi.com" target="_blank" rel="noopener">gudubi.com</a></p>`;
   $('menuDlg').hidden = false;
   card.querySelectorAll<HTMLButtonElement>('[data-cam]').forEach(b => b.onclick = () => { settings.cam = b.dataset.cam as CamMode; saveSettings(); openMenuRefresh(); });
   card.querySelectorAll<HTMLButtonElement>('[data-snd]').forEach(b => b.onclick = () => { sfx.setMuted(b.dataset.snd === '0'); refreshMute(); openMenuRefresh(); });
