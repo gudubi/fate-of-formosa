@@ -1,4 +1,5 @@
 // 離線快取：頁面採「網路優先」以便取得新版，其餘同源資源採「快取優先、背景更新」
+// 只處理本遊戲資料夾（Service Worker 的 scope）以內的請求，不影響同網站的其他頁面
 const CACHE = 'tgh-v1';
 
 self.addEventListener('install', () => self.skipWaiting());
@@ -11,11 +12,11 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   const url = new URL(req.url);
-  if (req.method !== 'GET' || url.origin !== location.origin) return;
+  if (req.method !== 'GET' || url.origin !== location.origin || !req.url.startsWith(self.registration.scope)) return;
   if (req.mode === 'navigate') {
     e.respondWith(fetch(req)
       .then(res => { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); return res; })
-      .catch(() => caches.match(req).then(r => r || caches.match('/'))));
+      .catch(() => caches.match(req).then(r => r || caches.match(self.registration.scope))));
     return;
   }
   e.respondWith(caches.match(req).then(hit => {

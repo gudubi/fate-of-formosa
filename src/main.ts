@@ -29,6 +29,8 @@ const INTRO_PEAK = 6e8;             // 最高倍率：約每秒 19 年，讓年�
 const INTRO_SETTLE = 0.5;           // 接近此刻時的減速時間常數（秒）
 const TICK_GAP = 70;                // 滴答聲最短間隔（毫秒）
 const SAVE_KEY = 'tgh-save-v1';
+/** 靜態檔的根路徑：建置時為相對路徑，遊戲可以放在任何子資料夾（例如 gudubi.com/games/fate-of-formosa/） */
+const BASE = import.meta.env.BASE_URL;
 const SETTINGS_KEY = 'tgh-settings-v1';
 const WEEK = ['日', '一', '二', '三', '四', '五', '六'];
 
@@ -638,7 +640,7 @@ function openModal(uid: number) {
   card.style.setProperty('--c', c.color);
   const isMajor = p.tier === 'major';
   card.innerHTML = `
-    <div class="ev-hero" style="background-image:radial-gradient(120% 140% at 20% 0%, ${c.color}, transparent 60%), url('/assets/events/${d.cat}.webp')"><span class="ic">${iconSvg(d.cat, 40)}</span></div>
+    <div class="ev-hero" style="background-image:radial-gradient(120% 140% at 20% 0%, ${c.color}, transparent 60%), url('${BASE}assets/events/${d.cat}.webp')"><span class="ic">${iconSvg(d.cat, 40)}</span></div>
     <div class="ev-head">
       <div class="ev-kind"><span class="pill">${c.label}</span><span>${isMajor ? '重大事件' : '事件'} · ${esc(e.placeName(p))} · ${shortDate(e.s.day)}</span></div>
       <div class="ev-title">${esc(e.text(d.title, p))}</div>
@@ -836,7 +838,7 @@ function showEnding(end: Ending) {
   card.innerHTML = `
     <div class="end-kicker">${end.survived ? '守護之路・' : '終局・'}${shortDate(end.day)}・第 ${years} 年</div>
     <div class="end-title">${esc(end.title)}</div>
-    <img class="end-img" src="/assets/endings/${end.id}.webp" alt="" onerror="this.remove()">
+    <img class="end-img" src="${BASE}assets/endings/${end.id}.webp" alt="" onerror="this.remove()">
     <p class="end-text">${esc(end.text)}</p>
     <div class="parallel">在無人干預的平行世界裡，這座島${base.ended && base.ended.day <= end.day && base.ended.id !== 'timeup'
       ? `走向了「${esc(base.ended.title)}」`
@@ -879,7 +881,7 @@ function showEnding(end: Ending) {
         text: end.text, score: end.score, baseline: base.score, years, interventions: intervened,
         milestones: ms.map(m => m.title), code: e.s.code ?? String(e.s.seed),
         stats: STAT_ORDER.map(k => ({ label: STAT_META[k].label, value: STAT_META[k].lean ? describeLean(e.s.stats[k]) : String(Math.round(e.s.stats[k])) })),
-      }, `/assets/endings/${end.id}.webp`, '/assets/icon-192.png');
+      }, `${BASE}assets/endings/${end.id}.webp`, `${BASE}assets/icon-192.png`);
       await shareOrDownload(blob, `命運之手-${end.title}-${end.score}.png`, `我在《命運之手：台灣》守護了 ${years} 年，結局「${end.title}」，守護指數 ${end.score}。${e.s.code ? `種子碼 ${e.s.code}，一起來挑戰同一個世界：${seedLink(e.s.code)}` : ''}`);
     } finally { btn.disabled = false; }
   };
@@ -1207,7 +1209,7 @@ setTimeout(() => void boot(), 50);
 
 // 離線遊玩：正式版註冊 Service Worker
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
-  window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => { /* 不支援時照常遊玩 */ }); });
+  window.addEventListener('load', () => { navigator.serviceWorker.register(`${BASE}sw.js`).catch(() => { /* 不支援時照常遊玩 */ }); });
 }
 
 // 開發用：主控台輸入 __dbg.ff(365) 快轉一年

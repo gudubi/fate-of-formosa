@@ -10,7 +10,8 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host",
     "simulate": "tsx tools/simulate.ts",
-    "check-history": "tsx tools/check-history.ts"
+    "check-history": "tsx tools/check-history.ts",
+    "publish:site": "node tools/publish_site.mjs"
   },
   "dependencies": {
     "d3-geo": "^3.1.1",

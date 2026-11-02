@@ -12,6 +12,7 @@ npm run dev        # 開發伺服器（--host，同網段的手機與平板可�
 npm run build      # 輸出至 dist/，可部署到任何靜態網站主機
 npm run simulate   # 無畫面批次模擬 300 局，檢查平衡
 npm run check-history  # 檢查「歷史上的今天」資料格式與日期涵蓋
+npm run publish:site -- <資料夾>  # 建置並放進網站資料夾（相對路徑，可放在任何子目錄）
 ```
 
 ## 時間設計
