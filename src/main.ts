@@ -18,6 +18,7 @@ import { optionPreview, lastingNote } from './ui/preview';
 import { addRecord, loadRecords } from './ui/records';
 import { renderShareCard, shareOrDownload } from './ui/share';
 import { randomCode, normalizeCode, codeToSeed } from './sim/seed';
+import { animateDetails } from './ui/collapse';
 
 const SPEEDS = [0, 4, 8, 16];       // 天／秒
 // 開場：日期從中華民國建立（1912-01-01）開始以遊戲速度跳動，
@@ -991,6 +992,7 @@ function renderRecords() {
     setCode(li.dataset.code!);
   });
   $('records').hidden = !list.length;
+  $('records').classList.toggle('is-open', ($('records') as HTMLDetailsElement).open);
 }
 
 function refreshMute() {
@@ -1014,6 +1016,7 @@ function bindInput() {
   $('btnMenu').onclick = openMenu;
   $('btnNew').onclick = () => newGame(true);
   $('btnContinue').onclick = continueGame;
+  document.querySelectorAll<HTMLDetailsElement>('#title details').forEach(d => animateDetails(d, reducedMotion));
   $('btnSeedRandom').onclick = () => { sfx.unlock(); sfx.play('click'); setCode(randomCode()); };
   $('btnSeedCopy').onclick = async () => {
     const btn = $('btnSeedCopy');

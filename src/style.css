@@ -340,7 +340,11 @@ body.reduce-motion *, body.reduce-motion *::before, body.reduce-motion *::after 
 .btns button.primary { background: linear-gradient(180deg, #8fdcff, #4fb2e8); color: #04121d; border: 0; box-shadow: 0 8px 30px rgba(79,178,232,.35); }
 .btns button:disabled { opacity: .6; cursor: progress; }
 .howto { margin-top: 22px; text-align: left; background: rgba(0,0,0,.35); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; font-size: 13px; color: #c4d3df; line-height: 1.7; }
-.howto summary { cursor: pointer; color: var(--text); text-align: center; letter-spacing: 3px; }
+.howto summary { cursor: pointer; color: var(--text); text-align: center; letter-spacing: 3px; list-style: none; user-select: none; -webkit-user-select: none; }
+.howto summary::-webkit-details-marker { display: none; }
+/* 自訂箭頭：點下時立即旋轉，與高度動畫同步 */
+.howto summary::before { content: ""; display: inline-block; width: 6px; height: 6px; margin: 0 10px 2px 0; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); transition: transform .28s cubic-bezier(.25, .8, .25, 1); }
+.howto.is-open > summary::before { transform: rotate(45deg); }
 .howto ul { padding-left: 18px; margin: 8px 0 0; }
 .howto a, .author a { color: var(--accent); text-decoration: none; }
 .howto a:hover, .author a:hover { text-decoration: underline; }
