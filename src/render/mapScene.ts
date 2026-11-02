@@ -1,11 +1,10 @@
 import * as THREE from 'three';
 import { MapControls } from 'three/examples/jsm/controls/MapControls.js';
-import { GEO, RASTER, RW, RH, buildRaster, elevation, rasterAt, type Raster } from '../map/mapData';
+import { GEO, RASTER, RW, RH, GRID, GW, GH, heightAt, rasterAt, type Raster } from '../map/mapData';
 import { MAP_EXTENT } from '../map/projection';
 
 const BASE = 1.0;       // 陸地底座高度（公里）
 const EXAG = 5;         // 地形垂直誇張倍率
-const GRID = 1.0;       // 地形網格間距（公里）
 const MAX_ID = 32;
 
 const TERRAIN_VS = /* glsl */`
@@ -112,7 +111,6 @@ export class MapScene {
   readonly scene = new THREE.Scene();
   readonly camera: THREE.PerspectiveCamera;
   readonly controls: MapControls;
-  readonly raster: Raster;
   private terrain!: THREE.Mesh;
   private terrainMat!: THREE.ShaderMaterial;
   private colorData = new Uint8Array(MAX_ID * 4);
@@ -122,10 +120,22 @@ export class MapScene {
   private flight: null | { t: number; dur: number; fromT: THREE.Vector3; toT: THREE.Vector3; fromD: number; toD: number; fromPolar: number; toPolar: number } = null;
   private time = 0;
   private ray = new THREE.Raycaster();
+  /** 畫布位置快取：每幀轉換標籤座標時不必重新查詢版面 */
+  private rect = { left: 0, top: 0, width: 1, height: 1 };
+  private v3 = new THREE.Vector3();
+  /** 減少動態：鏡頭移動改為瞬間到位 */
+  reducedMotion = false;
 
-  constructor(private canvas: HTMLCanvasElement) {
+  /** 載入預先算好的地圖柵格後建立場景 */
+  static async create(canvas: HTMLCanvasElement, raster: Raster) {
+    return new MapScene(canvas, raster);
+  }
+
+  private constructor(private canvas: HTMLCanvasElement, readonly raster: Raster) {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // 手機 GPU 較弱：觸控裝置的像素比上限 1.5
+    const touch = matchMedia('(pointer: coarse)').matches;
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, touch ? 1.5 : 2));
     this.scene.background = new THREE.Color(0x03090f);
     this.camera = new THREE.PerspectiveCamera(40, 1, 5, 6000);
     this.controls = new MapControls(this.camera, canvas);
@@ -138,7 +148,6 @@ export class MapScene {
     this.colorTex = new THREE.DataTexture(this.colorData, MAX_ID, 1, THREE.RGBAFormat);
     this.colorTex.needsUpdate = true;
 
-    this.raster = buildRaster();
     this.scene.add(new THREE.HemisphereLight(0xbfd4ff, 0x0b1a22, 1.2));
     const sun = new THREE.DirectionalLight(0xffffff, 1.3);
     sun.position.set(-300, 600, -350);
@@ -178,18 +187,22 @@ export class MapScene {
 
   private buildNeighbors() {
     const mat = new THREE.MeshLambertMaterial({ color: 0x2a3540 });
-    const edge = new THREE.LineBasicMaterial({ color: 0x6d8496, transparent: true, opacity: 0.6 });
+    const edgePts: number[] = [];
     for (const n of GEO.neighbors) {
       const shapes = n.rings.map(r => this.shapeFromRing(r));
       const geo = new THREE.ExtrudeGeometry(shapes, { depth: 0.6, bevelEnabled: false });
       const mesh = new THREE.Mesh(geo, mat);
       mesh.rotation.x = -Math.PI / 2;
       this.scene.add(mesh);
-      for (const r of n.rings) {
-        const g = new THREE.BufferGeometry().setFromPoints(r.map(([x, y]) => new THREE.Vector3(x, 0.65, y)));
-        this.scene.add(new THREE.LineLoop(g, edge));
-      }
+      for (const r of n.rings) r.forEach(([x, y], i) => {
+        const [nx, ny] = r[(i + 1) % r.length];
+        edgePts.push(x, 0.65, y, nx, 0.65, ny);
+      });
     }
+    // 所有海岸線合併成一次繪製
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(edgePts, 3));
+    this.scene.add(new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0x6d8496, transparent: true, opacity: 0.6 })));
   }
 
   /** 縣市擠出的側牆（海岸峭壁）；頂面被地形覆蓋 */
@@ -210,18 +223,15 @@ export class MapScene {
   }
 
   private buildTerrain() {
-    const nx = Math.ceil((RASTER.x1 - RASTER.x0) / GRID) + 1;
-    const ny = Math.ceil((RASTER.y1 - RASTER.y0) / GRID) + 1;
+    const nx = GW, ny = GH;
     const pos = new Float32Array(nx * ny * 3);
-    const elev = new Float32Array(nx * ny);
+    const elev = this.raster.heights;
     const land = new Uint8Array(nx * ny);
     for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
       const x = RASTER.x0 + i * GRID, y = RASTER.y0 + j * GRID;
       const k = j * nx + i;
-      const h = elevation(this.raster, x, y);
-      elev[k] = h;
-      land[k] = rasterAt(this.raster, x, y).id ? 1 : 0;
-      pos[k * 3] = x; pos[k * 3 + 1] = BASE + 0.08 + (h / 1000) * EXAG; pos[k * 3 + 2] = y;
+      land[k] = rasterAt(this.raster, x, y) ? 1 : 0;
+      pos[k * 3] = x; pos[k * 3 + 1] = BASE + 0.08 + (elev[k] / 1000) * EXAG; pos[k * 3 + 2] = y;
     }
     const idx: number[] = [];
     const g2 = GRID / 2;
@@ -229,7 +239,7 @@ export class MapScene {
       const a = j * nx + i, b = a + 1, c = a + nx, d = c + 1;
       const x = RASTER.x0 + i * GRID, y = RASTER.y0 + j * GRID;
       const any = land[a] || land[b] || land[c] || land[d]
-        || rasterAt(this.raster, x + g2, y + g2).id || rasterAt(this.raster, x + g2, y).id || rasterAt(this.raster, x, y + g2).id;
+        || rasterAt(this.raster, x + g2, y + g2) || rasterAt(this.raster, x + g2, y) || rasterAt(this.raster, x, y + g2);
       if (any) idx.push(a, c, b, b, c, d);
     }
     const geo = new THREE.BufferGeometry();
@@ -261,7 +271,7 @@ export class MapScene {
 
   /** 平面公里座標 → 該處地表高度（世界座標 y） */
   surfaceY(x: number, y: number): number {
-    return BASE + 0.08 + (elevation(this.raster, x, y) / 1000) * EXAG;
+    return BASE + 0.08 + (heightAt(this.raster, x, y) / 1000) * EXAG;
   }
 
   setMode(m: MapMode) { this.terrainMat.uniforms.mode.value = m === 'terrain' ? 0 : 1; }
@@ -303,6 +313,7 @@ export class MapScene {
 
   /** 鏡頭飛往指定平面座標 */
   flyTo(x: number, y: number, distance: number, dur = 1.4, polar = 0.78) {
+    if (this.reducedMotion) dur = 0.01;
     const sph = new THREE.Spherical().setFromVector3(this.camera.position.clone().sub(this.controls.target));
     this.flight = {
       t: 0, dur, fromT: this.controls.target.clone(), toT: new THREE.Vector3(x, 0, y),
@@ -329,32 +340,36 @@ export class MapScene {
     this.controls.update();
   }
 
-  /** 螢幕座標 → 縣市索引（無則 null）與平面座標 */
+  /**
+   * 螢幕座標 → 縣市索引（無則 null）與平面座標。
+   * 不對十幾萬個三角形做射線檢測：先與平面相交，再依地表高度迭代修正幾次即可。
+   */
   pick(clientX: number, clientY: number): { county: number | null; x: number; y: number } | null {
-    const rect = this.canvas.getBoundingClientRect();
-    const ndc = new THREE.Vector2(((clientX - rect.left) / rect.width) * 2 - 1, -((clientY - rect.top) / rect.height) * 2 + 1);
+    const r = this.rect;
+    const ndc = new THREE.Vector2(((clientX - r.left) / r.width) * 2 - 1, -((clientY - r.top) / r.height) * 2 + 1);
     this.ray.setFromCamera(ndc, this.camera);
-    const hit = this.ray.intersectObject(this.terrain, false)[0];
-    let p: THREE.Vector3 | null = hit?.point ?? null;
-    if (!p) {
-      p = new THREE.Vector3();
-      if (!this.ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), -BASE), p)) return null;
+    const p = new THREE.Vector3();
+    let h = BASE;
+    for (let i = 0; i < 4; i++) {
+      if (!this.ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), -h), p)) return null;
+      h = this.surfaceY(p.x, p.z);
     }
-    const id = rasterAt(this.raster, p.x, p.z).id;
+    const id = rasterAt(this.raster, p.x, p.z);
     return { county: id ? id - 1 : null, x: p.x, y: p.z };
   }
 
   /** 世界座標 → 螢幕座標（CSS 像素）；在鏡頭後方回傳 null */
   toScreen(x: number, yWorld: number, z: number): { x: number; y: number } | null {
-    const v = new THREE.Vector3(x, yWorld, z).project(this.camera);
+    const v = this.v3.set(x, yWorld, z).project(this.camera);
     if (v.z > 1) return null;
-    const rect = this.canvas.getBoundingClientRect();
-    return { x: (v.x * 0.5 + 0.5) * rect.width, y: (-v.y * 0.5 + 0.5) * rect.height };
+    return { x: (v.x * 0.5 + 0.5) * this.rect.width, y: (-v.y * 0.5 + 0.5) * this.rect.height };
   }
 
   cameraDistance() { return this.camera.position.distanceTo(this.controls.target); }
 
   resize() {
+    const b = this.canvas.getBoundingClientRect();
+    this.rect = { left: b.left, top: b.top, width: b.width, height: b.height };
     const w = this.canvas.clientWidth, h = this.canvas.clientHeight;
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / Math.max(1, h);

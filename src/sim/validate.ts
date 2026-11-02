@@ -3,8 +3,9 @@ import { STAT_ORDER } from './engine';
 import { COUNTY_BASE, NAMED_POINTS } from './countyData';
 import { SYSTEM_EVENTS } from './systemEvents';
 
-const READ = new Set<string>([...STAT_ORDER, 'gap', 'absGov', 'absPop', 'year', 'elapsed']);
-const EFFECT = new Set<string>([...STAT_ORDER, 'govToPop', 'popToGov']);
+const READ = new Set<string>([...STAT_ORDER, 'gap', 'absGov', 'absPop', 'year', 'elapsed', 'dep']);
+const EFFECT = new Set<string>([...STAT_ORDER, 'govToPop', 'popToGov', 'dep']);
+const POLICY = new Set(['gdp', 'trust', 'tension', 'intl', 'defense', 'tech', 'demo', 'stability', 'wealth']);
 const LOCAL = new Set(['popLean', 'stability', 'wealth']);
 
 /** 檢查事件資料，回傳錯誤訊息清單 */
@@ -26,9 +27,11 @@ export function validateEvents(events: EventDef[]): string[] {
     };
     chkEff(e.effects, EFFECT); chkEff(e.local, LOCAL);
     if (e.tier !== 'news' && (e.options?.length ?? 0) < 2) at('選項不足');
+    for (const v of e.variants ?? []) if (!v.title) at('變體缺標題');
     for (const o of e.options ?? []) {
       chkEff(o.effects, EFFECT); chkEff(o.local, LOCAL); chkEff(o.over?.effects, EFFECT);
       for (const m of o.mods ?? []) if (!READ.has(m.stat)) at(`option mod ${m.stat}`);
+      for (const pl of o.policy ?? []) if (!POLICY.has(pl.stat) || !(pl.days > 0)) at(`policy ${pl.stat}`);
       if (!(o.weight > 0)) at(`權重 ${o.text}`);
     }
   }

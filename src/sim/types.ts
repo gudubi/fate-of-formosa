@@ -20,9 +20,10 @@ export type CountyStatKey = 'popLean' | 'stability' | 'wealth';
 /**
  * 可在條件與權重修正中讀取的衍生值：
  * gap = |govLean - popLean|（0…200）、absGov = |govLean|、absPop = |popLean|、
- * year = 遊戲年份（西元）、elapsed = 已經過年數（0…30）
+ * year = 遊戲年份（西元）、elapsed = 已經過年數（0…30）、
+ * dep = 對單一市場的經濟依賴度（0…100，隱藏值；政府越偏向統一越高，與 tension 對稱）
  */
-export type DerivedKey = 'gap' | 'absGov' | 'absPop' | 'year' | 'elapsed';
+export type DerivedKey = 'gap' | 'absGov' | 'absPop' | 'year' | 'elapsed' | 'dep';
 export type ReadKey = StatKey | DerivedKey;
 
 export type Category = 'disaster' | 'strait' | 'politics' | 'public' | 'intl' | 'economy';
@@ -30,7 +31,7 @@ export type Tier = 'news' | 'general' | 'major';
 
 /**
  * 權重修正：最終權重 *= exp(k * norm(stat))
- * norm：0…100 數值 → (v-50)/50（-1…1）；lean 類 → v/100（-1…1）；
+ * norm：0…100 數值（含 dep）→ (v-50)/50（-1…1）；lean 類 → v/100（-1…1）；
  * gap/absGov/absPop → v/100（0…2 / 0…1）；elapsed → v/30（0…1）；year 不建議用於 mods
  * 例：{stat:'stability', k:-1.5} → 社會越動亂越容易發生
  */
@@ -45,6 +46,8 @@ export type Effects = Partial<Record<StatKey, number>> & {
   govToPop?: number;
   /** popLean 往 govLean 靠近的比例（0…1） */
   popToGov?: number;
+  /** 隱藏的經濟依賴度增減 */
+  dep?: number;
 };
 
 export interface FollowUp {
@@ -55,6 +58,13 @@ export interface FollowUp {
   /** 觸發機率 0…1，預設 1 */
   chance?: number;
 }
+
+/**
+ * 長期政策：在 days 天內把 stat 的「平衡點」移動 shift。
+ * 一般 effects 會隨時間被拉回平衡點，policy 才能留下持久影響。
+ * 適用 stat：gdp、trust、tension、intl、defense、tech、demo、stability、wealth
+ */
+export interface Policy { stat: StatKey; shift: number; days: number }
 
 export interface OptionDef {
   /** 選項文字（建議 ≤ 14 字） */
@@ -71,6 +81,8 @@ export interface OptionDef {
   local?: Partial<Record<CountyStatKey, number>>;
   /** 持續效果：在 days 天內平均分攤 */
   over?: { days: number; effects: Effects };
+  /** 長期政策（改變平衡點） */
+  policy?: Policy[];
   /** 事件鏈 */
   follow?: FollowUp[];
   /** 干預此選項的神力花費；省略則依影響力與機率自動計算 */
@@ -109,6 +121,8 @@ export interface EventDef {
   effects?: Effects;
   /** news 用：發生地額外效果 */
   local?: Partial<Record<CountyStatKey, number>>;
+  /** 同一事件的其他寫法，發生時隨機挑一個（避免重複出現同一句） */
+  variants?: { title: string; desc?: string }[];
   /** 歷史參考（僅供設計者，不顯示） */
   ref?: string;
 }

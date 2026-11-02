@@ -7,12 +7,81 @@
     "desc": "針對核能電廠是否重啟的公投案進入投票，正反雙方在全台舉辦說明會，電價、碳排與核廢料處置成為焦點，結果將左右未來十年的能源配置。",
     "rate": 0.8,
     "cooldown": 1200,
-    "loc": ["台北市"],
+    "loc": [
+      "台北市"
+    ],
     "ref": "2021 重啟核四公投、2025 核三延役公投",
     "options": [
-      { "text": "同意重啟核電", "result": "公投通過，供電壓力緩解但反對方不滿", "weight": 1, "mods": [{ "stat": "gdp", "k": -0.8 }], "effects": { "gdp": 2, "tech": 2, "stability": -2 }, "over": { "days": 365, "effects": { "gdp": 2 } } },
-      { "text": "否決重啟案", "result": "公投未通過，綠能擴建加速但供電吃緊", "weight": 1, "effects": { "gdp": -2, "intl": 1, "stability": 1 } },
-      { "text": "投票率未達門檻", "result": "公投不成立，能源爭議持續延燒", "weight": 0.8, "mods": [{ "stat": "trust", "k": -0.8 }], "effects": { "trust": -2 } }
+      {
+        "text": "同意重啟核電",
+        "result": "公投通過，供電壓力緩解但反對方不滿",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "gdp": 2,
+          "tech": 2,
+          "stability": -2
+        },
+        "over": {
+          "days": 365,
+          "effects": {
+            "gdp": 2
+          }
+        },
+        "policy": [
+          {
+            "stat": "gdp",
+            "shift": 4,
+            "days": 2920
+          },
+          {
+            "stat": "stability",
+            "shift": -3,
+            "days": 1460
+          }
+        ]
+      },
+      {
+        "text": "否決重啟案",
+        "result": "公投未通過，綠能擴建加速但供電吃緊",
+        "weight": 1,
+        "effects": {
+          "gdp": -2,
+          "intl": 1,
+          "stability": 1
+        },
+        "policy": [
+          {
+            "stat": "gdp",
+            "shift": -3,
+            "days": 2190
+          },
+          {
+            "stat": "intl",
+            "shift": 3,
+            "days": 2190
+          }
+        ]
+      },
+      {
+        "text": "投票率未達門檻",
+        "result": "公投不成立，能源爭議持續延燒",
+        "weight": 0.8,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "trust": -2
+        }
+      }
     ]
   },
   {
@@ -24,12 +93,77 @@
     "rate": 1,
     "cooldown": 700,
     "loc": "random",
-    "mods": [{ "stat": "gap", "k": 1 }, { "stat": "trust", "k": -1 }],
+    "mods": [
+      {
+        "stat": "gap",
+        "k": 1
+      },
+      {
+        "stat": "trust",
+        "k": -1
+      }
+    ],
     "ref": "2025 大罷免",
     "options": [
-      { "text": "罷免案成功過關", "result": "罷免通過，地方政治版圖重整", "weight": 1, "mods": [{ "stat": "gap", "k": 0.8 }], "effects": { "govToPop": 0.15, "trust": -2 }, "local": { "stability": -6 } },
-      { "text": "罷免案遭否決", "result": "罷免未過門檻，雙方各自檢討", "weight": 1.2, "effects": { "trust": 1 }, "local": { "stability": -3 } },
-      { "text": "全台連鎖罷免", "result": "罷免潮蔓延全台，政局動盪", "weight": 0.4, "mods": [{ "stat": "stability", "k": -1.2 }, { "stat": "gap", "k": 1 }], "effects": { "stability": -4, "trust": -4, "govToPop": 0.1 }, "local": { "stability": -8 }, "follow": [{ "id": "pol_recall_backlash", "delay": 90, "chance": 0.6 }] }
+      {
+        "text": "罷免案成功過關",
+        "result": "罷免通過，地方政治版圖重整",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "gap",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "govToPop": 0.15,
+          "trust": -2
+        },
+        "local": {
+          "stability": -6
+        }
+      },
+      {
+        "text": "罷免案遭否決",
+        "result": "罷免未過門檻，雙方各自檢討",
+        "weight": 1.2,
+        "effects": {
+          "trust": 1
+        },
+        "local": {
+          "stability": -3
+        }
+      },
+      {
+        "text": "全台連鎖罷免",
+        "result": "罷免潮蔓延全台，政局動盪",
+        "weight": 0.4,
+        "mods": [
+          {
+            "stat": "stability",
+            "k": -1.2
+          },
+          {
+            "stat": "gap",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "stability": -4,
+          "trust": -4,
+          "govToPop": 0.1
+        },
+        "local": {
+          "stability": -8
+        },
+        "follow": [
+          {
+            "id": "pol_recall_backlash",
+            "delay": 90,
+            "chance": 0.6
+          }
+        ]
+      }
     ]
   },
   {
@@ -40,11 +174,43 @@
     "desc": "罷免風潮過後，各陣營互相指控動員失當，有人提議提高罷免門檻，也有人主張維持直接民權，立法院再度陷入激烈攻防。",
     "rate": 1,
     "chainOnly": true,
-    "loc": ["台北市"],
+    "loc": [
+      "台北市"
+    ],
     "options": [
-      { "text": "提高罷免門檻", "result": "門檻提高，政局較穩但民怨累積", "weight": 1, "effects": { "trust": -2, "stability": 2 } },
-      { "text": "維持現行制度", "result": "制度不變，民權團體表示肯定", "weight": 1, "effects": { "trust": 1, "stability": -1 } },
-      { "text": "各方停火協議", "result": "各方暫時休兵，社會氣氛降溫", "weight": 0.6, "mods": [{ "stat": "trust", "k": 1 }], "effects": { "stability": 3, "trust": 2 } }
+      {
+        "text": "提高罷免門檻",
+        "result": "門檻提高，政局較穩但民怨累積",
+        "weight": 1,
+        "effects": {
+          "trust": -2,
+          "stability": 2
+        }
+      },
+      {
+        "text": "維持現行制度",
+        "result": "制度不變，民權團體表示肯定",
+        "weight": 1,
+        "effects": {
+          "trust": 1,
+          "stability": -1
+        }
+      },
+      {
+        "text": "各方停火協議",
+        "result": "各方暫時休兵，社會氣氛降溫",
+        "weight": 0.6,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "stability": 3,
+          "trust": 2
+        }
+      }
     ]
   },
   {
@@ -56,11 +222,57 @@
     "rate": 1,
     "cooldown": 500,
     "loc": "random",
-    "mods": [{ "stat": "tension", "k": 0.8 }, { "stat": "trust", "k": -0.6 }],
+    "mods": [
+      {
+        "stat": "tension",
+        "k": 0.8
+      },
+      {
+        "stat": "trust",
+        "k": -0.6
+      }
+    ],
     "options": [
-      { "text": "立法強化平台責任", "result": "平台下架加速，但引發言論自由疑慮", "weight": 1, "effects": { "trust": 1, "stability": 2, "tech": -1 } },
-      { "text": "交由民間查核", "result": "查核社群動員，謠言擴散趨緩", "weight": 1.2, "effects": { "trust": 1 } },
-      { "text": "謠言發酵失控", "result": "假訊息大量擴散，社會互信受創", "weight": 0.8, "mods": [{ "stat": "trust", "k": -1.2 }, { "stat": "stability", "k": -0.8 }], "effects": { "stability": -4, "trust": -4 }, "local": { "stability": -4 } }
+      {
+        "text": "立法強化平台責任",
+        "result": "平台下架加速，但引發言論自由疑慮",
+        "weight": 1,
+        "effects": {
+          "trust": 1,
+          "stability": 2,
+          "tech": -1
+        }
+      },
+      {
+        "text": "交由民間查核",
+        "result": "查核社群動員，謠言擴散趨緩",
+        "weight": 1.2,
+        "effects": {
+          "trust": 1
+        }
+      },
+      {
+        "text": "謠言發酵失控",
+        "result": "假訊息大量擴散，社會互信受創",
+        "weight": 0.8,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1.2
+          },
+          {
+            "stat": "stability",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "stability": -4,
+          "trust": -4
+        },
+        "local": {
+          "stability": -4
+        }
+      }
     ]
   },
   {
@@ -71,12 +283,63 @@
     "desc": "立法院審議爭議法案時爆發肢體衝突，議場內推擠、搶占主席台的畫面登上國際媒體，法案進度停擺，社會對國會觀感降至谷底。",
     "rate": 1.2,
     "cooldown": 300,
-    "loc": ["台北市"],
-    "mods": [{ "stat": "gap", "k": 0.6 }, { "stat": "trust", "k": -0.6 }],
+    "loc": [
+      "台北市"
+    ],
+    "mods": [
+      {
+        "stat": "gap",
+        "k": 0.6
+      },
+      {
+        "stat": "trust",
+        "k": -0.6
+      }
+    ],
     "options": [
-      { "text": "協商退讓", "result": "法案延後審查，衝突暫歇", "weight": 1, "effects": { "trust": 2, "gdp": -0.5 } },
-      { "text": "強行表決通過", "result": "法案闖關成功，場外抗議隨即集結", "weight": 1, "mods": [{ "stat": "trust", "k": -0.8 }], "effects": { "trust": -3, "stability": -2 }, "local": { "stability": -4 }, "follow": [{ "id": "pub_student_occupation", "delay": 10, "chance": 0.15 }] },
-      { "text": "長期杯葛空轉", "result": "國會空轉數月，多項預算延宕", "weight": 0.8, "effects": { "gdp": -2, "trust": -2 } }
+      {
+        "text": "協商退讓",
+        "result": "法案延後審查，衝突暫歇",
+        "weight": 1,
+        "effects": {
+          "trust": 2,
+          "gdp": -0.5
+        }
+      },
+      {
+        "text": "強行表決通過",
+        "result": "法案闖關成功，場外抗議隨即集結",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "trust": -3,
+          "stability": -2
+        },
+        "local": {
+          "stability": -4
+        },
+        "follow": [
+          {
+            "id": "pub_student_occupation",
+            "delay": 10,
+            "chance": 0.15
+          }
+        ]
+      },
+      {
+        "text": "長期杯葛空轉",
+        "result": "國會空轉數月，多項預算延宕",
+        "weight": 0.8,
+        "effects": {
+          "gdp": -2,
+          "trust": -2
+        }
+      }
     ]
   },
   {
@@ -87,11 +350,61 @@
     "desc": "檢調大規模搜索，一起涉及高層官員與財團的工程弊案曝光，金額高達數十億元，媒體連日追蹤，政府信任面臨嚴峻考驗。",
     "rate": 0.9,
     "cooldown": 600,
-    "loc": ["台北市"],
+    "loc": [
+      "台北市"
+    ],
     "options": [
-      { "text": "檢調徹查到底", "result": "多名官員遭起訴，司法程序啟動", "weight": 1, "effects": { "trust": -2 }, "over": { "days": 180, "effects": { "trust": 3 } }, "follow": [{ "id": "pol_scandal_verdict", "delay": 365, "chance": 0.8 }] },
-      { "text": "高層切割止血", "result": "涉案者請辭，外界質疑避重就輕", "weight": 1, "effects": { "trust": -4 } },
-      { "text": "攻防模糊焦點", "result": "真相不明，民怨持續升溫", "weight": 0.8, "mods": [{ "stat": "trust", "k": -1 }], "effects": { "trust": -5, "stability": -2 }, "follow": [{ "id": "pub_million_march", "delay": 60, "chance": 0.25 }] }
+      {
+        "text": "檢調徹查到底",
+        "result": "多名官員遭起訴，司法程序啟動",
+        "weight": 1,
+        "effects": {
+          "trust": -2
+        },
+        "over": {
+          "days": 180,
+          "effects": {
+            "trust": 3
+          }
+        },
+        "follow": [
+          {
+            "id": "pol_scandal_verdict",
+            "delay": 365,
+            "chance": 0.8
+          }
+        ]
+      },
+      {
+        "text": "高層切割止血",
+        "result": "涉案者請辭，外界質疑避重就輕",
+        "weight": 1,
+        "effects": {
+          "trust": -4
+        }
+      },
+      {
+        "text": "攻防模糊焦點",
+        "result": "真相不明，民怨持續升溫",
+        "weight": 0.8,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -5,
+          "stability": -2
+        },
+        "follow": [
+          {
+            "id": "pub_million_march",
+            "delay": 60,
+            "chance": 0.25
+          }
+        ]
+      }
     ]
   },
   {
@@ -102,11 +415,41 @@
     "desc": "延燒一年的重大弊案一審宣判，被告與檢方各有攻防，判決結果在社會上引發兩極評價，司法公信力再度成為輿論焦點。",
     "rate": 1,
     "chainOnly": true,
-    "loc": ["台北市"],
+    "loc": [
+      "台北市"
+    ],
     "options": [
-      { "text": "重判涉案官員", "result": "重判出爐，社會肯定司法魄力", "weight": 1, "effects": { "trust": 4 } },
-      { "text": "輕判或無罪", "result": "判決引發譁然，司法改革呼聲再起", "weight": 1, "mods": [{ "stat": "trust", "k": -0.6 }], "effects": { "trust": -4, "stability": -2 } },
-      { "text": "發回更審延宕", "result": "案件纏訟多年，社會逐漸淡忘", "weight": 0.8, "effects": { "trust": -1 } }
+      {
+        "text": "重判涉案官員",
+        "result": "重判出爐，社會肯定司法魄力",
+        "weight": 1,
+        "effects": {
+          "trust": 4
+        }
+      },
+      {
+        "text": "輕判或無罪",
+        "result": "判決引發譁然，司法改革呼聲再起",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -0.6
+          }
+        ],
+        "effects": {
+          "trust": -4,
+          "stability": -2
+        }
+      },
+      {
+        "text": "發回更審延宕",
+        "result": "案件纏訟多年，社會逐漸淡忘",
+        "weight": 0.8,
+        "effects": {
+          "trust": -1
+        }
+      }
     ]
   },
   {
@@ -117,13 +460,52 @@
     "desc": "國會以多數決凍結中央政府總預算中多項重大計畫，行政部門痛批癱瘓施政，國會則指預算浮濫，雙方僵持不下，地方建設恐受波及。",
     "rate": 1,
     "cooldown": 365,
-    "loc": ["台北市"],
-    "mods": [{ "stat": "gap", "k": 0.5 }],
+    "loc": [
+      "台北市"
+    ],
+    "mods": [
+      {
+        "stat": "gap",
+        "k": 0.5
+      }
+    ],
     "ref": "2025 總預算刪凍爭議",
     "options": [
-      { "text": "行政部門讓步刪減", "result": "預算刪減後解凍，計畫大幅縮水", "weight": 1, "effects": { "trust": 1, "gdp": -1, "defense": -1 } },
-      { "text": "聲請釋憲對抗", "result": "府會僵局送進憲法法庭", "weight": 0.8, "effects": { "trust": -1, "stability": -1 }, "follow": [{ "id": "pol_constitutional_court", "delay": 60, "chance": 0.5 }] },
-      { "text": "協商部分解凍", "result": "雙方各退一步，預算有條件解凍", "weight": 1.2, "effects": { "gdp": -0.5, "trust": 0.5 } }
+      {
+        "text": "行政部門讓步刪減",
+        "result": "預算刪減後解凍，計畫大幅縮水",
+        "weight": 1,
+        "effects": {
+          "trust": 1,
+          "gdp": -1,
+          "defense": -1
+        }
+      },
+      {
+        "text": "聲請釋憲對抗",
+        "result": "府會僵局送進憲法法庭",
+        "weight": 0.8,
+        "effects": {
+          "trust": -1,
+          "stability": -1
+        },
+        "follow": [
+          {
+            "id": "pol_constitutional_court",
+            "delay": 60,
+            "chance": 0.5
+          }
+        ]
+      },
+      {
+        "text": "協商部分解凍",
+        "result": "雙方各退一步，預算有條件解凍",
+        "weight": 1.2,
+        "effects": {
+          "gdp": -0.5,
+          "trust": 0.5
+        }
+      }
     ]
   },
   {
@@ -134,11 +516,47 @@
     "desc": "憲法法庭針對一項重大爭議法律作出判決，支持者稱捍衛憲政秩序，反對者質疑法官人事與程序正當性，判決效力引發激烈辯論。",
     "rate": 0.8,
     "cooldown": 500,
-    "loc": ["台北市"],
+    "loc": [
+      "台北市"
+    ],
     "options": [
-      { "text": "宣告法律違憲", "result": "法律失效，立法部門強烈反彈", "weight": 1, "effects": { "trust": -1, "stability": -2 } },
-      { "text": "宣告法律合憲", "result": "法律續行，聲請方誓言抗爭到底", "weight": 1, "effects": { "trust": 1, "stability": -1 } },
-      { "text": "法庭癱瘓難判決", "result": "大法官人數不足，憲政機制停擺", "weight": 0.5, "mods": [{ "stat": "trust", "k": -1 }, { "stat": "stability", "k": -0.5 }], "effects": { "trust": -4, "stability": -3 } }
+      {
+        "text": "宣告法律違憲",
+        "result": "法律失效，立法部門強烈反彈",
+        "weight": 1,
+        "effects": {
+          "trust": -1,
+          "stability": -2
+        }
+      },
+      {
+        "text": "宣告法律合憲",
+        "result": "法律續行，聲請方誓言抗爭到底",
+        "weight": 1,
+        "effects": {
+          "trust": 1,
+          "stability": -1
+        }
+      },
+      {
+        "text": "法庭癱瘓難判決",
+        "result": "大法官人數不足，憲政機制停擺",
+        "weight": 0.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          },
+          {
+            "stat": "stability",
+            "k": -0.5
+          }
+        ],
+        "effects": {
+          "trust": -4,
+          "stability": -3
+        }
+      }
     ]
   },
   {
@@ -149,11 +567,41 @@
     "desc": "一名高層官員在公開場合發言失當，影片經剪輯後在網路瘋傳，引發族群與性別歧視爭議，各界要求當事人公開道歉並下台負責。",
     "rate": 1.3,
     "cooldown": 200,
-    "loc": ["台北市"],
+    "loc": [
+      "台北市"
+    ],
     "options": [
-      { "text": "道歉並辭職", "result": "當事人下台，風波迅速平息", "weight": 1, "effects": { "trust": 1 } },
-      { "text": "硬拗拒不道歉", "result": "輿論持續延燒，政府形象受損", "weight": 1, "mods": [{ "stat": "trust", "k": -0.8 }], "effects": { "trust": -3, "stability": -1 } },
-      { "text": "冷處理轉移焦點", "result": "風波逐漸淡去，但留下負面印象", "weight": 1, "effects": { "trust": -1.5 } }
+      {
+        "text": "道歉並辭職",
+        "result": "當事人下台，風波迅速平息",
+        "weight": 1,
+        "effects": {
+          "trust": 1
+        }
+      },
+      {
+        "text": "硬拗拒不道歉",
+        "result": "輿論持續延燒，政府形象受損",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "trust": -3,
+          "stability": -1
+        }
+      },
+      {
+        "text": "冷處理轉移焦點",
+        "result": "風波逐漸淡去，但留下負面印象",
+        "weight": 1,
+        "effects": {
+          "trust": -1.5
+        }
+      }
     ]
   },
   {
@@ -166,9 +614,45 @@
     "cooldown": 200,
     "loc": "random",
     "options": [
-      { "text": "強勢推動開發", "result": "開發案動工，地方抗議不斷", "weight": 1, "effects": { "gdp": 0.5 }, "local": { "wealth": 5, "stability": -4 } },
-      { "text": "暫停重新評估", "result": "開發案延宕，居民暫時鬆一口氣", "weight": 1, "local": { "stability": 3, "wealth": -2 } },
-      { "text": "議會發動彈劾", "result": "府會全面決裂，地方施政癱瘓", "weight": 0.5, "mods": [{ "stat": "trust", "k": -1 }], "effects": { "trust": -1 }, "local": { "stability": -6, "wealth": -2 } }
+      {
+        "text": "強勢推動開發",
+        "result": "開發案動工，地方抗議不斷",
+        "weight": 1,
+        "effects": {
+          "gdp": 0.5
+        },
+        "local": {
+          "wealth": 5,
+          "stability": -4
+        }
+      },
+      {
+        "text": "暫停重新評估",
+        "result": "開發案延宕，居民暫時鬆一口氣",
+        "weight": 1,
+        "local": {
+          "stability": 3,
+          "wealth": -2
+        }
+      },
+      {
+        "text": "議會發動彈劾",
+        "result": "府會全面決裂，地方施政癱瘓",
+        "weight": 0.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -1
+        },
+        "local": {
+          "stability": -6,
+          "wealth": -2
+        }
+      }
     ]
   },
   {
@@ -179,13 +663,62 @@
     "desc": "媒體揭露情治單位疑似違法監聽記者、社運人士與民代，相關公文外流，輿論譁然，政府面臨國會調查與人權團體的強烈抨擊。",
     "rate": 0.6,
     "cooldown": 900,
-    "loc": ["台北市"],
-    "mods": [{ "stat": "trust", "k": -0.8 }],
+    "loc": [
+      "台北市"
+    ],
+    "mods": [
+      {
+        "stat": "trust",
+        "k": -0.8
+      }
+    ],
     "ref": "2013 九月政爭監聽爭議",
     "options": [
-      { "text": "成立獨立調查會", "result": "調查啟動，情治改革列為優先", "weight": 1, "effects": { "trust": -1 }, "over": { "days": 180, "effects": { "trust": 3 } } },
-      { "text": "否認並追查洩密", "result": "政府全面否認，抗議聲浪升高", "weight": 1, "mods": [{ "stat": "trust", "k": -0.8 }], "effects": { "trust": -5, "stability": -2 }, "follow": [{ "id": "pub_million_march", "delay": 45, "chance": 0.2 }] },
-      { "text": "首長下台並修法", "result": "情治首長下台，監聽法制大幅修正", "weight": 1, "effects": { "trust": 2, "defense": -1 } }
+      {
+        "text": "成立獨立調查會",
+        "result": "調查啟動，情治改革列為優先",
+        "weight": 1,
+        "effects": {
+          "trust": -1
+        },
+        "over": {
+          "days": 180,
+          "effects": {
+            "trust": 3
+          }
+        }
+      },
+      {
+        "text": "否認並追查洩密",
+        "result": "政府全面否認，抗議聲浪升高",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "trust": -5,
+          "stability": -2
+        },
+        "follow": [
+          {
+            "id": "pub_million_march",
+            "delay": 45,
+            "chance": 0.2
+          }
+        ]
+      },
+      {
+        "text": "首長下台並修法",
+        "result": "情治首長下台，監聽法制大幅修正",
+        "weight": 1,
+        "effects": {
+          "trust": 2,
+          "defense": -1
+        }
+      }
     ]
   },
   {
@@ -196,12 +729,64 @@
     "desc": "行政院提出大幅增加國防預算的特別條例，支持者強調提升嚇阻力，反對者擔憂排擠社福支出並加劇兩岸對峙，國會攻防激烈。",
     "rate": 1,
     "cooldown": 365,
-    "loc": ["台北市"],
-    "mods": [{ "stat": "tension", "k": 1 }],
+    "loc": [
+      "台北市"
+    ],
+    "mods": [
+      {
+        "stat": "tension",
+        "k": 1
+      }
+    ],
     "options": [
-      { "text": "全額通過特別預算", "result": "預算通過，國防採購加速", "weight": 1, "mods": [{ "stat": "tension", "k": 1 }], "effects": { "defense": 5, "gdp": -2, "tension": 2 } },
-      { "text": "刪減後通過", "result": "預算部分刪減，各方勉強接受", "weight": 1.2, "effects": { "defense": 2, "gdp": -0.5 } },
-      { "text": "預算遭擱置", "result": "預算擱置，國防計畫延後", "weight": 0.8, "mods": [{ "stat": "tension", "k": -1 }], "effects": { "defense": -1, "tension": -1, "trust": -1 } }
+      {
+        "text": "全額通過特別預算",
+        "result": "預算通過，國防採購加速",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "tension",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "defense": 5,
+          "gdp": -2,
+          "tension": 2
+        },
+        "policy": [
+          {
+            "stat": "defense",
+            "shift": 6,
+            "days": 2555
+          }
+        ]
+      },
+      {
+        "text": "刪減後通過",
+        "result": "預算部分刪減，各方勉強接受",
+        "weight": 1.2,
+        "effects": {
+          "defense": 2,
+          "gdp": -0.5
+        }
+      },
+      {
+        "text": "預算遭擱置",
+        "result": "預算擱置，國防計畫延後",
+        "weight": 0.8,
+        "mods": [
+          {
+            "stat": "tension",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "defense": -1,
+          "tension": -1,
+          "trust": -1
+        }
+      }
     ]
   },
   {
@@ -212,13 +797,61 @@
     "desc": "國防部提議延長義務役役期，並研議擴大女性服役，青年族群反應兩極，部分家長團體走上街頭表達疑慮，國會要求完整評估。",
     "rate": 0.7,
     "cooldown": 1000,
-    "loc": ["台北市"],
-    "mods": [{ "stat": "tension", "k": 1.2 }, { "stat": "defense", "k": -0.8 }],
+    "loc": [
+      "台北市"
+    ],
+    "mods": [
+      {
+        "stat": "tension",
+        "k": 1.2
+      },
+      {
+        "stat": "defense",
+        "k": -0.8
+      }
+    ],
     "ref": "2022 恢復一年義務役",
     "options": [
-      { "text": "延長役期實施", "result": "役期延長，國防人力回升但青年反彈", "weight": 1, "effects": { "defense": 5, "demo": -1, "stability": -2, "gdp": -1 } },
-      { "text": "維持現制強化訓練", "result": "役期不變，改以訓練品質為重點", "weight": 1.2, "effects": { "defense": 2 } },
-      { "text": "轉向募兵加薪", "result": "加薪招募志願役，財政負擔增加", "weight": 0.8, "effects": { "defense": 1, "gdp": -2 } }
+      {
+        "text": "延長役期實施",
+        "result": "役期延長，國防人力回升但青年反彈",
+        "weight": 1,
+        "effects": {
+          "defense": 5,
+          "demo": -1,
+          "stability": -2,
+          "gdp": -1
+        },
+        "policy": [
+          {
+            "stat": "defense",
+            "shift": 7,
+            "days": 3650
+          },
+          {
+            "stat": "demo",
+            "shift": -3,
+            "days": 2190
+          }
+        ]
+      },
+      {
+        "text": "維持現制強化訓練",
+        "result": "役期不變，改以訓練品質為重點",
+        "weight": 1.2,
+        "effects": {
+          "defense": 2
+        }
+      },
+      {
+        "text": "轉向募兵加薪",
+        "result": "加薪招募志願役，財政負擔增加",
+        "weight": 0.8,
+        "effects": {
+          "defense": 1,
+          "gdp": -2
+        }
+      }
     ]
   },
   {
@@ -229,15 +862,91 @@
     "desc": "行政部門提出新一輪兩岸政策檢討報告，內容涉及交流開放程度與主權論述，社會各界意見分歧，政策最終走向備受國內外關注。",
     "rate": 1,
     "cooldown": 400,
-    "loc": ["台北市"],
-    "mods": [{ "stat": "gap", "k": 0.8 }],
+    "loc": [
+      "台北市"
+    ],
+    "mods": [
+      {
+        "stat": "gap",
+        "k": 0.8
+      }
+    ],
     "options": [
-      { "text": "擴大交流放寬限制", "result": "交流管制放寬，兩岸氣氛和緩", "weight": 1, "mods": [{ "stat": "popLean", "k": -1.5 }], "effects": { "govLean": -4, "tension": -3, "intl": -1 } },
-      { "text": "收緊交流強化主權", "result": "管制收緊，兩岸互動轉冷", "weight": 1, "mods": [{ "stat": "popLean", "k": 1.5 }], "effects": { "govLean": 4, "tension": 3, "intl": 1 } },
-      { "text": "順應民意微調", "result": "政府參酌民調調整路線，爭議降溫", "weight": 1, "mods": [{ "stat": "gap", "k": 1.2 }], "effects": { "govToPop": 0.3, "stability": 1 } }
+      {
+        "text": "擴大交流放寬限制",
+        "result": "交流管制放寬，兩岸氣氛和緩",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "popLean",
+            "k": -1.5
+          }
+        ],
+        "effects": {
+          "govLean": -4,
+          "tension": -3,
+          "intl": -1,
+          "dep": 4
+        },
+        "policy": [
+          {
+            "stat": "tension",
+            "shift": -4,
+            "days": 1460
+          },
+          {
+            "stat": "intl",
+            "shift": -3,
+            "days": 1460
+          }
+        ]
+      },
+      {
+        "text": "收緊交流強化主權",
+        "result": "管制收緊，兩岸互動轉冷",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "popLean",
+            "k": 1.5
+          }
+        ],
+        "effects": {
+          "govLean": 4,
+          "tension": 3,
+          "intl": 1,
+          "dep": -3
+        },
+        "policy": [
+          {
+            "stat": "tension",
+            "shift": 4,
+            "days": 1460
+          },
+          {
+            "stat": "intl",
+            "shift": 3,
+            "days": 1460
+          }
+        ]
+      },
+      {
+        "text": "順應民意微調",
+        "result": "政府參酌民調調整路線，爭議降溫",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "gap",
+            "k": 1.2
+          }
+        ],
+        "effects": {
+          "govToPop": 0.3,
+          "stability": 1
+        }
+      }
     ]
   },
-
   {
     "id": "pol_constitutional_amendment",
     "cat": "politics",
@@ -246,12 +955,62 @@
     "desc": "國會通過修憲案，內容涵蓋政府體制調整、投票年齡下修與國會席次改革，須經全國公民複決過半數同意，各陣營全面動員。",
     "rate": 0.5,
     "cooldown": 1500,
-    "loc": ["台北市"],
+    "loc": [
+      "台北市"
+    ],
     "ref": "2022 十八歲公民權修憲複決",
     "options": [
-      { "text": "複決通過體制改革", "result": "修憲成功，新體制上路磨合", "weight": 1, "mods": [{ "stat": "trust", "k": 1 }], "effects": { "trust": 6, "stability": -3 }, "over": { "days": 365, "effects": { "stability": 4 } } },
-      { "text": "未達同意門檻", "result": "修憲失敗，改革動能消散", "weight": 1.5, "effects": { "trust": -4 } },
-      { "text": "對立失控撤案", "result": "動員對立失控，修憲案撤回", "weight": 0.4, "mods": [{ "stat": "stability", "k": -1 }], "effects": { "trust": -8, "stability": -6 } }
+      {
+        "text": "複決通過體制改革",
+        "result": "修憲成功，新體制上路磨合",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "trust": 6,
+          "stability": -3
+        },
+        "over": {
+          "days": 365,
+          "effects": {
+            "stability": 4
+          }
+        },
+        "policy": [
+          {
+            "stat": "trust",
+            "shift": 5,
+            "days": 3650
+          }
+        ]
+      },
+      {
+        "text": "未達同意門檻",
+        "result": "修憲失敗，改革動能消散",
+        "weight": 1.5,
+        "effects": {
+          "trust": -4
+        }
+      },
+      {
+        "text": "對立失控撤案",
+        "result": "動員對立失控，修憲案撤回",
+        "weight": 0.4,
+        "mods": [
+          {
+            "stat": "stability",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -8,
+          "stability": -6
+        }
+      }
     ]
   },
   {
@@ -262,13 +1021,78 @@
     "desc": "政府信任度持續低迷，國會通過不信任案，行政院長率內閣總辭，政壇震動，股市應聲下跌，各方角力新閣揆人選。",
     "rate": 0.8,
     "cooldown": 900,
-    "loc": ["台北市"],
-    "cond": [["trust", "<", 40]],
-    "mods": [{ "stat": "trust", "k": -1.5 }],
+    "loc": [
+      "台北市"
+    ],
+    "cond": [
+      [
+        "trust",
+        "<",
+        40
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "trust",
+        "k": -1.5
+      }
+    ],
     "options": [
-      { "text": "組成聯合內閣", "result": "新內閣廣納各方，政局暫穩", "weight": 1, "effects": { "trust": 6, "stability": 3, "gdp": -1, "govToPop": 0.2 }, "follow": [{ "id": "pol_new_cabinet_test", "delay": 100 }] },
-      { "text": "提名專業閣揆", "result": "技術官僚內閣上任，政治色彩淡化", "weight": 1, "effects": { "trust": 3, "gdp": 1 }, "follow": [{ "id": "pol_new_cabinet_test", "delay": 100 }] },
-      { "text": "府方拒換人僵持", "result": "府會對峙升級，國政陷入空轉", "weight": 0.7, "mods": [{ "stat": "trust", "k": -1 }], "effects": { "trust": -6, "stability": -5, "gdp": -3 }, "follow": [{ "id": "pub_million_march", "delay": 30, "chance": 0.35 }] }
+      {
+        "text": "組成聯合內閣",
+        "result": "新內閣廣納各方，政局暫穩",
+        "weight": 1,
+        "effects": {
+          "trust": 6,
+          "stability": 3,
+          "gdp": -1,
+          "govToPop": 0.2
+        },
+        "follow": [
+          {
+            "id": "pol_new_cabinet_test",
+            "delay": 100
+          }
+        ]
+      },
+      {
+        "text": "提名專業閣揆",
+        "result": "技術官僚內閣上任，政治色彩淡化",
+        "weight": 1,
+        "effects": {
+          "trust": 3,
+          "gdp": 1
+        },
+        "follow": [
+          {
+            "id": "pol_new_cabinet_test",
+            "delay": 100
+          }
+        ]
+      },
+      {
+        "text": "府方拒換人僵持",
+        "result": "府會對峙升級，國政陷入空轉",
+        "weight": 0.7,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -6,
+          "stability": -5,
+          "gdp": -3
+        },
+        "follow": [
+          {
+            "id": "pub_million_march",
+            "delay": 30,
+            "chance": 0.35
+          }
+        ]
+      }
     ]
   },
   {
@@ -279,11 +1103,47 @@
     "desc": "新內閣上任滿百日，媒體檢視施政成績單，物價、住宅與兩岸議題成為最大考驗，最新民調顯示民眾仍在觀望。",
     "rate": 1,
     "chainOnly": true,
-    "loc": ["台北市"],
+    "loc": [
+      "台北市"
+    ],
     "options": [
-      { "text": "施政獲得肯定", "result": "百日成績亮眼，信任度回升", "weight": 1, "mods": [{ "stat": "gdp", "k": 0.8 }], "effects": { "trust": 4 } },
-      { "text": "表現平平", "result": "民眾觀望，新政效果有限", "weight": 1.2, "effects": { "trust": 0.5 } },
-      { "text": "閣員接連出包", "result": "新內閣迅速失分，倒閣聲再起", "weight": 0.8, "mods": [{ "stat": "trust", "k": -0.8 }], "effects": { "trust": -4, "stability": -1 } }
+      {
+        "text": "施政獲得肯定",
+        "result": "百日成績亮眼，信任度回升",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "gdp",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "trust": 4
+        }
+      },
+      {
+        "text": "表現平平",
+        "result": "民眾觀望，新政效果有限",
+        "weight": 1.2,
+        "effects": {
+          "trust": 0.5
+        }
+      },
+      {
+        "text": "閣員接連出包",
+        "result": "新內閣迅速失分，倒閣聲再起",
+        "weight": 0.8,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "trust": -4,
+          "stability": -1
+        }
+      }
     ]
   },
   {
@@ -294,12 +1154,71 @@
     "desc": "一項涉及兩岸關係定位的公投案通過連署門檻，國際媒體高度關注，對岸發表強烈聲明，國內正反陣營全面動員，投票日逼近。",
     "rate": 0.35,
     "cooldown": 1500,
-    "loc": ["台北市"],
-    "mods": [{ "stat": "absPop", "k": 1.5 }, { "stat": "gap", "k": 0.6 }],
+    "loc": [
+      "台北市"
+    ],
+    "mods": [
+      {
+        "stat": "absPop",
+        "k": 1.5
+      },
+      {
+        "stat": "gap",
+        "k": 0.6
+      }
+    ],
     "options": [
-      { "text": "統一方向過關", "result": "結果傾向統一，兩岸對話管道開啟", "weight": 1, "mods": [{ "stat": "popLean", "k": -3 }], "effects": { "popLean": -6, "govLean": -6, "tension": -6, "intl": 3, "stability": -3 } },
-      { "text": "獨立方向過關", "result": "結果傾向獨立，對岸強烈反應", "weight": 1, "mods": [{ "stat": "popLean", "k": 3 }], "effects": { "popLean": 6, "govLean": 6, "tension": 7, "intl": 4, "stability": -3 } },
-      { "text": "未達門檻", "result": "投票率不足，現狀維持", "weight": 1.5, "mods": [{ "stat": "absPop", "k": -1.5 }], "effects": { "stability": 2, "trust": -2 } }
+      {
+        "text": "統一方向過關",
+        "result": "結果傾向統一，兩岸對話管道開啟",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "popLean",
+            "k": -3
+          }
+        ],
+        "effects": {
+          "popLean": -6,
+          "govLean": -6,
+          "tension": -6,
+          "intl": 3,
+          "stability": -3
+        }
+      },
+      {
+        "text": "獨立方向過關",
+        "result": "結果傾向獨立，對岸強烈反應",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "popLean",
+            "k": 3
+          }
+        ],
+        "effects": {
+          "popLean": 6,
+          "govLean": 6,
+          "tension": 7,
+          "intl": 4,
+          "stability": -3
+        }
+      },
+      {
+        "text": "未達門檻",
+        "result": "投票率不足，現狀維持",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "absPop",
+            "k": -1.5
+          }
+        ],
+        "effects": {
+          "stability": 2,
+          "trust": -2
+        }
+      }
     ]
   },
   {
@@ -310,33 +1229,546 @@
     "desc": "行政與立法部門因人事同意權與法案覆議全面對立，國會拒審多項人事案，行政部門拒絕副署法案，憲政運作瀕臨停擺。",
     "rate": 0.6,
     "cooldown": 1000,
-    "loc": ["台北市"],
-    "cond": [["trust", "<", 55]],
-    "mods": [{ "stat": "trust", "k": -1 }, { "stat": "stability", "k": -0.8 }],
+    "loc": [
+      "台北市"
+    ],
+    "cond": [
+      [
+        "trust",
+        "<",
+        55
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "trust",
+        "k": -1
+      },
+      {
+        "stat": "stability",
+        "k": -0.8
+      }
+    ],
     "options": [
-      { "text": "憲法法庭解套", "result": "大法官明確權限分際，僵局化解", "weight": 1, "effects": { "trust": 3, "stability": 3 } },
-      { "text": "一方退讓妥協", "result": "協商達成，國政恢復運轉", "weight": 1, "mods": [{ "stat": "trust", "k": 0.8 }], "effects": { "trust": 2, "stability": 4, "gdp": 1 } },
-      { "text": "僵局長期化", "result": "憲政危機延燒數月，經濟受累", "weight": 0.8, "mods": [{ "stat": "stability", "k": -1 }], "effects": { "trust": -8, "stability": -5, "gdp": -4 }, "over": { "days": 180, "effects": { "gdp": -2 } }, "follow": [{ "id": "pub_million_march", "delay": 60, "chance": 0.3 }] }
+      {
+        "text": "憲法法庭解套",
+        "result": "大法官明確權限分際，僵局化解",
+        "weight": 1,
+        "effects": {
+          "trust": 3,
+          "stability": 3
+        }
+      },
+      {
+        "text": "一方退讓妥協",
+        "result": "協商達成，國政恢復運轉",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "trust": 2,
+          "stability": 4,
+          "gdp": 1
+        }
+      },
+      {
+        "text": "僵局長期化",
+        "result": "憲政危機延燒數月，經濟受累",
+        "weight": 0.8,
+        "mods": [
+          {
+            "stat": "stability",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -8,
+          "stability": -5,
+          "gdp": -4
+        },
+        "over": {
+          "days": 180,
+          "effects": {
+            "gdp": -2
+          }
+        },
+        "follow": [
+          {
+            "id": "pub_million_march",
+            "delay": 60,
+            "chance": 0.3
+          }
+        ]
+      }
     ]
   },
-
-  { "id": "pol_n_bill_digital", "cat": "politics", "tier": "news", "title": "立院三讀數位治理法案", "desc": "立法院三讀通過數位治理相關法案，政府服務將全面線上化。", "rate": 1, "cooldown": 300, "loc": ["台北市"], "effects": { "trust": 0.5, "tech": 0.5 } },
-  { "id": "pol_n_approval_down", "cat": "politics", "tier": "news", "title": "施政滿意度創新低", "desc": "最新民調顯示政府施政滿意度跌破三成，創執政以來新低。", "rate": 1, "cooldown": 240, "loc": ["台北市"], "mods": [{ "stat": "trust", "k": -1.5 }], "effects": { "trust": -1.5 } },
-  { "id": "pol_n_approval_up", "cat": "politics", "tier": "news", "title": "施政滿意度明顯回升", "desc": "民調顯示政府施政滿意度較上季回升，經濟與治安獲肯定。", "rate": 1, "cooldown": 240, "loc": ["台北市"], "mods": [{ "stat": "trust", "k": 1.5 }, { "stat": "gdp", "k": 0.5 }], "effects": { "trust": 1.5 } },
-  { "id": "pol_n_council_brawl", "cat": "politics", "tier": "news", "title": "議會質詢爆口角衝突", "desc": "{county}議會總質詢時議員與官員互嗆，場面一度失控。", "rate": 1.2, "cooldown": 150, "loc": "random", "local": { "stability": -3 } },
-  { "id": "pol_n_impeach", "cat": "politics", "tier": "news", "title": "監察院彈劾失職官員", "desc": "監察院通過彈劾案，指部會官員督導不周釀成重大損失。", "rate": 0.8, "cooldown": 300, "loc": ["台北市"], "effects": { "trust": 0.8 } },
-  { "id": "pol_n_minister_quit", "cat": "politics", "tier": "news", "title": "部長請辭下台", "desc": "一位部會首長因政策爭議請辭獲准，內閣進行局部改組。", "rate": 1, "cooldown": 200, "loc": ["台北市"], "mods": [{ "stat": "trust", "k": -0.8 }], "effects": { "trust": -0.8, "stability": -0.3 } },
-  { "id": "pol_n_poll_unify", "cat": "politics", "tier": "news", "title": "民調：偏統一比例微升", "desc": "最新民調顯示傾向兩岸統一的受訪者比例較去年微幅上升。", "rate": 1, "cooldown": 300, "loc": ["台北市"], "mods": [{ "stat": "tension", "k": -0.8 }], "effects": { "popLean": -1 } },
-  { "id": "pol_n_poll_indep", "cat": "politics", "tier": "news", "title": "民調：偏獨立比例微升", "desc": "最新民調顯示傾向台灣獨立的受訪者比例較去年微幅上升。", "rate": 1, "cooldown": 300, "loc": ["台北市"], "mods": [{ "stat": "tension", "k": 0.8 }], "effects": { "popLean": 1 } },
-  { "id": "pol_n_policy_soft", "cat": "politics", "tier": "news", "title": "官方釋出兩岸善意", "desc": "政府宣布放寬部分兩岸交流限制，釋出和緩訊號。", "rate": 1, "cooldown": 300, "loc": ["台北市"], "mods": [{ "stat": "popLean", "k": -1 }], "effects": { "govLean": -1.5, "tension": -1 } },
-  { "id": "pol_n_policy_firm", "cat": "politics", "tier": "news", "title": "官方重申主權立場", "desc": "政府發言人重申主權立場，強調任何安排須經民意同意。", "rate": 1, "cooldown": 300, "loc": ["台北市"], "mods": [{ "stat": "popLean", "k": 1 }], "effects": { "govLean": 1.5, "tension": 1 } },
-  { "id": "pol_n_arms_deal", "cat": "politics", "tier": "news", "title": "軍購案順利過關", "desc": "國會通過新一批防衛性武器採購，預計三年內陸續交運。", "rate": 0.9, "cooldown": 300, "loc": ["台北市"], "mods": [{ "stat": "tension", "k": 0.8 }], "effects": { "defense": 1.5, "tension": 0.5, "gdp": -0.3 } },
-  { "id": "pol_n_data_leak", "cat": "politics", "tier": "news", "title": "政府資料庫外洩", "desc": "某部會資料庫遭駭，數百萬筆個資疑外流，主管機關道歉。", "rate": 0.9, "cooldown": 300, "loc": ["台北市"], "effects": { "trust": -1, "tech": -0.3 } },
-  { "id": "pol_n_vote_buying", "cat": "politics", "tier": "news", "title": "賄選案起訴多人", "desc": "{county}檢方偵結賄選案，起訴樁腳與民代共十餘人。", "rate": 0.9, "cooldown": 200, "loc": "random", "effects": { "trust": -0.3 }, "local": { "stability": -3 } },
-  { "id": "pol_n_donation_open", "cat": "politics", "tier": "news", "title": "政治獻金全面公開", "desc": "政治獻金資料庫上線，民眾可即時查詢捐款明細。", "rate": 0.7, "cooldown": 400, "loc": ["台北市"], "effects": { "trust": 0.8 } },
-  { "id": "pol_n_civil_defense", "cat": "politics", "tier": "news", "title": "全民防衛演練登場", "desc": "{county}舉行全民防衛與防空疏散演練，數萬民眾參與。", "rate": 1, "cooldown": 200, "loc": "random", "mods": [{ "stat": "tension", "k": 1 }], "effects": { "defense": 0.8, "stability": 0.3 } },
-  { "id": "pol_n_county_merger", "cat": "politics", "tier": "news", "title": "縣市合併倡議再起", "desc": "{county}地方人士倡議與鄰近縣市合併升格，引發地方論戰。", "rate": 0.7, "cooldown": 400, "loc": "random", "local": { "stability": -3 } },
-
+  {
+    "id": "pol_n_bill_digital",
+    "cat": "politics",
+    "tier": "news",
+    "title": "立院三讀數位治理法案",
+    "desc": "立法院三讀通過數位治理相關法案，政府服務將全面線上化。",
+    "rate": 1,
+    "cooldown": 365,
+    "loc": [
+      "台北市"
+    ],
+    "effects": {
+      "trust": 0.5,
+      "tech": 0.5
+    },
+    "variants": [
+      {
+        "title": "數位身分法案三讀",
+        "desc": "國會三讀通過數位身分相關法案，多數業務可線上辦理。"
+      },
+      {
+        "title": "資安法修正三讀",
+        "desc": "國會三讀通過資安法修正案，強化關鍵基礎設施防護。"
+      }
+    ]
+  },
+  {
+    "id": "pol_n_approval_down",
+    "cat": "politics",
+    "tier": "news",
+    "title": "施政滿意度創新低",
+    "desc": "最新民調顯示政府施政滿意度跌破三成，創執政以來新低。",
+    "rate": 1,
+    "cooldown": 365,
+    "loc": [
+      "台北市"
+    ],
+    "mods": [
+      {
+        "stat": "trust",
+        "k": -1.5
+      }
+    ],
+    "effects": {
+      "trust": -1.5
+    },
+    "variants": [
+      {
+        "title": "滿意度跌破三成",
+        "desc": "最新民調顯示施政滿意度跌破三成，經濟與物價最受批評。"
+      },
+      {
+        "title": "施政滿意度連續下滑",
+        "desc": "多家民調顯示施政滿意度連續下滑，民眾對政策方向不滿。"
+      }
+    ]
+  },
+  {
+    "id": "pol_n_approval_up",
+    "cat": "politics",
+    "tier": "news",
+    "title": "施政滿意度明顯回升",
+    "desc": "民調顯示政府施政滿意度較上季回升，經濟與治安獲肯定。",
+    "rate": 1,
+    "cooldown": 365,
+    "loc": [
+      "台北市"
+    ],
+    "mods": [
+      {
+        "stat": "trust",
+        "k": 1.5
+      },
+      {
+        "stat": "gdp",
+        "k": 0.5
+      }
+    ],
+    "effects": {
+      "trust": 1.5
+    },
+    "variants": [
+      {
+        "title": "施政滿意度止跌回升",
+        "desc": "最新民調施政滿意度止跌回升，防災與經濟表現獲好評。"
+      },
+      {
+        "title": "滿意度創近年新高",
+        "desc": "民調顯示施政滿意度創近年新高，民眾肯定政策執行力。"
+      }
+    ]
+  },
+  {
+    "id": "pol_n_council_brawl",
+    "cat": "politics",
+    "tier": "news",
+    "title": "議會質詢爆口角衝突",
+    "desc": "{county}議會總質詢時議員與官員互嗆，場面一度失控。",
+    "rate": 1.2,
+    "cooldown": 365,
+    "loc": "random",
+    "local": {
+      "stability": -3
+    },
+    "variants": [
+      {
+        "title": "議會推擠議事中斷",
+        "desc": "{county}議會審查預算時爆發推擠，議事一度中斷。"
+      },
+      {
+        "title": "議員質詢互嗆",
+        "desc": "{county}議員質詢時與局處首長互嗆，影片在網路瘋傳。"
+      }
+    ]
+  },
+  {
+    "id": "pol_n_impeach",
+    "cat": "politics",
+    "tier": "news",
+    "title": "監察院彈劾失職官員",
+    "desc": "監察院通過彈劾案，指部會官員督導不周釀成重大損失。",
+    "rate": 0.8,
+    "cooldown": 365,
+    "loc": [
+      "台北市"
+    ],
+    "effects": {
+      "trust": 0.8
+    },
+    "variants": [
+      {
+        "title": "監察院糾正部會",
+        "desc": "監察院糾正部會督導不周，要求檢討改善並追究責任。"
+      },
+      {
+        "title": "高階官員遭彈劾",
+        "desc": "監察院通過彈劾一名高階官員，全案移送懲戒法院審理。"
+      }
+    ]
+  },
+  {
+    "id": "pol_n_minister_quit",
+    "cat": "politics",
+    "tier": "news",
+    "title": "部長請辭下台",
+    "desc": "一位部會首長因政策爭議請辭獲准，內閣進行局部改組。",
+    "rate": 1,
+    "cooldown": 365,
+    "loc": [
+      "台北市"
+    ],
+    "mods": [
+      {
+        "stat": "trust",
+        "k": -0.8
+      }
+    ],
+    "effects": {
+      "trust": -0.8,
+      "stability": -0.3
+    },
+    "variants": [
+      {
+        "title": "閣員因爭議請辭",
+        "desc": "一位閣員因政策執行爭議請辭，內閣宣布局部改組。"
+      },
+      {
+        "title": "部會首長請辭負責",
+        "desc": "一位部會首長為重大疏失請辭負責，暫由次長代理。"
+      }
+    ]
+  },
+  {
+    "id": "pol_n_poll_unify",
+    "cat": "politics",
+    "tier": "news",
+    "title": "民調：偏統一比例微升",
+    "desc": "最新民調顯示傾向兩岸統一的受訪者比例較去年微幅上升。",
+    "rate": 1,
+    "cooldown": 365,
+    "loc": [
+      "台北市"
+    ],
+    "mods": [
+      {
+        "stat": "tension",
+        "k": -0.8
+      }
+    ],
+    "effects": {
+      "popLean": -1
+    },
+    "variants": [
+      {
+        "title": "民調：偏統比例增加",
+        "desc": "學術單位民調顯示，傾向兩岸統一的受訪者比例較去年增加。"
+      },
+      {
+        "title": "調查：統一支持上升",
+        "desc": "年度民意調查指出，支持兩岸統一的受訪者比例微幅上升。"
+      }
+    ]
+  },
+  {
+    "id": "pol_n_poll_indep",
+    "cat": "politics",
+    "tier": "news",
+    "title": "民調：偏獨立比例微升",
+    "desc": "最新民調顯示傾向台灣獨立的受訪者比例較去年微幅上升。",
+    "rate": 1,
+    "cooldown": 365,
+    "loc": [
+      "台北市"
+    ],
+    "mods": [
+      {
+        "stat": "tension",
+        "k": 0.8
+      }
+    ],
+    "effects": {
+      "popLean": 1
+    },
+    "variants": [
+      {
+        "title": "民調：偏獨比例增加",
+        "desc": "學術單位民調顯示，傾向台灣獨立的受訪者比例較去年增加。"
+      },
+      {
+        "title": "調查：獨立支持上升",
+        "desc": "年度民意調查指出，支持台灣獨立的受訪者比例微幅上升。"
+      }
+    ]
+  },
+  {
+    "id": "pol_n_policy_soft",
+    "cat": "politics",
+    "tier": "news",
+    "title": "官方釋出兩岸善意",
+    "desc": "政府宣布放寬部分兩岸交流限制，釋出和緩訊號。",
+    "rate": 1,
+    "cooldown": 365,
+    "loc": [
+      "台北市"
+    ],
+    "mods": [
+      {
+        "stat": "popLean",
+        "k": -1
+      }
+    ],
+    "effects": {
+      "govLean": -1.5,
+      "tension": -1,
+      "dep": 0.5
+    },
+    "variants": [
+      {
+        "title": "官方呼籲兩岸對話",
+        "desc": "政府發言人呼籲兩岸恢復對話，並放寬部分交流活動限制。"
+      },
+      {
+        "title": "兩岸交流規範鬆綁",
+        "desc": "主管機關鬆綁部分兩岸文教交流規範，各界解讀為善意。"
+      }
+    ]
+  },
+  {
+    "id": "pol_n_policy_firm",
+    "cat": "politics",
+    "tier": "news",
+    "title": "官方重申主權立場",
+    "desc": "政府發言人重申主權立場，強調任何安排須經民意同意。",
+    "rate": 1,
+    "cooldown": 365,
+    "loc": [
+      "台北市"
+    ],
+    "mods": [
+      {
+        "stat": "popLean",
+        "k": 1
+      }
+    ],
+    "effects": {
+      "govLean": 1.5,
+      "tension": 1,
+      "dep": -0.5
+    },
+    "variants": [
+      {
+        "title": "官方強調主權不容讓",
+        "desc": "政府發言人強調主權立場不變，任何安排都須經民意同意。"
+      },
+      {
+        "title": "兩岸交流規範收緊",
+        "desc": "主管機關收緊部分兩岸交流規範，各界解讀為立場轉硬。"
+      }
+    ]
+  },
+  {
+    "id": "pol_n_arms_deal",
+    "cat": "politics",
+    "tier": "news",
+    "title": "軍購案順利過關",
+    "desc": "國會通過新一批防衛性武器採購，預計三年內陸續交運。",
+    "rate": 0.9,
+    "cooldown": 365,
+    "loc": [
+      "台北市"
+    ],
+    "mods": [
+      {
+        "stat": "tension",
+        "k": 0.8
+      }
+    ],
+    "effects": {
+      "defense": 1.5,
+      "tension": 0.5,
+      "gdp": -0.3
+    },
+    "variants": [
+      {
+        "title": "國防採購預算過關",
+        "desc": "國會通過年度國防採購預算，包含防空與無人機系統。"
+      },
+      {
+        "title": "國產武器進入量產",
+        "desc": "國產防衛武器系統通過測試，國防部宣布進入量產。"
+      }
+    ]
+  },
+  {
+    "id": "pol_n_data_leak",
+    "cat": "politics",
+    "tier": "news",
+    "title": "政府資料庫外洩",
+    "desc": "某部會資料庫遭駭，數百萬筆個資疑外流，主管機關道歉。",
+    "rate": 0.9,
+    "cooldown": 365,
+    "loc": [
+      "台北市"
+    ],
+    "effects": {
+      "trust": -1,
+      "tech": -0.3
+    },
+    "variants": [
+      {
+        "title": "個資外洩驚動全台",
+        "desc": "某公部門系統遭入侵，大量個資外洩，主管機關成立專案調查。"
+      },
+      {
+        "title": "公部門資料疑外流",
+        "desc": "網路論壇出現疑似公部門個資，相關單位緊急查證。"
+      }
+    ]
+  },
+  {
+    "id": "pol_n_vote_buying",
+    "cat": "politics",
+    "tier": "news",
+    "title": "賄選案起訴多人",
+    "desc": "{county}檢方偵結賄選案，起訴樁腳與民代共十餘人。",
+    "rate": 0.9,
+    "cooldown": 365,
+    "loc": "random",
+    "effects": {
+      "trust": -0.3
+    },
+    "local": {
+      "stability": -3
+    },
+    "variants": [
+      {
+        "title": "賄選查緝多人起訴",
+        "desc": "{county}檢調查獲賄選案，多名樁腳遭起訴。"
+      },
+      {
+        "title": "地方選舉買票案爆",
+        "desc": "{county}檢方破獲地方選舉買票集團，起訴十餘人。"
+      }
+    ]
+  },
+  {
+    "id": "pol_n_donation_open",
+    "cat": "politics",
+    "tier": "news",
+    "title": "政治獻金全面公開",
+    "desc": "政治獻金資料庫上線，民眾可即時查詢捐款明細。",
+    "rate": 0.7,
+    "cooldown": 400,
+    "loc": [
+      "台北市"
+    ],
+    "effects": {
+      "trust": 0.8
+    },
+    "variants": [
+      {
+        "title": "政治獻金查詢上線",
+        "desc": "政治獻金查詢系統上線，捐款資料公開透明。"
+      },
+      {
+        "title": "獻金資料開放下載",
+        "desc": "監察院開放政治獻金資料下載，公民團體製作分析網站。"
+      }
+    ]
+  },
+  {
+    "id": "pol_n_civil_defense",
+    "cat": "politics",
+    "tier": "news",
+    "title": "全民防衛演練登場",
+    "desc": "{county}舉行全民防衛與防空疏散演練，數萬民眾參與。",
+    "rate": 1,
+    "cooldown": 365,
+    "loc": "random",
+    "mods": [
+      {
+        "stat": "tension",
+        "k": 1
+      }
+    ],
+    "effects": {
+      "defense": 0.8,
+      "stability": 0.3
+    },
+    "variants": [
+      {
+        "title": "防空演習全城淨空",
+        "desc": "{county}舉行防空演習，街道淨空半小時，民眾配合避難。"
+      },
+      {
+        "title": "民防訓練報名踴躍",
+        "desc": "{county}民防與急救訓練課程開放報名，名額迅速額滿。"
+      }
+    ]
+  },
+  {
+    "id": "pol_n_county_merger",
+    "cat": "politics",
+    "tier": "news",
+    "title": "縣市合併倡議再起",
+    "desc": "{county}地方人士倡議與鄰近縣市合併升格，引發地方論戰。",
+    "rate": 0.7,
+    "cooldown": 400,
+    "loc": "random",
+    "local": {
+      "stability": -3
+    },
+    "variants": [
+      {
+        "title": "升格直轄市聲浪起",
+        "desc": "{county}地方人士推動升格直轄市，與鄰近縣市意見分歧。"
+      },
+      {
+        "title": "行政區劃調整爭論",
+        "desc": "{county}行政區劃調整方案公布，地方意見兩極。"
+      }
+    ]
+  },
   {
     "id": "pub_pension_protest",
     "cat": "public",
@@ -345,13 +1777,77 @@
     "desc": "政府推動軍公教與勞保年金改革以避免基金破產，退休團體集結包圍立法院，部分場面失控，世代之間的爭論在網路持續延燒。",
     "rate": 1,
     "cooldown": 900,
-    "loc": ["台北市"],
-    "mods": [{ "stat": "demo", "k": -0.8 }, { "stat": "trust", "k": -0.5 }],
+    "loc": [
+      "台北市"
+    ],
+    "mods": [
+      {
+        "stat": "demo",
+        "k": -0.8
+      },
+      {
+        "stat": "trust",
+        "k": -0.5
+      }
+    ],
     "ref": "2017 年金改革抗爭",
     "options": [
-      { "text": "改革照案通過", "result": "法案通過，退休族群強烈不滿", "weight": 1, "effects": { "gdp": 2, "trust": -2, "stability": -2 }, "local": { "stability": -6 } },
-      { "text": "放緩改革幅度", "result": "改革縮水，基金壓力延後爆發", "weight": 1, "effects": { "trust": 1, "gdp": -2 } },
-      { "text": "抗爭爆發衝突", "result": "抗議者與警方衝突，多人受傷", "weight": 0.6, "mods": [{ "stat": "stability", "k": -1 }, { "stat": "trust", "k": -0.8 }], "effects": { "stability": -4, "trust": -3 }, "local": { "stability": -10 } }
+      {
+        "text": "改革照案通過",
+        "result": "法案通過，退休族群強烈不滿",
+        "weight": 1,
+        "effects": {
+          "gdp": 2,
+          "trust": -2,
+          "stability": -2
+        },
+        "local": {
+          "stability": -6
+        },
+        "policy": [
+          {
+            "stat": "gdp",
+            "shift": 4,
+            "days": 2920
+          },
+          {
+            "stat": "trust",
+            "shift": 3,
+            "days": 2920
+          }
+        ]
+      },
+      {
+        "text": "放緩改革幅度",
+        "result": "改革縮水，基金壓力延後爆發",
+        "weight": 1,
+        "effects": {
+          "trust": 1,
+          "gdp": -2
+        }
+      },
+      {
+        "text": "抗爭爆發衝突",
+        "result": "抗議者與警方衝突，多人受傷",
+        "weight": 0.6,
+        "mods": [
+          {
+            "stat": "stability",
+            "k": -1
+          },
+          {
+            "stat": "trust",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "stability": -4,
+          "trust": -3
+        },
+        "local": {
+          "stability": -10
+        }
+      }
     ]
   },
   {
@@ -362,13 +1858,60 @@
     "desc": "{county}大型企業工會因薪資與工時爭議宣布罷工，物流與交通運輸大受影響，資方與工會隔空喊話，勞動部緊急介入協調。",
     "rate": 1.2,
     "cooldown": 300,
-    "loc": ["桃園市", "台北市", "高雄市", "台中市", "新北市"],
-    "mods": [{ "stat": "wealth", "k": -1 }],
+    "loc": [
+      "桃園市",
+      "台北市",
+      "高雄市",
+      "台中市",
+      "新北市"
+    ],
+    "mods": [
+      {
+        "stat": "wealth",
+        "k": -1
+      }
+    ],
     "ref": "2019 航空業罷工",
     "options": [
-      { "text": "資方讓步加薪", "result": "勞資達成協議，罷工落幕", "weight": 1, "effects": { "wealth": 1, "gdp": -1 }, "local": { "wealth": 4 } },
-      { "text": "罷工延長僵持", "result": "罷工持續，民眾生活受影響", "weight": 1, "effects": { "gdp": -2 }, "local": { "stability": -5, "wealth": -3 }, "follow": [{ "id": "pub_strike_settlement", "delay": 30 }] },
-      { "text": "政府強制仲裁", "result": "仲裁結果出爐，工會不滿但復工", "weight": 0.8, "effects": { "trust": -1, "stability": 1 } }
+      {
+        "text": "資方讓步加薪",
+        "result": "勞資達成協議，罷工落幕",
+        "weight": 1,
+        "effects": {
+          "wealth": 1,
+          "gdp": -1
+        },
+        "local": {
+          "wealth": 4
+        }
+      },
+      {
+        "text": "罷工延長僵持",
+        "result": "罷工持續，民眾生活受影響",
+        "weight": 1,
+        "effects": {
+          "gdp": -2
+        },
+        "local": {
+          "stability": -5,
+          "wealth": -3
+        },
+        "follow": [
+          {
+            "id": "pub_strike_settlement",
+            "delay": 30
+          }
+        ]
+      },
+      {
+        "text": "政府強制仲裁",
+        "result": "仲裁結果出爐，工會不滿但復工",
+        "weight": 0.8,
+        "effects": {
+          "trust": -1,
+          "stability": 1
+        }
+      }
     ]
   },
   {
@@ -379,11 +1922,57 @@
     "desc": "{county}罷工進入第二個月，供應鏈與旅客受影響擴大，社會輿論逐漸分歧，勞資雙方在政府安排下展開最後一輪協商。",
     "rate": 1,
     "chainOnly": true,
-    "loc": ["桃園市", "台北市", "高雄市", "台中市", "新北市"],
+    "loc": [
+      "桃園市",
+      "台北市",
+      "高雄市",
+      "台中市",
+      "新北市"
+    ],
     "options": [
-      { "text": "達成歷史性協議", "result": "協議簽署，勞權立下里程碑", "weight": 1, "effects": { "wealth": 2, "stability": 2, "trust": 1 }, "local": { "wealth": 5 } },
-      { "text": "工會分裂瓦解", "result": "罷工瓦解，勞資對立轉為暗流", "weight": 1, "effects": { "stability": 1, "wealth": -1 }, "local": { "stability": -3 } },
-      { "text": "聲援罷工擴散", "result": "多產業聲援，罷工規模擴大", "weight": 0.5, "mods": [{ "stat": "wealth", "k": -1 }], "effects": { "gdp": -3, "stability": -3 }, "local": { "stability": -8 } }
+      {
+        "text": "達成歷史性協議",
+        "result": "協議簽署，勞權立下里程碑",
+        "weight": 1,
+        "effects": {
+          "wealth": 2,
+          "stability": 2,
+          "trust": 1
+        },
+        "local": {
+          "wealth": 5
+        }
+      },
+      {
+        "text": "工會分裂瓦解",
+        "result": "罷工瓦解，勞資對立轉為暗流",
+        "weight": 1,
+        "effects": {
+          "stability": 1,
+          "wealth": -1
+        },
+        "local": {
+          "stability": -3
+        }
+      },
+      {
+        "text": "聲援罷工擴散",
+        "result": "多產業聲援，罷工規模擴大",
+        "weight": 0.5,
+        "mods": [
+          {
+            "stat": "wealth",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "gdp": -3,
+          "stability": -3
+        },
+        "local": {
+          "stability": -8
+        }
+      }
     ]
   },
   {
@@ -396,9 +1985,41 @@
     "cooldown": 150,
     "loc": "random",
     "options": [
-      { "text": "平台介入降溫", "result": "平台刪除不實內容，討論降溫", "weight": 1, "effects": { "stability": 1 } },
-      { "text": "演變全國論戰", "result": "對立情緒蔓延，網路戰火不斷", "weight": 1, "mods": [{ "stat": "stability", "k": -0.8 }], "effects": { "stability": -3, "trust": -1 }, "local": { "stability": -4 } },
-      { "text": "當事人澄清翻轉", "result": "真相大白，網友反省肉搜文化", "weight": 0.8, "effects": { "stability": 0.5, "trust": 0.5 } }
+      {
+        "text": "平台介入降溫",
+        "result": "平台刪除不實內容，討論降溫",
+        "weight": 1,
+        "effects": {
+          "stability": 1
+        }
+      },
+      {
+        "text": "演變全國論戰",
+        "result": "對立情緒蔓延，網路戰火不斷",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "stability",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "stability": -3,
+          "trust": -1
+        },
+        "local": {
+          "stability": -4
+        }
+      },
+      {
+        "text": "當事人澄清翻轉",
+        "result": "真相大白，網友反省肉搜文化",
+        "weight": 0.8,
+        "effects": {
+          "stability": 0.5,
+          "trust": 0.5
+        }
+      }
     ]
   },
   {
@@ -410,11 +2031,71 @@
     "rate": 0.9,
     "cooldown": 700,
     "loc": "random",
-    "mods": [{ "stat": "wealth", "k": -1 }, { "stat": "stability", "k": -0.6 }],
+    "mods": [
+      {
+        "stat": "wealth",
+        "k": -1
+      },
+      {
+        "stat": "stability",
+        "k": -0.6
+      }
+    ],
     "options": [
-      { "text": "推出攬才回流方案", "result": "政府祭出補助，部分人才回流", "weight": 1, "effects": { "gdp": -1, "demo": 2, "tech": 1 } },
-      { "text": "出走潮擴大", "result": "人才外流加劇，產業缺工嚴重", "weight": 1, "mods": [{ "stat": "wealth", "k": -1 }], "effects": { "demo": -3, "tech": -2, "gdp": -1 } },
-      { "text": "遠距工作留台", "result": "跨國遠距興起，青年留台接案", "weight": 0.7, "mods": [{ "stat": "tech", "k": 0.8 }], "effects": { "tech": 1, "demo": 1, "wealth": 1 } }
+      {
+        "text": "推出攬才回流方案",
+        "result": "政府祭出補助，部分人才回流",
+        "weight": 1,
+        "effects": {
+          "gdp": -1,
+          "demo": 2,
+          "tech": 1
+        },
+        "policy": [
+          {
+            "stat": "demo",
+            "shift": 4,
+            "days": 2190
+          },
+          {
+            "stat": "tech",
+            "shift": 3,
+            "days": 2190
+          }
+        ]
+      },
+      {
+        "text": "出走潮擴大",
+        "result": "人才外流加劇，產業缺工嚴重",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "wealth",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "demo": -3,
+          "tech": -2,
+          "gdp": -1
+        }
+      },
+      {
+        "text": "遠距工作留台",
+        "result": "跨國遠距興起，青年留台接案",
+        "weight": 0.7,
+        "mods": [
+          {
+            "stat": "tech",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "tech": 1,
+          "demo": 1,
+          "wealth": 1
+        }
+      }
     ]
   },
   {
@@ -425,12 +2106,55 @@
     "desc": "學術機構公布年度認同與兩岸立場調查，結果與往年出現明顯變化，各方媒體解讀不一，引發社會對未來走向的熱烈討論。",
     "rate": 1.2,
     "cooldown": 365,
-    "loc": ["台北市"],
+    "loc": [
+      "台北市"
+    ],
     "ref": "政大選研中心認同趨勢調查",
     "options": [
-      { "text": "偏統一比例上升", "result": "調查顯示傾向統一者增加", "weight": 1, "mods": [{ "stat": "popLean", "k": -1 }, { "stat": "tension", "k": -0.8 }], "effects": { "popLean": -3 } },
-      { "text": "偏獨立比例上升", "result": "調查顯示傾向獨立者增加", "weight": 1, "mods": [{ "stat": "popLean", "k": 1 }, { "stat": "tension", "k": 0.8 }], "effects": { "popLean": 3 } },
-      { "text": "維持現狀仍主流", "result": "多數民眾仍偏好維持現狀", "weight": 1.3, "effects": { "stability": 2 } }
+      {
+        "text": "偏統一比例上升",
+        "result": "調查顯示傾向統一者增加",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "popLean",
+            "k": -1
+          },
+          {
+            "stat": "tension",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "popLean": -3
+        }
+      },
+      {
+        "text": "偏獨立比例上升",
+        "result": "調查顯示傾向獨立者增加",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "popLean",
+            "k": 1
+          },
+          {
+            "stat": "tension",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "popLean": 3
+        }
+      },
+      {
+        "text": "維持現狀仍主流",
+        "result": "多數民眾仍偏好維持現狀",
+        "weight": 1.3,
+        "effects": {
+          "stability": 2
+        }
+      }
     ]
   },
   {
@@ -441,11 +2165,62 @@
     "desc": "{county}年度媽祖遶境吸引數十萬信眾隨香，沿途商家湧入人潮，今年因對岸宮廟受邀參與交流，部分團體表達不同意見。",
     "rate": 1,
     "cooldown": 365,
-    "loc": ["台中市", "苗栗縣", "嘉義縣", "雲林縣", "彰化縣"],
+    "loc": [
+      "台中市",
+      "苗栗縣",
+      "嘉義縣",
+      "雲林縣",
+      "彰化縣"
+    ],
     "options": [
-      { "text": "盛大舉行平安落幕", "result": "遶境圓滿，地方經濟受惠", "weight": 1.2, "effects": { "stability": 1 }, "local": { "wealth": 5, "stability": 3 } },
-      { "text": "擴大兩岸宮廟交流", "result": "交流熱絡，兩岸民間互動增加", "weight": 1, "mods": [{ "stat": "popLean", "k": -1 }], "effects": { "popLean": -1, "tension": -1 }, "local": { "wealth": 4 } },
-      { "text": "婉拒對岸團體", "result": "主辦方婉拒交流，引發正反討論", "weight": 1, "mods": [{ "stat": "popLean", "k": 1 }], "effects": { "popLean": 1, "tension": 1 }, "local": { "wealth": 2 } }
+      {
+        "text": "盛大舉行平安落幕",
+        "result": "遶境圓滿，地方經濟受惠",
+        "weight": 1.2,
+        "effects": {
+          "stability": 1
+        },
+        "local": {
+          "wealth": 5,
+          "stability": 3
+        }
+      },
+      {
+        "text": "擴大兩岸宮廟交流",
+        "result": "交流熱絡，兩岸民間互動增加",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "popLean",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "popLean": -1,
+          "tension": -1
+        },
+        "local": {
+          "wealth": 4
+        }
+      },
+      {
+        "text": "婉拒對岸團體",
+        "result": "主辦方婉拒交流，引發正反討論",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "popLean",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "popLean": 1,
+          "tension": 1
+        },
+        "local": {
+          "wealth": 2
+        }
+      }
     ]
   },
   {
@@ -459,9 +2234,50 @@
     "loc": "random",
     "ref": "2024 世界棒球12強奪冠",
     "options": [
-      { "text": "全民團結慶祝", "result": "舉國同慶，社會凝聚力上升", "weight": 1.3, "effects": { "stability": 3, "trust": 1 }, "local": { "stability": 4 } },
-      { "text": "正名呼聲高漲", "result": "奪金激起正名討論，對岸表達不滿", "weight": 1, "mods": [{ "stat": "popLean", "k": 1 }], "effects": { "popLean": 2, "tension": 1, "stability": 1 } },
-      { "text": "兩岸媒體同賀", "result": "對岸媒體同步祝賀，引發不同解讀", "weight": 1, "mods": [{ "stat": "popLean", "k": -1 }], "effects": { "popLean": -2, "tension": -1, "stability": 1 } }
+      {
+        "text": "全民團結慶祝",
+        "result": "舉國同慶，社會凝聚力上升",
+        "weight": 1.3,
+        "effects": {
+          "stability": 3,
+          "trust": 1
+        },
+        "local": {
+          "stability": 4
+        }
+      },
+      {
+        "text": "正名呼聲高漲",
+        "result": "奪金激起正名討論，對岸表達不滿",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "popLean",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "popLean": 2,
+          "tension": 1,
+          "stability": 1
+        }
+      },
+      {
+        "text": "兩岸媒體同賀",
+        "result": "對岸媒體同步祝賀，引發不同解讀",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "popLean",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "popLean": -2,
+          "tension": -1,
+          "stability": 1
+        }
+      }
     ]
   },
   {
@@ -472,12 +2288,60 @@
     "desc": "{county}一起移工遭雇主不當對待的案件曝光，人權團體要求修法保障，但部分業者擔憂成本上升，社會對移工政策意見分歧。",
     "rate": 1,
     "cooldown": 400,
-    "loc": ["桃園市", "台中市", "新北市", "彰化縣", "雲林縣"],
-    "mods": [{ "stat": "demo", "k": -0.6 }],
+    "loc": [
+      "桃園市",
+      "台中市",
+      "新北市",
+      "彰化縣",
+      "雲林縣"
+    ],
+    "mods": [
+      {
+        "stat": "demo",
+        "k": -0.6
+      }
+    ],
     "options": [
-      { "text": "修法保障移工權益", "result": "修法通過，國際人權評價提升", "weight": 1, "effects": { "intl": 2, "gdp": -1 }, "local": { "stability": 3 } },
-      { "text": "擴大引進移工", "result": "引進名額增加，產業缺工緩解", "weight": 1, "mods": [{ "stat": "demo", "k": -1 }], "effects": { "gdp": 2, "demo": 1, "stability": -1 }, "local": { "stability": -3 } },
-      { "text": "爭議擱置", "result": "議題冷卻，移工處境未見改善", "weight": 0.8, "effects": { "intl": -1, "stability": -1 } }
+      {
+        "text": "修法保障移工權益",
+        "result": "修法通過，國際人權評價提升",
+        "weight": 1,
+        "effects": {
+          "intl": 2,
+          "gdp": -1
+        },
+        "local": {
+          "stability": 3
+        }
+      },
+      {
+        "text": "擴大引進移工",
+        "result": "引進名額增加，產業缺工緩解",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "demo",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "gdp": 2,
+          "demo": 1,
+          "stability": -1
+        },
+        "local": {
+          "stability": -3
+        }
+      },
+      {
+        "text": "爭議擱置",
+        "result": "議題冷卻，移工處境未見改善",
+        "weight": 0.8,
+        "effects": {
+          "intl": -1,
+          "stability": -1
+        }
+      }
     ]
   },
   {
@@ -488,12 +2352,62 @@
     "desc": "{county}原住民族部落抗議傳統領域劃設延宕，族人在公路旁搭棚靜坐，要求歸還土地與資源管理權，與開發業者形成對立。",
     "rate": 0.8,
     "cooldown": 500,
-    "loc": ["花蓮縣", "台東縣", "屏東縣", "南投縣"],
+    "loc": [
+      "花蓮縣",
+      "台東縣",
+      "屏東縣",
+      "南投縣"
+    ],
     "ref": "2017 凱道傳統領域抗議",
     "options": [
-      { "text": "劃設傳統領域", "result": "傳統領域公告，部落歡慶", "weight": 1, "effects": { "trust": 1, "intl": 1, "gdp": -1 }, "local": { "stability": 5 } },
-      { "text": "成立協商平台", "result": "政府、部落與業者展開對話", "weight": 1.2, "effects": { "trust": 0.5 }, "local": { "stability": 2 } },
-      { "text": "抗議長期化", "result": "靜坐延續，族人與警方多次對峙", "weight": 0.8, "mods": [{ "stat": "trust", "k": -0.8 }], "effects": { "trust": -1 }, "local": { "stability": -6 } }
+      {
+        "text": "劃設傳統領域",
+        "result": "傳統領域公告，部落歡慶",
+        "weight": 1,
+        "effects": {
+          "trust": 1,
+          "intl": 1,
+          "gdp": -1
+        },
+        "local": {
+          "stability": 5
+        },
+        "policy": [
+          {
+            "stat": "stability",
+            "shift": 3,
+            "days": 2555
+          }
+        ]
+      },
+      {
+        "text": "成立協商平台",
+        "result": "政府、部落與業者展開對話",
+        "weight": 1.2,
+        "effects": {
+          "trust": 0.5
+        },
+        "local": {
+          "stability": 2
+        }
+      },
+      {
+        "text": "抗議長期化",
+        "result": "靜坐延續，族人與警方多次對峙",
+        "weight": 0.8,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "trust": -1
+        },
+        "local": {
+          "stability": -6
+        }
+      }
     ]
   },
   {
@@ -505,11 +2419,47 @@
     "rate": 1,
     "cooldown": 400,
     "loc": "random",
-    "mods": [{ "stat": "demo", "k": -1 }],
+    "mods": [
+      {
+        "stat": "demo",
+        "k": -1
+      }
+    ],
     "options": [
-      { "text": "開徵長照稅", "result": "長照財源到位，工作世代負擔加重", "weight": 1, "effects": { "demo": 1, "wealth": -2, "gdp": 1, "stability": -1 } },
-      { "text": "舉辦世代對話", "result": "跨世代論壇舉行，緊張關係緩和", "weight": 1, "effects": { "stability": 2 } },
-      { "text": "對立擴大", "result": "世代對立加深，青年更想出走", "weight": 0.7, "mods": [{ "stat": "stability", "k": -0.8 }], "effects": { "stability": -3, "demo": -1 } }
+      {
+        "text": "開徵長照稅",
+        "result": "長照財源到位，工作世代負擔加重",
+        "weight": 1,
+        "effects": {
+          "demo": 1,
+          "wealth": -2,
+          "gdp": 1,
+          "stability": -1
+        }
+      },
+      {
+        "text": "舉辦世代對話",
+        "result": "跨世代論壇舉行，緊張關係緩和",
+        "weight": 1,
+        "effects": {
+          "stability": 2
+        }
+      },
+      {
+        "text": "對立擴大",
+        "result": "世代對立加深，青年更想出走",
+        "weight": 0.7,
+        "mods": [
+          {
+            "stat": "stability",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "stability": -3,
+          "demo": -1
+        }
+      }
     ]
   },
   {
@@ -520,13 +2470,76 @@
     "desc": "因房價與租金連年攀升，數萬名青年與無殼族在{county}街頭夜宿抗議，要求打房、擴大社宅與稅制改革，引發廣泛共鳴。",
     "rate": 1,
     "cooldown": 500,
-    "loc": ["台北市", "新北市", "台中市", "新竹縣", "新竹市", "桃園市"],
-    "mods": [{ "stat": "wealth", "k": -1.2 }, { "stat": "trust", "k": -0.5 }],
+    "loc": [
+      "台北市",
+      "新北市",
+      "台中市",
+      "新竹縣",
+      "新竹市",
+      "桃園市"
+    ],
+    "mods": [
+      {
+        "stat": "wealth",
+        "k": -1.2
+      },
+      {
+        "stat": "trust",
+        "k": -0.5
+      }
+    ],
     "ref": "1989 無住屋者夜宿忠孝東路、2014 巢運",
     "options": [
-      { "text": "推出打房社宅方案", "result": "政策出爐，房市降溫，建商反彈", "weight": 1, "effects": { "wealth": 2, "gdp": -2, "trust": 2 } },
-      { "text": "象徵性回應", "result": "政府口頭承諾，抗議者表示失望", "weight": 1, "effects": { "trust": -2 }, "local": { "stability": -3 } },
-      { "text": "運動擴散全台", "result": "多個城市響應夜宿，壓力倍增", "weight": 0.6, "mods": [{ "stat": "wealth", "k": -1 }, { "stat": "trust", "k": -0.8 }], "effects": { "stability": -3, "trust": -3 }, "local": { "stability": -7 } }
+      {
+        "text": "推出打房社宅方案",
+        "result": "政策出爐，房市降溫，建商反彈",
+        "weight": 1,
+        "effects": {
+          "wealth": 2,
+          "gdp": -2,
+          "trust": 2
+        },
+        "policy": [
+          {
+            "stat": "wealth",
+            "shift": 5,
+            "days": 2555
+          }
+        ]
+      },
+      {
+        "text": "象徵性回應",
+        "result": "政府口頭承諾，抗議者表示失望",
+        "weight": 1,
+        "effects": {
+          "trust": -2
+        },
+        "local": {
+          "stability": -3
+        }
+      },
+      {
+        "text": "運動擴散全台",
+        "result": "多個城市響應夜宿，壓力倍增",
+        "weight": 0.6,
+        "mods": [
+          {
+            "stat": "wealth",
+            "k": -1
+          },
+          {
+            "stat": "trust",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "stability": -3,
+          "trust": -3
+        },
+        "local": {
+          "stability": -7
+        }
+      }
     ]
   },
   {
@@ -539,9 +2552,49 @@
     "cooldown": 300,
     "loc": "random",
     "options": [
-      { "text": "校方道歉撤銷處分", "result": "校方讓步，學生撤出行政大樓", "weight": 1, "effects": { "trust": 0.5 }, "local": { "stability": 3 } },
-      { "text": "警方強制驅離", "result": "驅離畫面曝光，各校串聯抗議", "weight": 0.8, "mods": [{ "stat": "trust", "k": -0.8 }], "effects": { "trust": -2 }, "local": { "stability": -5 }, "follow": [{ "id": "pub_student_occupation", "delay": 20, "chance": 0.1 }] },
-      { "text": "事件逐漸平息", "result": "期末將至，抗議逐漸冷卻", "weight": 1.2, "effects": { "stability": 0.5 } }
+      {
+        "text": "校方道歉撤銷處分",
+        "result": "校方讓步，學生撤出行政大樓",
+        "weight": 1,
+        "effects": {
+          "trust": 0.5
+        },
+        "local": {
+          "stability": 3
+        }
+      },
+      {
+        "text": "警方強制驅離",
+        "result": "驅離畫面曝光，各校串聯抗議",
+        "weight": 0.8,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "trust": -2
+        },
+        "local": {
+          "stability": -5
+        },
+        "follow": [
+          {
+            "id": "pub_student_occupation",
+            "delay": 20,
+            "chance": 0.1
+          }
+        ]
+      },
+      {
+        "text": "事件逐漸平息",
+        "result": "期末將至，抗議逐漸冷卻",
+        "weight": 1.2,
+        "effects": {
+          "stability": 0.5
+        }
+      }
     ]
   },
   {
@@ -554,9 +2607,44 @@
     "cooldown": 250,
     "loc": "random",
     "options": [
-      { "text": "統一立場獲聲援", "result": "表態獲部分網友聲援，另一方發起抵制", "weight": 1, "mods": [{ "stat": "popLean", "k": -1 }], "effects": { "popLean": -1.5, "stability": -1 } },
-      { "text": "獨立立場獲聲援", "result": "表態掀起支持浪潮，對岸市場封殺", "weight": 1, "mods": [{ "stat": "popLean", "k": 1 }], "effects": { "popLean": 1.5, "stability": -1 } },
-      { "text": "藝人道歉退出", "result": "當事人道歉，論戰逐漸平息", "weight": 0.8, "effects": { "stability": 0.5 } }
+      {
+        "text": "統一立場獲聲援",
+        "result": "表態獲部分網友聲援，另一方發起抵制",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "popLean",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "popLean": -1.5,
+          "stability": -1
+        }
+      },
+      {
+        "text": "獨立立場獲聲援",
+        "result": "表態掀起支持浪潮，對岸市場封殺",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "popLean",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "popLean": 1.5,
+          "stability": -1
+        }
+      },
+      {
+        "text": "藝人道歉退出",
+        "result": "當事人道歉，論戰逐漸平息",
+        "weight": 0.8,
+        "effects": {
+          "stability": 0.5
+        }
+      }
     ]
   },
   {
@@ -567,14 +2655,47 @@
     "desc": "攸關性別平權與多元家庭的法案進入審議，支持與反對團體在{county}分別舉辦大型集會，宗教團體與青年族群看法明顯分歧。",
     "rate": 0.8,
     "cooldown": 700,
-    "loc": ["台北市"],
+    "loc": [
+      "台北市"
+    ],
     "options": [
-      { "text": "法案三讀通過", "result": "法案三讀，國際媒體廣泛報導", "weight": 1, "effects": { "intl": 3, "stability": -1 } },
-      { "text": "法案退回再議", "result": "法案擱置，支持團體表達失望", "weight": 1, "effects": { "stability": 1, "intl": -1, "trust": -1 } },
-      { "text": "交付公投決定", "result": "雙方轉戰公投，社會對立延長", "weight": 0.6, "effects": { "stability": -2, "trust": -1 }, "follow": [{ "id": "pub_equality_referendum", "delay": 180, "chance": 0.5 }] }
+      {
+        "text": "法案三讀通過",
+        "result": "法案三讀，國際媒體廣泛報導",
+        "weight": 1,
+        "effects": {
+          "intl": 3,
+          "stability": -1
+        }
+      },
+      {
+        "text": "法案退回再議",
+        "result": "法案擱置，支持團體表達失望",
+        "weight": 1,
+        "effects": {
+          "stability": 1,
+          "intl": -1,
+          "trust": -1
+        }
+      },
+      {
+        "text": "交付公投決定",
+        "result": "雙方轉戰公投，社會對立延長",
+        "weight": 0.6,
+        "effects": {
+          "stability": -2,
+          "trust": -1
+        },
+        "follow": [
+          {
+            "id": "pub_equality_referendum",
+            "delay": 180,
+            "chance": 0.5
+          }
+        ]
+      }
     ]
   },
-
   {
     "id": "pub_student_occupation",
     "cat": "public",
@@ -583,14 +2704,102 @@
     "desc": "大批學生與公民團體不滿國會審議程序，夜間突破封鎖佔領立法院議場，場外數萬人聲援，政府與佔領者陷入對峙，全國關注。",
     "rate": 0.5,
     "cooldown": 1500,
-    "loc": ["台北市"],
-    "cond": [["trust", "<", 60]],
-    "mods": [{ "stat": "gap", "k": 1.5 }, { "stat": "trust", "k": -1.5 }],
+    "loc": [
+      "台北市"
+    ],
+    "cond": [
+      [
+        "trust",
+        "<",
+        60
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "gap",
+        "k": 1.5
+      },
+      {
+        "stat": "trust",
+        "k": -1.5
+      }
+    ],
     "ref": "2014 太陽花學運",
     "options": [
-      { "text": "政府讓步回應訴求", "result": "政府接受訴求，佔領和平落幕", "weight": 1, "mods": [{ "stat": "gap", "k": 1 }, { "stat": "trust", "k": -0.5 }], "effects": { "govToPop": 0.35, "trust": 3, "stability": -2 }, "local": { "stability": -4 }, "follow": [{ "id": "pub_occupation_aftermath", "delay": 60, "chance": 0.7 }] },
-      { "text": "強制驅離議場", "result": "警方驅離釀衝突，社會譁然", "weight": 0.8, "mods": [{ "stat": "trust", "k": -1 }], "effects": { "trust": -8, "stability": -6 }, "local": { "stability": -12 }, "follow": [{ "id": "pub_occupation_aftermath", "delay": 30 }] },
-      { "text": "對話後自主退場", "result": "雙方對話，學生宣布自主退場", "weight": 1, "effects": { "trust": 1, "stability": -1, "popToGov": 0.1 }, "local": { "stability": -5 }, "follow": [{ "id": "pub_occupation_aftermath", "delay": 60, "chance": 0.5 }] }
+      {
+        "text": "政府讓步回應訴求",
+        "result": "政府接受訴求，佔領和平落幕",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "gap",
+            "k": 1
+          },
+          {
+            "stat": "trust",
+            "k": -0.5
+          }
+        ],
+        "effects": {
+          "govToPop": 0.35,
+          "trust": 3,
+          "stability": -2
+        },
+        "local": {
+          "stability": -4
+        },
+        "follow": [
+          {
+            "id": "pub_occupation_aftermath",
+            "delay": 60,
+            "chance": 0.7
+          }
+        ]
+      },
+      {
+        "text": "強制驅離議場",
+        "result": "警方驅離釀衝突，社會譁然",
+        "weight": 0.8,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "trust": -8,
+          "stability": -6
+        },
+        "local": {
+          "stability": -12
+        },
+        "follow": [
+          {
+            "id": "pub_occupation_aftermath",
+            "delay": 30
+          }
+        ]
+      },
+      {
+        "text": "對話後自主退場",
+        "result": "雙方對話，學生宣布自主退場",
+        "weight": 1,
+        "effects": {
+          "trust": 1,
+          "stability": -1,
+          "popToGov": 0.1
+        },
+        "local": {
+          "stability": -5
+        },
+        "follow": [
+          {
+            "id": "pub_occupation_aftermath",
+            "delay": 60,
+            "chance": 0.5
+          }
+        ]
+      }
     ]
   },
   {
@@ -601,11 +2810,55 @@
     "desc": "佔領事件落幕後，參與者成立新的公民團體，支持與反對者在家庭、校園與職場間出現裂痕，政府面臨是否推動制度改革的抉擇。",
     "rate": 1,
     "chainOnly": true,
-    "loc": ["台北市"],
+    "loc": [
+      "台北市"
+    ],
     "options": [
-      { "text": "推動監督制度改革", "result": "制度改革上路，公民團體轉型參政", "weight": 1, "effects": { "trust": 3, "govToPop": 0.1 } },
-      { "text": "追究佔領者責任", "result": "起訴爭議再起，社會裂痕加深", "weight": 1, "mods": [{ "stat": "trust", "k": -0.6 }], "effects": { "trust": -3, "stability": -2 } },
-      { "text": "社會逐漸和解", "result": "對立降溫，社會重回日常", "weight": 0.8, "mods": [{ "stat": "stability", "k": 0.8 }], "effects": { "stability": 3 } }
+      {
+        "text": "推動監督制度改革",
+        "result": "制度改革上路，公民團體轉型參政",
+        "weight": 1,
+        "effects": {
+          "trust": 3,
+          "govToPop": 0.1
+        },
+        "policy": [
+          {
+            "stat": "trust",
+            "shift": 5,
+            "days": 2920
+          }
+        ]
+      },
+      {
+        "text": "追究佔領者責任",
+        "result": "起訴爭議再起，社會裂痕加深",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -0.6
+          }
+        ],
+        "effects": {
+          "trust": -3,
+          "stability": -2
+        }
+      },
+      {
+        "text": "社會逐漸和解",
+        "result": "對立降溫，社會重回日常",
+        "weight": 0.8,
+        "mods": [
+          {
+            "stat": "stability",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "stability": 3
+        }
+      }
     ]
   },
   {
@@ -616,14 +2869,74 @@
     "desc": "不滿政府施政與爭議頻傳，民間發起全民上街行動，主辦單位估計逾百萬人走上{county}街頭，訴求領導人負起政治責任。",
     "rate": 0.5,
     "cooldown": 1200,
-    "loc": ["台北市"],
-    "cond": [["trust", "<", 50]],
-    "mods": [{ "stat": "trust", "k": -2 }, { "stat": "gap", "k": 0.8 }],
+    "loc": [
+      "台北市"
+    ],
+    "cond": [
+      [
+        "trust",
+        "<",
+        50
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "trust",
+        "k": -2
+      },
+      {
+        "stat": "gap",
+        "k": 0.8
+      }
+    ],
     "ref": "2006 百萬人民倒扁運動",
     "options": [
-      { "text": "領導人道歉改組", "result": "政府高層改組，遊行和平解散", "weight": 1, "effects": { "trust": 4, "stability": 2, "govToPop": 0.2 } },
-      { "text": "轉為長期靜坐", "result": "遊行轉為長期靜坐，對峙持續", "weight": 1, "mods": [{ "stat": "trust", "k": -0.8 }], "effects": { "trust": -5, "stability": -4 }, "local": { "stability": -10 }, "follow": [{ "id": "pub_march_sitin", "delay": 30, "chance": 0.8 }] },
-      { "text": "遊行和平落幕", "result": "遊行平和結束，訴求未獲回應", "weight": 0.8, "effects": { "trust": -2 }, "local": { "stability": -4 } }
+      {
+        "text": "領導人道歉改組",
+        "result": "政府高層改組，遊行和平解散",
+        "weight": 1,
+        "effects": {
+          "trust": 4,
+          "stability": 2,
+          "govToPop": 0.2
+        }
+      },
+      {
+        "text": "轉為長期靜坐",
+        "result": "遊行轉為長期靜坐，對峙持續",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "trust": -5,
+          "stability": -4
+        },
+        "local": {
+          "stability": -10
+        },
+        "follow": [
+          {
+            "id": "pub_march_sitin",
+            "delay": 30,
+            "chance": 0.8
+          }
+        ]
+      },
+      {
+        "text": "遊行和平落幕",
+        "result": "遊行平和結束，訴求未獲回應",
+        "weight": 0.8,
+        "effects": {
+          "trust": -2
+        },
+        "local": {
+          "stability": -4
+        }
+      }
     ]
   },
   {
@@ -634,11 +2947,50 @@
     "desc": "靜坐行動持續一個月，{county}主要道路封閉，商家生意大受影響，參與者與反制群眾不時爆發口角，警方嚴陣以待。",
     "rate": 1,
     "chainOnly": true,
-    "loc": ["台北市"],
+    "loc": [
+      "台北市"
+    ],
     "options": [
-      { "text": "提出改革時程", "result": "靜坐者接受時程，宣布撤場", "weight": 1, "effects": { "trust": 3, "stability": 3, "govToPop": 0.15 } },
-      { "text": "警方清場", "result": "清場釀衝突，抗議轉向分散游擊", "weight": 0.8, "mods": [{ "stat": "trust", "k": -0.8 }], "effects": { "trust": -4, "stability": -2 }, "local": { "stability": -6 } },
-      { "text": "運動能量消退", "result": "參與人數驟減，靜坐自行解散", "weight": 1.2, "effects": { "trust": -1, "stability": 1 }, "local": { "wealth": -3 } }
+      {
+        "text": "提出改革時程",
+        "result": "靜坐者接受時程，宣布撤場",
+        "weight": 1,
+        "effects": {
+          "trust": 3,
+          "stability": 3,
+          "govToPop": 0.15
+        }
+      },
+      {
+        "text": "警方清場",
+        "result": "清場釀衝突，抗議轉向分散游擊",
+        "weight": 0.8,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "trust": -4,
+          "stability": -2
+        },
+        "local": {
+          "stability": -6
+        }
+      },
+      {
+        "text": "運動能量消退",
+        "result": "參與人數驟減，靜坐自行解散",
+        "weight": 1.2,
+        "effects": {
+          "trust": -1,
+          "stability": 1
+        },
+        "local": {
+          "wealth": -3
+        }
+      }
     ]
   },
   {
@@ -649,12 +3001,39 @@
     "desc": "一項攸關婚姻與家庭定義的公投案付諸表決，正反陣營投入大量資源宣傳，家庭、教會與校園都成為論戰場域，國際社會密切關注。",
     "rate": 0.4,
     "cooldown": 1500,
-    "loc": ["台北市"],
+    "loc": [
+      "台北市"
+    ],
     "ref": "2018 婚姻平權相關公投",
     "options": [
-      { "text": "支持平權方勝出", "result": "平權方勝出，國際社會給予肯定", "weight": 1, "effects": { "intl": 5, "stability": -3, "trust": 1 } },
-      { "text": "反對方勝出", "result": "反對方勝出，平權團體誓言再戰", "weight": 1, "effects": { "intl": -3, "stability": -3 } },
-      { "text": "未達門檻不成立", "result": "公投未成立，爭議回到國會", "weight": 0.8, "effects": { "stability": 1, "trust": -3 } }
+      {
+        "text": "支持平權方勝出",
+        "result": "平權方勝出，國際社會給予肯定",
+        "weight": 1,
+        "effects": {
+          "intl": 5,
+          "stability": -3,
+          "trust": 1
+        }
+      },
+      {
+        "text": "反對方勝出",
+        "result": "反對方勝出，平權團體誓言再戰",
+        "weight": 1,
+        "effects": {
+          "intl": -3,
+          "stability": -3
+        }
+      },
+      {
+        "text": "未達門檻不成立",
+        "result": "公投未成立，爭議回到國會",
+        "weight": 0.8,
+        "effects": {
+          "stability": 1,
+          "trust": -3
+        }
+      }
     ]
   },
   {
@@ -665,13 +3044,79 @@
     "desc": "物價高漲、實質薪資連年下滑，多個產業工會串聯發動全國總罷工，交通、物流與醫療部分停擺，政府緊急召開跨部會會議。",
     "rate": 0.4,
     "cooldown": 1500,
-    "loc": ["台北市"],
-    "cond": [["wealth", "<", 50]],
-    "mods": [{ "stat": "wealth", "k": -2 }, { "stat": "trust", "k": -1 }],
+    "loc": [
+      "台北市"
+    ],
+    "cond": [
+      [
+        "wealth",
+        "<",
+        50
+      ]
+    ],
+    "mods": [
+      {
+        "stat": "wealth",
+        "k": -2
+      },
+      {
+        "stat": "trust",
+        "k": -1
+      }
+    ],
     "options": [
-      { "text": "提出加薪減稅方案", "result": "方案出爐，罷工逐步解除", "weight": 1, "effects": { "wealth": 5, "gdp": -4, "trust": 2 } },
-      { "text": "罷工持續數週", "result": "經濟重創，社會疲憊不堪", "weight": 1, "mods": [{ "stat": "trust", "k": -1 }], "effects": { "gdp": -6, "stability": -6, "trust": -4 }, "local": { "stability": -10 }, "over": { "days": 90, "effects": { "gdp": -2 } } },
-      { "text": "勞資政三方協議", "result": "三方協議簽署，勞動制度大改革", "weight": 0.8, "mods": [{ "stat": "trust", "k": 1 }], "effects": { "wealth": 3, "stability": 3, "trust": 3, "gdp": -1 } }
+      {
+        "text": "提出加薪減稅方案",
+        "result": "方案出爐，罷工逐步解除",
+        "weight": 1,
+        "effects": {
+          "wealth": 5,
+          "gdp": -4,
+          "trust": 2
+        }
+      },
+      {
+        "text": "罷工持續數週",
+        "result": "經濟重創，社會疲憊不堪",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "gdp": -6,
+          "stability": -6,
+          "trust": -4
+        },
+        "local": {
+          "stability": -10
+        },
+        "over": {
+          "days": 90,
+          "effects": {
+            "gdp": -2
+          }
+        }
+      },
+      {
+        "text": "勞資政三方協議",
+        "result": "三方協議簽署，勞動制度大改革",
+        "weight": 0.8,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "wealth": 3,
+          "stability": 3,
+          "trust": 3,
+          "gdp": -1
+        }
+      }
     ]
   },
   {
@@ -682,30 +3127,609 @@
     "desc": "立場傾向統一與傾向獨立的兩派團體同日在{county}舉行大型集會，雙方人潮僅隔數條街，警方築起人牆隔離，網路對立情緒持續升溫。",
     "rate": 0.5,
     "cooldown": 1000,
-    "loc": ["台北市"],
-    "mods": [{ "stat": "absPop", "k": 1.2 }, { "stat": "gap", "k": 0.8 }, { "stat": "stability", "k": -0.8 }],
+    "loc": [
+      "台北市"
+    ],
+    "mods": [
+      {
+        "stat": "absPop",
+        "k": 1.2
+      },
+      {
+        "stat": "gap",
+        "k": 0.8
+      },
+      {
+        "stat": "stability",
+        "k": -0.8
+      }
+    ],
     "options": [
-      { "text": "統一派聲勢壓倒", "result": "統一派人潮更多，政策壓力轉向", "weight": 1, "mods": [{ "stat": "popLean", "k": -2 }], "effects": { "popLean": -4, "tension": -3, "stability": -3 }, "local": { "stability": -6 } },
-      { "text": "獨立派聲勢壓倒", "result": "獨立派人潮更多，對岸表達關切", "weight": 1, "mods": [{ "stat": "popLean", "k": 2 }], "effects": { "popLean": 4, "tension": 3, "stability": -3 }, "local": { "stability": -6 } },
-      { "text": "爆發流血衝突", "result": "雙方激烈衝突，多人受傷送醫", "weight": 0.4, "mods": [{ "stat": "stability", "k": -1.5 }], "effects": { "stability": -8, "trust": -4 }, "local": { "stability": -14 } },
-      { "text": "和平落幕", "result": "集會和平結束，各界呼籲包容", "weight": 0.8, "mods": [{ "stat": "stability", "k": 1 }], "effects": { "stability": 3 } }
+      {
+        "text": "統一派聲勢壓倒",
+        "result": "統一派人潮更多，政策壓力轉向",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "popLean",
+            "k": -2
+          }
+        ],
+        "effects": {
+          "popLean": -4,
+          "tension": -3,
+          "stability": -3
+        },
+        "local": {
+          "stability": -6
+        }
+      },
+      {
+        "text": "獨立派聲勢壓倒",
+        "result": "獨立派人潮更多，對岸表達關切",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "popLean",
+            "k": 2
+          }
+        ],
+        "effects": {
+          "popLean": 4,
+          "tension": 3,
+          "stability": -3
+        },
+        "local": {
+          "stability": -6
+        }
+      },
+      {
+        "text": "爆發流血衝突",
+        "result": "雙方激烈衝突，多人受傷送醫",
+        "weight": 0.4,
+        "mods": [
+          {
+            "stat": "stability",
+            "k": -1.5
+          }
+        ],
+        "effects": {
+          "stability": -8,
+          "trust": -4
+        },
+        "local": {
+          "stability": -14
+        }
+      },
+      {
+        "text": "和平落幕",
+        "result": "集會和平結束，各界呼籲包容",
+        "weight": 0.8,
+        "mods": [
+          {
+            "stat": "stability",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "stability": 3
+        }
+      }
     ]
   },
-
-  { "id": "pub_n_viral_video", "cat": "public", "tier": "news", "title": "爭議影片網路瘋傳", "desc": "{county}一段街頭衝突影片在網路瘋傳，引發網友激烈論戰。", "rate": 1.3, "cooldown": 120, "loc": "random", "effects": { "stability": -0.3 }, "local": { "stability": -3 } },
-  { "id": "pub_n_baseball", "cat": "public", "tier": "news", "title": "棒球國家隊奪冠", "desc": "棒球國家隊在國際賽封王，全台各地湧現慶祝人潮。", "rate": 0.8, "cooldown": 365, "loc": "random", "effects": { "stability": 1.5, "trust": 0.5 } },
-  { "id": "pub_n_mazu", "cat": "public", "tier": "news", "title": "媽祖遶境湧入人潮", "desc": "{county}媽祖遶境起駕，數十萬信眾隨香，沿線商家生意興隆。", "rate": 1, "cooldown": 300, "loc": ["台中市", "苗栗縣"], "local": { "wealth": 3, "stability": 2 } },
-  { "id": "pub_n_fake_news", "cat": "public", "tier": "news", "title": "假訊息大量擴散", "desc": "一則關於物資短缺的假訊息在通訊群組擴散，引發搶購。", "rate": 1.2, "cooldown": 150, "loc": "random", "mods": [{ "stat": "tension", "k": 0.8 }], "effects": { "stability": -1, "trust": -0.5 } },
-  { "id": "pub_n_fact_check", "cat": "public", "tier": "news", "title": "查核平台闢謠有成", "desc": "民間查核平台迅速澄清多則謠言，獲網友好評。", "rate": 0.9, "cooldown": 200, "loc": ["台北市"], "effects": { "trust": 0.5, "stability": 0.3 } },
-  { "id": "pub_n_low_pay", "cat": "public", "tier": "news", "title": "青年低薪調查出爐", "desc": "調查指近半數青年月薪不足以負擔都會區房租與生活開銷。", "rate": 1, "cooldown": 300, "loc": "random", "mods": [{ "stat": "wealth", "k": -1 }], "effects": { "stability": -0.5, "demo": -0.3 } },
-  { "id": "pub_n_birth_low", "cat": "public", "tier": "news", "title": "新生兒數再創新低", "desc": "內政部統計今年新生兒數再創歷史新低，少子化警訊加劇。", "rate": 1, "cooldown": 365, "loc": ["台北市"], "mods": [{ "stat": "demo", "k": -1 }], "effects": { "demo": -1.2 } },
-  { "id": "pub_n_rent_rise", "cat": "public", "tier": "news", "title": "都會租金再漲", "desc": "{county}平均租金年增近一成，租屋族叫苦連天。", "rate": 1, "cooldown": 200, "loc": ["台北市", "新北市", "台中市", "新竹市"], "local": { "wealth": -3 } },
-  { "id": "pub_n_eid", "cat": "public", "tier": "news", "title": "移工歡慶開齋節", "desc": "{county}車站周邊湧入上萬名移工歡慶開齋節，氣氛熱鬧。", "rate": 0.8, "cooldown": 365, "loc": ["台北市", "桃園市", "台中市"], "effects": { "stability": 0.3, "intl": 0.3 } },
-  { "id": "pub_n_harvest", "cat": "public", "tier": "news", "title": "部落豐年祭登場", "desc": "{county}各部落豐年祭陸續登場，吸引大批遊客參與。", "rate": 0.9, "cooldown": 365, "loc": ["花蓮縣", "台東縣"], "local": { "stability": 3, "wealth": 2 } },
-  { "id": "pub_n_bullying", "cat": "public", "tier": "news", "title": "校園霸凌案引眾怒", "desc": "{county}校園霸凌影片曝光，家長團體要求教育單位嚴懲。", "rate": 1, "cooldown": 200, "loc": "random", "effects": { "trust": -0.3 }, "local": { "stability": -3 } },
-  { "id": "pub_n_artist_remark", "cat": "public", "tier": "news", "title": "藝人兩岸發言惹議", "desc": "知名藝人受訪談及兩岸關係，發言偏向統一立場引發討論。", "rate": 1, "cooldown": 200, "loc": "random", "effects": { "popLean": -0.5, "stability": -0.3 } },
-  { "id": "pub_n_influencer_remark", "cat": "public", "tier": "news", "title": "網紅發言掀論戰", "desc": "百萬網紅直播談及兩岸，發言偏向獨立立場引發論戰。", "rate": 1, "cooldown": 200, "loc": "random", "effects": { "popLean": 0.5, "stability": -0.3 } },
-  { "id": "pub_n_pride", "cat": "public", "tier": "news", "title": "同志大遊行登場", "desc": "{county}同志大遊行吸引十餘萬人參與，國際旅客踴躍。", "rate": 0.8, "cooldown": 365, "loc": ["台北市", "高雄市", "台中市"], "effects": { "intl": 0.5 }, "local": { "wealth": 2 } },
-  { "id": "pub_n_small_protest", "cat": "public", "tier": "news", "title": "民眾集結陳情抗議", "desc": "{county}數千名民眾集結陳情，不滿政府近期政策方向。", "rate": 1.2, "cooldown": 120, "loc": "random", "mods": [{ "stat": "gap", "k": 1 }, { "stat": "trust", "k": -1 }], "effects": { "trust": -0.3 }, "local": { "stability": -3 } },
-  { "id": "pub_n_emigration", "cat": "public", "tier": "news", "title": "移民諮詢量暴增", "desc": "移民代辦業者表示諮詢量較去年倍增，中產家庭最多。", "rate": 0.8, "cooldown": 300, "loc": ["台北市"], "mods": [{ "stat": "tension", "k": 1.2 }, { "stat": "stability", "k": -0.8 }], "effects": { "demo": -0.5, "wealth": -0.3 } }
+  {
+    "id": "pub_n_viral_video",
+    "cat": "public",
+    "tier": "news",
+    "title": "爭議影片網路瘋傳",
+    "desc": "{county}一段街頭衝突影片在網路瘋傳，引發網友激烈論戰。",
+    "rate": 1.3,
+    "cooldown": 365,
+    "loc": "random",
+    "effects": {
+      "stability": -0.3
+    },
+    "local": {
+      "stability": -3
+    },
+    "variants": [
+      {
+        "title": "行車糾紛影片熱議",
+        "desc": "{county}一段行車糾紛影片在網路瘋傳，雙方說法各異。"
+      },
+      {
+        "title": "公共場所爭執影片",
+        "desc": "{county}一段公共場所爭執影片引發網友兩極論戰。"
+      }
+    ]
+  },
+  {
+    "id": "pub_n_baseball",
+    "cat": "public",
+    "tier": "news",
+    "title": "棒球國家隊奪冠",
+    "desc": "棒球國家隊在國際賽封王，全台各地湧現慶祝人潮。",
+    "rate": 0.8,
+    "cooldown": 365,
+    "loc": "random",
+    "effects": {
+      "stability": 1.5,
+      "trust": 0.5
+    },
+    "variants": [
+      {
+        "title": "國家隊凱旋遊行",
+        "desc": "國際賽奪冠的國家隊返國遊行，沿途湧入大批球迷。"
+      },
+      {
+        "title": "冠軍戰收視創紀錄",
+        "desc": "棒球國家隊奪冠一戰收視創紀錄，各地轉播現場歡聲雷動。"
+      }
+    ]
+  },
+  {
+    "id": "pub_n_mazu",
+    "cat": "public",
+    "tier": "news",
+    "title": "媽祖遶境湧入人潮",
+    "desc": "{county}媽祖遶境起駕，數十萬信眾隨香，沿線商家生意興隆。",
+    "rate": 1,
+    "cooldown": 365,
+    "loc": [
+      "台中市",
+      "苗栗縣"
+    ],
+    "local": {
+      "wealth": 3,
+      "stability": 2
+    },
+    "variants": [
+      {
+        "title": "媽祖進香隊伍起駕",
+        "desc": "{county}媽祖進香隊伍出發，沿途信眾夾道迎接，交通管制。"
+      },
+      {
+        "title": "遶境帶動觀光商機",
+        "desc": "{county}遶境活動吸引大量香客，沿線攤販與旅宿生意興隆。"
+      }
+    ]
+  },
+  {
+    "id": "pub_n_fake_news",
+    "cat": "public",
+    "tier": "news",
+    "title": "假訊息大量擴散",
+    "desc": "一則關於物資短缺的假訊息在通訊群組擴散，引發搶購。",
+    "rate": 1.2,
+    "cooldown": 365,
+    "loc": "random",
+    "mods": [
+      {
+        "stat": "tension",
+        "k": 0.8
+      }
+    ],
+    "effects": {
+      "stability": -1,
+      "trust": -0.5
+    },
+    "variants": [
+      {
+        "title": "假訊息引發搶購潮",
+        "desc": "一則停水停電的假訊息在群組流傳，民眾湧入賣場搶購。"
+      },
+      {
+        "title": "不實訊息瘋傳群組",
+        "desc": "一則關於疫苗的不實訊息在群組瘋傳，衛生單位緊急澄清。"
+      }
+    ]
+  },
+  {
+    "id": "pub_n_fact_check",
+    "cat": "public",
+    "tier": "news",
+    "title": "查核平台闢謠有成",
+    "desc": "民間查核平台迅速澄清多則謠言，獲網友好評。",
+    "rate": 0.9,
+    "cooldown": 365,
+    "loc": [
+      "台北市"
+    ],
+    "effects": {
+      "trust": 0.5,
+      "stability": 0.3
+    },
+    "variants": [
+      {
+        "title": "闢謠機制發揮效果",
+        "desc": "查核平台與各界合作快速闢謠，假訊息擴散速度明顯下降。"
+      },
+      {
+        "title": "事實查核獲國際肯定",
+        "desc": "國際報告肯定台灣民間事實查核機制，成為他國參考。"
+      }
+    ]
+  },
+  {
+    "id": "pub_n_low_pay",
+    "cat": "public",
+    "tier": "news",
+    "title": "青年低薪調查出爐",
+    "desc": "調查指近半數青年月薪不足以負擔都會區房租與生活開銷。",
+    "rate": 1,
+    "cooldown": 365,
+    "loc": "random",
+    "mods": [
+      {
+        "stat": "wealth",
+        "k": -1
+      }
+    ],
+    "effects": {
+      "stability": -0.5,
+      "demo": -0.3
+    },
+    "variants": [
+      {
+        "title": "青年薪資調查出爐",
+        "desc": "調查顯示青年平均月薪成長有限，多數人無力負擔購屋。"
+      },
+      {
+        "title": "青年薪資滿意度低",
+        "desc": "調查指青年對薪資滿意度偏低，近四成考慮轉職或出國。"
+      }
+    ]
+  },
+  {
+    "id": "pub_n_rent_rise",
+    "cat": "public",
+    "tier": "news",
+    "title": "都會租金再漲",
+    "desc": "{county}平均租金年增近一成，租屋族叫苦連天。",
+    "rate": 1,
+    "cooldown": 365,
+    "loc": [
+      "台北市",
+      "新北市",
+      "台中市",
+      "新竹市"
+    ],
+    "local": {
+      "wealth": -3
+    },
+    "variants": [
+      {
+        "title": "租屋族負擔加重",
+        "desc": "{county}租金漲幅超越薪資漲幅，租屋族收入近半繳房租。"
+      },
+      {
+        "title": "房東普遍調漲租金",
+        "desc": "{county}多數房東調漲租金，學生與社會新鮮人叫苦。"
+      }
+    ]
+  },
+  {
+    "id": "pub_n_eid",
+    "cat": "public",
+    "tier": "news",
+    "title": "移工歡慶開齋節",
+    "desc": "{county}車站周邊湧入上萬名移工歡慶開齋節，氣氛熱鬧。",
+    "rate": 0.8,
+    "cooldown": 365,
+    "loc": [
+      "台北市",
+      "桃園市",
+      "台中市"
+    ],
+    "effects": {
+      "stability": 0.3,
+      "intl": 0.3
+    },
+    "variants": [
+      {
+        "title": "開齋節人潮湧車站",
+        "desc": "{county}車站大廳湧入大批移工歡慶開齋節，市府加派人力。"
+      },
+      {
+        "title": "移工文化節展多元",
+        "desc": "{county}舉辦移工文化節，各國移工表演傳統舞蹈與美食。"
+      }
+    ]
+  },
+  {
+    "id": "pub_n_harvest",
+    "cat": "public",
+    "tier": "news",
+    "title": "部落豐年祭登場",
+    "desc": "{county}各部落豐年祭陸續登場，吸引大批遊客參與。",
+    "rate": 0.9,
+    "cooldown": 365,
+    "loc": [
+      "花蓮縣",
+      "台東縣"
+    ],
+    "local": {
+      "stability": 3,
+      "wealth": 2
+    },
+    "variants": [
+      {
+        "title": "部落祭典吸引遊客",
+        "desc": "{county}部落祭典熱鬧登場，傳統歌舞吸引國內外遊客。"
+      },
+      {
+        "title": "青年返鄉傳承祭典",
+        "desc": "{county}部落青年返鄉參加豐年祭，傳承傳統歌舞與文化。"
+      }
+    ]
+  },
+  {
+    "id": "pub_n_bullying",
+    "cat": "public",
+    "tier": "news",
+    "title": "校園霸凌案引眾怒",
+    "desc": "{county}校園霸凌影片曝光，家長團體要求教育單位嚴懲。",
+    "rate": 1,
+    "cooldown": 365,
+    "loc": "random",
+    "effects": {
+      "trust": -0.3
+    },
+    "local": {
+      "stability": -3
+    },
+    "variants": [
+      {
+        "title": "校園霸凌事件延燒",
+        "desc": "{county}校園霸凌事件延燒，教育局成立專案小組調查。"
+      },
+      {
+        "title": "霸凌影片網路瘋傳",
+        "desc": "{county}學生霸凌影片在網路瘋傳，家長要求校方說明。"
+      }
+    ]
+  },
+  {
+    "id": "pub_n_artist_remark",
+    "cat": "public",
+    "tier": "news",
+    "title": "藝人兩岸發言惹議",
+    "desc": "知名藝人受訪談及兩岸關係，發言偏向統一立場引發討論。",
+    "rate": 1,
+    "cooldown": 365,
+    "loc": "random",
+    "effects": {
+      "popLean": -0.5,
+      "stability": -0.3
+    },
+    "variants": [
+      {
+        "title": "藝人偏統言論惹議",
+        "desc": "知名藝人在對岸節目談及兩岸關係，偏統一言論引發討論。"
+      },
+      {
+        "title": "歌手兩岸發文掀論戰",
+        "desc": "知名歌手在社群發文談兩岸，偏向統一的立場引發論戰。"
+      }
+    ]
+  },
+  {
+    "id": "pub_n_influencer_remark",
+    "cat": "public",
+    "tier": "news",
+    "title": "網紅發言掀論戰",
+    "desc": "百萬網紅直播談及兩岸，發言偏向獨立立場引發論戰。",
+    "rate": 1,
+    "cooldown": 365,
+    "loc": "random",
+    "effects": {
+      "popLean": 0.5,
+      "stability": -0.3
+    },
+    "variants": [
+      {
+        "title": "網紅偏獨言論惹議",
+        "desc": "知名網紅在節目談及兩岸關係，偏獨立言論引發討論。"
+      },
+      {
+        "title": "實況主兩岸發言惹議",
+        "desc": "知名實況主直播談兩岸，偏向獨立的立場引發論戰。"
+      }
+    ]
+  },
+  {
+    "id": "pub_n_pride",
+    "cat": "public",
+    "tier": "news",
+    "title": "同志大遊行登場",
+    "desc": "{county}同志大遊行吸引十餘萬人參與，國際旅客踴躍。",
+    "rate": 0.8,
+    "cooldown": 365,
+    "loc": [
+      "台北市",
+      "高雄市",
+      "台中市"
+    ],
+    "effects": {
+      "intl": 0.5
+    },
+    "local": {
+      "wealth": 2
+    },
+    "variants": [
+      {
+        "title": "彩虹遊行旅客湧入",
+        "desc": "{county}彩虹遊行吸引大批國際旅客，周邊旅宿爆滿。"
+      },
+      {
+        "title": "平權遊行和平落幕",
+        "desc": "{county}平權遊行數萬人參與，活動和平落幕。"
+      }
+    ]
+  },
+  {
+    "id": "pub_n_small_protest",
+    "cat": "public",
+    "tier": "news",
+    "title": "民眾集結陳情抗議",
+    "desc": "{county}數千名民眾集結陳情，不滿政府近期政策方向。",
+    "rate": 1.2,
+    "cooldown": 365,
+    "loc": "random",
+    "mods": [
+      {
+        "stat": "gap",
+        "k": 1
+      },
+      {
+        "stat": "trust",
+        "k": -1
+      }
+    ],
+    "effects": {
+      "trust": -0.3
+    },
+    "local": {
+      "stability": -3
+    },
+    "variants": [
+      {
+        "title": "民眾機關前陳情",
+        "desc": "{county}數百名民眾至政府機關前陳情，要求說明政策。"
+      },
+      {
+        "title": "自救會集結抗議",
+        "desc": "{county}自救會集結抗議開發案，與警方短暫推擠。"
+      }
+    ]
+  },
+  {
+    "id": "pub_n_emigration",
+    "cat": "public",
+    "tier": "news",
+    "title": "移民諮詢量暴增",
+    "desc": "移民代辦業者表示諮詢量較去年倍增，中產家庭最多。",
+    "rate": 0.8,
+    "cooldown": 365,
+    "loc": [
+      "台北市"
+    ],
+    "mods": [
+      {
+        "stat": "tension",
+        "k": 1.2
+      },
+      {
+        "stat": "stability",
+        "k": -0.8
+      }
+    ],
+    "effects": {
+      "demo": -0.5,
+      "wealth": -0.3
+    },
+    "variants": [
+      {
+        "title": "移民說明會爆滿",
+        "desc": "移民投資說明會場場爆滿，中產家庭詢問度最高。"
+      },
+      {
+        "title": "海外置產詢問度升",
+        "desc": "業者指海外置產與留學移民詢問度大增，年輕家庭居多。"
+      }
+    ]
+  },
+  {
+    "id": "pub_sovereignty_protest",
+    "cat": "public",
+    "tier": "major",
+    "title": "主權疑慮引爆抗議",
+    "desc": "政府對兩岸政治協商的態度引發民眾對主權前途的疑慮，數十萬人聚集{county}街頭，要求任何政治安排都必須先經人民同意。",
+    "rate": 0.5,
+    "mods": [
+      {
+        "stat": "govLean",
+        "k": -1.5
+      },
+      {
+        "stat": "gap",
+        "k": 0.8
+      }
+    ],
+    "cond": [
+      [
+        "govLean",
+        "<=",
+        -20
+      ]
+    ],
+    "cooldown": 1200,
+    "loc": [
+      "台北市",
+      "台中市",
+      "高雄市"
+    ],
+    "options": [
+      {
+        "text": "承諾協商須經公投",
+        "result": "政府承諾重大安排交付人民決定，群眾散去。",
+        "weight": 2,
+        "effects": {
+          "govToPop": 0.2,
+          "trust": 3,
+          "stability": 2,
+          "tension": 2,
+          "dep": -1
+        },
+        "local": {
+          "stability": -3
+        }
+      },
+      {
+        "text": "暫停兩岸政治協商",
+        "result": "協商喊停換來平靜，對岸表達不滿。",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "gap",
+            "k": 0.8
+          }
+        ],
+        "effects": {
+          "govLean": 4,
+          "tension": 3,
+          "stability": 2,
+          "trust": 1
+        },
+        "local": {
+          "stability": -3
+        }
+      },
+      {
+        "text": "強勢維持既定路線",
+        "result": "抗爭長期化，社會對立加深，信任大幅流失。",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "trust",
+            "k": -0.8
+          }
+        ],
+        "effects": {
+          "trust": -6,
+          "stability": -5,
+          "intl": -2
+        },
+        "local": {
+          "stability": -10
+        },
+        "over": {
+          "days": 180,
+          "effects": {
+            "stability": -2
+          }
+        }
+      }
+    ]
+  }
 ]

@@ -395,7 +395,8 @@
         "effects": {
           "intl": 1,
           "gdp": 0.5,
-          "popLean": 0.3
+          "popLean": 0.3,
+          "dep": -3
         },
         "local": {
           "wealth": -2
@@ -421,7 +422,8 @@
         "effects": {
           "tension": -1.5,
           "trust": -1,
-          "popLean": 0.3
+          "popLean": 0.3,
+          "dep": 2
         },
         "local": {
           "wealth": -3
@@ -452,11 +454,23 @@
     ],
     "effects": {
       "tension": -0.5,
-      "gdp": 0.3
+      "gdp": 0.3,
+      "dep": 0.5
     },
     "local": {
       "wealth": 3
-    }
+    },
+    "variants": [
+      {
+        "title": "果品輸出部分解禁",
+        "desc": "對岸恢復部分果品輸入，果農訂單回籠，產地價格止跌。"
+      },
+      {
+        "title": "檢疫協商露曙光",
+        "desc": "雙方檢疫單位完成技術溝通，部分果園恢復外銷資格。"
+      }
+    ],
+    "cooldown": 365
   },
   {
     "id": "str_tourism_open",
@@ -505,7 +519,8 @@
         "effects": {
           "tension": -2,
           "gdp": 1.5,
-          "wealth": 1
+          "wealth": 1,
+          "dep": 4
         },
         "local": {
           "wealth": 4,
@@ -589,7 +604,8 @@
         "result": "放寬簽證吸引新客源，需時間發酵。",
         "weight": 2,
         "effects": {
-          "intl": 1.5
+          "intl": 1.5,
+          "dep": -2
         },
         "local": {
           "wealth": -3
@@ -607,7 +623,8 @@
         ],
         "effects": {
           "tension": -1.5,
-          "trust": -1
+          "trust": -1,
+          "dep": 2
         },
         "local": {
           "wealth": -2
@@ -649,7 +666,8 @@
         "effects": {
           "tension": -2.5,
           "popLean": -0.5,
-          "trust": -1.5
+          "trust": -1.5,
+          "dep": 2
         }
       },
       {
@@ -702,7 +720,8 @@
         "weight": 3,
         "effects": {
           "popLean": -0.3,
-          "demo": -0.3
+          "demo": -0.3,
+          "dep": 2
         }
       },
       {
@@ -865,7 +884,8 @@
         "effects": {
           "tech": -2.5,
           "tension": -0.5,
-          "trust": -1
+          "trust": -1,
+          "dep": 2
         }
       }
     ]
@@ -887,14 +907,22 @@
         "weight": 2.5,
         "effects": {
           "gdp": -1.5,
-          "intl": 1.5
+          "intl": 1.5,
+          "dep": -4
         },
         "over": {
           "days": 540,
           "effects": {
             "gdp": 2
           }
-        }
+        },
+        "policy": [
+          {
+            "stat": "intl",
+            "shift": 3,
+            "days": 1825
+          }
+        ]
       },
       {
         "text": "協助台商就地紓困",
@@ -909,7 +937,8 @@
         "effects": {
           "gdp": -0.5,
           "tension": -1,
-          "wealth": -0.5
+          "wealth": -0.5,
+          "dep": 3
         }
       },
       {
@@ -1074,7 +1103,14 @@
           "defense": 3,
           "gdp": -1.5,
           "tension": 1
-        }
+        },
+        "policy": [
+          {
+            "stat": "defense",
+            "shift": 4,
+            "days": 1825
+          }
+        ]
       },
       {
         "text": "維持現行應對",
@@ -1099,7 +1135,14 @@
           "tension": -2,
           "intl": 1,
           "trust": -0.5
-        }
+        },
+        "policy": [
+          {
+            "stat": "tension",
+            "shift": -4,
+            "days": 1825
+          }
+        ]
       }
     ]
   },
@@ -1509,8 +1552,21 @@
           "popLean": -1,
           "trust": -3,
           "stability": -3,
-          "intl": -1
-        }
+          "intl": -1,
+          "dep": 6
+        },
+        "policy": [
+          {
+            "stat": "tension",
+            "shift": -6,
+            "days": 2555
+          },
+          {
+            "stat": "gdp",
+            "shift": 3,
+            "days": 2555
+          }
+        ]
       },
       {
         "text": "逐條審查再簽",
@@ -1519,14 +1575,22 @@
         "effects": {
           "gdp": 1,
           "tension": -2,
-          "trust": 2
+          "trust": 2,
+          "dep": 3
         },
         "over": {
           "days": 365,
           "effects": {
             "gdp": 1.5
           }
-        }
+        },
+        "policy": [
+          {
+            "stat": "tension",
+            "shift": -3,
+            "days": 1825
+          }
+        ]
       },
       {
         "text": "擱置協議",
@@ -1542,7 +1606,8 @@
           "gdp": -1.5,
           "tension": 3,
           "trust": 1,
-          "intl": 1
+          "intl": 1,
+          "dep": -2
         }
       }
     ]
@@ -1590,8 +1655,16 @@
           "intl": 3,
           "trust": -3,
           "stability": -3,
-          "popLean": -1
-        }
+          "popLean": -1,
+          "dep": 4
+        },
+        "policy": [
+          {
+            "stat": "tension",
+            "shift": -8,
+            "days": 2920
+          }
+        ]
       },
       {
         "text": "提出對等前提",
@@ -1677,7 +1750,8 @@
         ],
         "effects": {
           "tension": -1.5,
-          "trust": -1.5
+          "trust": -1.5,
+          "dep": 2
         },
         "local": {
           "wealth": -2
@@ -1690,7 +1764,8 @@
         "effects": {
           "intl": 2,
           "gdp": -0.5,
-          "tension": 0.5
+          "tension": 0.5,
+          "dep": -3
         },
         "local": {
           "wealth": -3
@@ -1711,13 +1786,27 @@
         "k": 1
       }
     ],
-    "cooldown": 30,
+    "cooldown": 365,
     "loc": "strait",
     "effects": {
       "tension": 1,
       "defense": 0.3,
       "popLean": 0.1
-    }
+    },
+    "variants": [
+      {
+        "title": "軍機編隊進入空域",
+        "desc": "對岸軍機編隊進入西南空域並逾越中線，國軍派機廣播驅離。"
+      },
+      {
+        "title": "擾台架次單日創高",
+        "desc": "國防部統計單日擾台架次創新高，戰機與無人機皆有。"
+      },
+      {
+        "title": "機艦聯合戰備警巡",
+        "desc": "對岸機艦於海峽周邊進行聯合戰備警巡，國軍嚴密監控。"
+      }
+    ]
   },
   {
     "id": "str_n_carrier",
@@ -1732,11 +1821,21 @@
         "k": 0.8
       }
     ],
-    "cooldown": 90,
+    "cooldown": 365,
     "loc": "strait",
     "effects": {
       "tension": 1.5
-    }
+    },
+    "variants": [
+      {
+        "title": "航艦駛經東部海域",
+        "desc": "對岸航艦編隊駛經台灣以東海域，國軍全程監控。"
+      },
+      {
+        "title": "航艦編隊遠海訓練",
+        "desc": "對岸航艦於西太平洋進行起降訓練，國防部公布監控畫面。"
+      }
+    ]
   },
   {
     "id": "str_n_coastguard_patrol",
@@ -1751,7 +1850,7 @@
         "k": 0.8
       }
     ],
-    "cooldown": 45,
+    "cooldown": 365,
     "loc": [
       "金門縣",
       "連江縣"
@@ -1761,7 +1860,17 @@
     },
     "local": {
       "stability": -1
-    }
+    },
+    "variants": [
+      {
+        "title": "海警船編隊巡航",
+        "desc": "四艘海警船編隊駛入{county}限制水域，海巡隊廣播驅離。"
+      },
+      {
+        "title": "海警登檢觀光船",
+        "desc": "對岸海警登上{county}觀光船檢查證件，業者與遊客受驚。"
+      }
+    ]
   },
   {
     "id": "str_n_new_route",
@@ -1775,7 +1884,17 @@
     "effects": {
       "tension": 0.8,
       "intl": 0.3
-    }
+    },
+    "variants": [
+      {
+        "title": "航路銜接段逕行啟用",
+        "desc": "對岸宣布啟用航路銜接段，民航單位抗議未經事先溝通。"
+      },
+      {
+        "title": "航路調整引飛安疑慮",
+        "desc": "對岸取消航路偏置措施，飛航管制單位提出飛安警示。"
+      }
+    ]
   },
   {
     "id": "str_n_grouper_ban",
@@ -1802,7 +1921,17 @@
     },
     "local": {
       "wealth": -3
-    }
+    },
+    "variants": [
+      {
+        "title": "養殖漁產遭暫停輸入",
+        "desc": "對岸以檢疫為由暫停部分養殖漁產輸入，{county}漁民急尋通路。"
+      },
+      {
+        "title": "漁產輸出受阻魚價跌",
+        "desc": "{county}養殖業者出口受阻，魚價下跌，業者呼籲開拓新市場。"
+      }
+    ]
   },
   {
     "id": "str_n_mainland_students",
@@ -1837,7 +1966,17 @@
     "effects": {
       "tension": -0.5,
       "demo": 0.3
-    }
+    },
+    "variants": [
+      {
+        "title": "陸籍交換生增加",
+        "desc": "大學陸籍交換生人數增加，校園交流活動明顯變多。"
+      },
+      {
+        "title": "陸生報考人數回溫",
+        "desc": "陸生報考學位人數回溫，私立大學招生壓力稍減。"
+      }
+    ]
   },
   {
     "id": "str_n_mini_links",
@@ -1859,17 +1998,28 @@
         55
       ]
     ],
-    "cooldown": 300,
+    "cooldown": 365,
     "loc": [
       "金門縣",
       "連江縣"
     ],
     "effects": {
-      "tension": -0.5
+      "tension": -0.5,
+      "dep": 0.5
     },
     "local": {
       "wealth": 3
-    }
+    },
+    "variants": [
+      {
+        "title": "外島航線加開班次",
+        "desc": "外島對岸客輪加開假日班次，{county}旅宿業者訂房滿檔。"
+      },
+      {
+        "title": "小三通旅客回流",
+        "desc": "小三通旅運量回升，{county}碼頭與商圈人潮明顯增加。"
+      }
+    ]
   },
   {
     "id": "str_n_cyberattack",
@@ -1884,13 +2034,23 @@
         "k": 0.8
       }
     ],
-    "cooldown": 120,
+    "cooldown": 365,
     "loc": "台北市",
     "effects": {
       "tension": 0.5,
       "trust": -0.5,
       "tech": 0.3
-    }
+    },
+    "variants": [
+      {
+        "title": "關鍵設施遭駭侵入",
+        "desc": "多個公共事業系統偵測到駭客入侵，資安單位緊急應變。"
+      },
+      {
+        "title": "惡意流量癱瘓官網",
+        "desc": "多個部會官網遭大量惡意流量攻擊，服務中斷數小時。"
+      }
+    ]
   },
   {
     "id": "str_n_sand_dredgers",
@@ -1899,7 +2059,7 @@
     "title": "抽砂船群聚外島海域",
     "desc": "大批抽砂船聚集{county}海域，居民憂心海岸侵蝕與海纜受損。",
     "rate": 1,
-    "cooldown": 200,
+    "cooldown": 365,
     "loc": [
       "連江縣",
       "金門縣",
@@ -1911,7 +2071,17 @@
     "local": {
       "stability": -1.5,
       "wealth": -1
-    }
+    },
+    "variants": [
+      {
+        "title": "抽砂船越界作業",
+        "desc": "數十艘抽砂船越界進入{county}周邊海域，海巡隊驅離。"
+      },
+      {
+        "title": "海巡扣押抽砂船",
+        "desc": "海巡於{county}海域扣押越界抽砂船，船員移送偵辦。"
+      }
+    ]
   },
   {
     "id": "str_n_white_paper",
@@ -1926,7 +2096,17 @@
       "tension": 1,
       "stability": -0.3,
       "popLean": 0.2
-    }
+    },
+    "variants": [
+      {
+        "title": "對岸發布對台新政策",
+        "desc": "對岸發布新一輪對台政策文件，學界與輿論解讀不一。"
+      },
+      {
+        "title": "對岸對台談話升溫",
+        "desc": "對岸官方發表對台政策談話，重申既定立場，引發國內關注。"
+      }
+    ]
   },
   {
     "id": "str_n_cross_marriage",
@@ -1945,7 +2125,17 @@
     "loc": "random",
     "effects": {
       "demo": -0.4
-    }
+    },
+    "variants": [
+      {
+        "title": "兩岸婚姻登記減少",
+        "desc": "兩岸婚姻登記數連年下滑，相關輔導單位業務縮減。"
+      },
+      {
+        "title": "陸配來台人數下降",
+        "desc": "陸籍配偶來台人數持續減少，學者認為與往來降溫相關。"
+      }
+    ]
   },
   {
     "id": "str_n_taishang_return",
@@ -1960,7 +2150,7 @@
         "k": 0.6
       }
     ],
-    "cooldown": 300,
+    "cooldown": 365,
     "loc": [
       "桃園市",
       "台中市",
@@ -1969,11 +2159,22 @@
       "苗栗縣"
     ],
     "effects": {
-      "gdp": 0.8
+      "gdp": 0.8,
+      "dep": -1
     },
     "local": {
       "wealth": 2
-    }
+    },
+    "variants": [
+      {
+        "title": "台商返台擴產",
+        "desc": "多家台商將產線移回國內，{county}工業區土地需求大增。"
+      },
+      {
+        "title": "回台投資案再增加",
+        "desc": "又有台商宣布回台投資數十億元，{county}工業區大舉招工。"
+      }
+    ]
   },
   {
     "id": "str_n_sanction_list",
@@ -1992,13 +2193,23 @@
         "k": 0.8
       }
     ],
-    "cooldown": 300,
+    "cooldown": 365,
     "loc": "台北市",
     "effects": {
       "tension": 0.8,
       "trust": 0.3,
       "popLean": 0.3
-    }
+    },
+    "variants": [
+      {
+        "title": "對岸宣布懲戒名單",
+        "desc": "對岸宣布將數家台灣企業與人士列入懲戒，禁止往來。"
+      },
+      {
+        "title": "對岸祭出制裁措施",
+        "desc": "對岸宣布制裁數名台灣人士，國內各界表達關切。"
+      }
+    ]
   },
   {
     "id": "str_n_youth_exchange",
@@ -2017,12 +2228,23 @@
         "k": -0.8
       }
     ],
-    "cooldown": 300,
+    "cooldown": 365,
     "loc": "mainland",
     "effects": {
       "tension": -0.4,
-      "popLean": -0.2
-    }
+      "popLean": -0.2,
+      "dep": 1
+    },
+    "variants": [
+      {
+        "title": "兩岸大學生交流營",
+        "desc": "兩岸大學舉辦學生交流營，參與者分享彼此生活見聞。"
+      },
+      {
+        "title": "青年團赴對岸參訪",
+        "desc": "青年交流團赴對岸參訪科技園區與城市，返台引發討論。"
+      }
+    ]
   },
   {
     "id": "str_n_kinmen_water",
@@ -2034,12 +2256,23 @@
     "cooldown": 500,
     "loc": "金門縣",
     "effects": {
-      "tension": -0.3
+      "tension": -0.3,
+      "dep": 0.5
     },
     "local": {
       "wealth": 1,
       "stability": 0.5
-    }
+    },
+    "variants": [
+      {
+        "title": "外島引水量再增",
+        "desc": "{county}自對岸引水量持續增加，在地供水趨於穩定。"
+      },
+      {
+        "title": "引水管線擴充評估",
+        "desc": "{county}評估擴充引水管線，正反意見各有支持者。"
+      }
+    ]
   },
   {
     "id": "str_n_fake_accounts",
@@ -2054,12 +2287,22 @@
         "k": -0.6
       }
     ],
-    "cooldown": 120,
+    "cooldown": 365,
     "loc": "random",
     "effects": {
       "stability": -0.5,
       "trust": -0.5
-    }
+    },
+    "variants": [
+      {
+        "title": "協同假帳號遭揭露",
+        "desc": "研究團隊揭露上百個協同操作帳號，大量散布不實訊息。"
+      },
+      {
+        "title": "平台下架一批假帳號",
+        "desc": "社群平台宣布下架一批假帳號，涉及跨國資訊操作。"
+      }
+    ]
   },
   {
     "id": "int_arms_sale",
@@ -2097,7 +2340,14 @@
           "gdp": -2,
           "tension": 2,
           "intl": 1
-        }
+        },
+        "policy": [
+          {
+            "stat": "defense",
+            "shift": 6,
+            "days": 2555
+          }
+        ]
       },
       {
         "text": "分批採購",
@@ -2418,6 +2668,18 @@
             "delay": 720,
             "chance": 0.9
           }
+        ],
+        "policy": [
+          {
+            "stat": "intl",
+            "shift": 5,
+            "days": 2920
+          },
+          {
+            "stat": "tech",
+            "shift": -3,
+            "days": 2920
+          }
         ]
       },
       {
@@ -2461,7 +2723,18 @@
       "intl": 1.5,
       "tech": -0.5,
       "gdp": 0.5
-    }
+    },
+    "variants": [
+      {
+        "title": "海外新廠啟用典禮",
+        "desc": "國內晶片廠海外新廠舉行啟用典禮，首批晶片出貨。"
+      },
+      {
+        "title": "海外晶圓廠良率達標",
+        "desc": "海外晶圓廠良率提升至量產標準，當地政府表達肯定。"
+      }
+    ],
+    "cooldown": 365
   },
   {
     "id": "int_japan_security",
@@ -2498,7 +2771,19 @@
           "intl": 3,
           "defense": 2,
           "tension": 2.5
-        }
+        },
+        "policy": [
+          {
+            "stat": "defense",
+            "shift": 4,
+            "days": 2190
+          },
+          {
+            "stat": "tension",
+            "shift": 3,
+            "days": 1460
+          }
+        ]
       },
       {
         "text": "限於災防層級",
@@ -2950,71 +3235,6 @@
     ]
   },
   {
-    "id": "int_financial_crisis",
-    "cat": "intl",
-    "tier": "major",
-    "title": "全球金融海嘯",
-    "desc": "國際大型投資銀行倒閉引發連鎖效應，全球股市崩跌、信用緊縮。台灣出口訂單急凍，失業率攀升，無薪假潮再現。",
-    "rate": 0.3,
-    "cooldown": 1500,
-    "loc": "world",
-    "ref": "2008 年全球金融危機",
-    "options": [
-      {
-        "text": "大規模紓困",
-        "result": "發放消費券並保障存款，民心穩定但債務上升。",
-        "weight": 2.5,
-        "effects": {
-          "gdp": -4,
-          "wealth": -2,
-          "trust": 3,
-          "stability": 1
-        },
-        "over": {
-          "days": 365,
-          "effects": {
-            "gdp": 3,
-            "wealth": 2
-          }
-        }
-      },
-      {
-        "text": "擴大公共建設",
-        "result": "加碼基礎建設創造就業，回升較慢但扎實。",
-        "weight": 2,
-        "effects": {
-          "gdp": -5,
-          "wealth": -3
-        },
-        "over": {
-          "days": 540,
-          "effects": {
-            "gdp": 5,
-            "stability": 2
-          }
-        }
-      },
-      {
-        "text": "財政保守觀望",
-        "result": "保留財政彈性，衝擊延長、失業擴大。",
-        "weight": 1.5,
-        "effects": {
-          "gdp": -6,
-          "wealth": -5,
-          "stability": -4,
-          "trust": -3,
-          "demo": -1
-        },
-        "over": {
-          "days": 720,
-          "effects": {
-            "gdp": 3
-          }
-        }
-      }
-    ]
-  },
-  {
     "id": "int_chip_realign",
     "cat": "intl",
     "tier": "major",
@@ -3051,11 +3271,24 @@
           "intl": 6,
           "tech": 3,
           "tension": 4,
-          "gdp": -1
+          "gdp": -1,
+          "dep": -3
         },
         "local": {
           "wealth": 2
-        }
+        },
+        "policy": [
+          {
+            "stat": "intl",
+            "shift": 6,
+            "days": 3650
+          },
+          {
+            "stat": "tension",
+            "shift": 3,
+            "days": 1825
+          }
+        ]
       },
       {
         "text": "維持多邊供貨",
@@ -3081,7 +3314,14 @@
           "effects": {
             "gdp": 4
           }
-        }
+        },
+        "policy": [
+          {
+            "stat": "tech",
+            "shift": 7,
+            "days": 3650
+          }
+        ]
       }
     ]
   },
@@ -3142,12 +3382,22 @@
         "k": 0.6
       }
     ],
-    "cooldown": 60,
+    "cooldown": 365,
     "loc": "strait",
     "effects": {
       "tension": 0.8,
       "intl": 0.5
-    }
+    },
+    "variants": [
+      {
+        "title": "盟國艦艇航經海峽",
+        "desc": "盟國巡防艦依國際法航經台灣海峽，對岸派艦跟監。"
+      },
+      {
+        "title": "兩國軍艦聯合通過",
+        "desc": "兩國軍艦首度聯合航經台灣海峽，國際媒體大幅報導。"
+      }
+    ]
   },
   {
     "id": "int_n_mp_delegation",
@@ -3162,12 +3412,22 @@
         "k": 0.8
       }
     ],
-    "cooldown": 90,
+    "cooldown": 365,
     "loc": "台北市",
     "effects": {
       "intl": 0.6,
       "tension": 0.3
-    }
+    },
+    "variants": [
+      {
+        "title": "外國國會代表團來訪",
+        "desc": "外國國會代表團抵台，關注供應鏈韌性與資安合作。"
+      },
+      {
+        "title": "地方議會團訪台交流",
+        "desc": "外國地方議會代表團訪台，交流智慧城市與防災經驗。"
+      }
+    ]
   },
   {
     "id": "int_n_democracy_index",
@@ -3176,12 +3436,22 @@
     "title": "國際民主指數排名公布",
     "desc": "年度民主指數報告出爐，台灣名列亞洲前段。",
     "rate": 0.6,
-    "cooldown": 360,
+    "cooldown": 365,
     "loc": "world",
     "effects": {
       "intl": 0.5,
       "trust": 0.3
-    }
+    },
+    "variants": [
+      {
+        "title": "新聞自由排名公布",
+        "desc": "國際組織公布新聞自由指數，台灣排名位居亞洲前列。"
+      },
+      {
+        "title": "治理評比名列前茅",
+        "desc": "國際評比報告指台灣法治與公民自由表現穩定。"
+      }
+    ]
   },
   {
     "id": "int_n_film_award",
@@ -3190,12 +3460,22 @@
     "title": "國片榮獲國際影展大獎",
     "desc": "國片在歐洲影展奪得最高榮譽，導演致詞感謝家鄉。",
     "rate": 0.5,
-    "cooldown": 300,
+    "cooldown": 365,
     "loc": "台北市",
     "effects": {
       "intl": 0.6,
       "stability": 0.3
-    }
+    },
+    "variants": [
+      {
+        "title": "台灣導演影展奪獎",
+        "desc": "台灣導演在國際影展奪下最佳導演，作品將全球上映。"
+      },
+      {
+        "title": "國產動畫揚名海外",
+        "desc": "國產動畫電影在國際動畫節獲獎，海外發行權熱銷。"
+      }
+    ]
   },
   {
     "id": "int_n_ally_leader",
@@ -3204,12 +3484,22 @@
     "title": "友邦元首訪台",
     "desc": "友邦元首率團抵台進行國是訪問，簽署多項合作協定。",
     "rate": 0.8,
-    "cooldown": 200,
+    "cooldown": 365,
     "loc": "台北市",
     "effects": {
       "intl": 0.4,
       "gdp": -0.2
-    }
+    },
+    "variants": [
+      {
+        "title": "友邦外長率團來訪",
+        "desc": "友邦外長率團訪台，雙方簽署農業與醫療合作協議。"
+      },
+      {
+        "title": "友邦議長訪台",
+        "desc": "友邦國會議長來訪，參觀科技園區並出席國宴。"
+      }
+    ]
   },
   {
     "id": "int_n_rate_hike",
@@ -3218,12 +3508,22 @@
     "title": "國際升息新台幣走貶",
     "desc": "主要央行大幅升息，資金外流，新台幣兌美元走貶。",
     "rate": 0.8,
-    "cooldown": 240,
+    "cooldown": 365,
     "loc": "world",
     "effects": {
       "gdp": -0.5,
       "wealth": -0.5
-    }
+    },
+    "variants": [
+      {
+        "title": "美元走強台幣貶值",
+        "desc": "國際主要央行連續升息，新台幣跌至近年低點，進口成本上升。"
+      },
+      {
+        "title": "熱錢外流股匯雙跌",
+        "desc": "國際升息預期升溫，外資撤出，股匯市同步走弱。"
+      }
+    ]
   },
   {
     "id": "int_n_oil_spike",
@@ -3232,13 +3532,23 @@
     "title": "國際油價飆漲",
     "desc": "中東情勢緊張帶動油價飆升，國內油電價格面臨調漲壓力。",
     "rate": 0.8,
-    "cooldown": 240,
+    "cooldown": 365,
     "loc": "world",
     "effects": {
       "gdp": -0.8,
       "wealth": -0.5,
       "stability": -0.3
-    }
+    },
+    "variants": [
+      {
+        "title": "產油區衝突推升油價",
+        "desc": "產油區衝突升溫，國際油價單週大漲，國內油價跟漲。"
+      },
+      {
+        "title": "原油價格突破高點",
+        "desc": "國際原油價格突破近年高點，航空燃油附加費調漲。"
+      }
+    ]
   },
   {
     "id": "int_n_ai_demand",
@@ -3253,7 +3563,7 @@
         "k": 0.8
       }
     ],
-    "cooldown": 180,
+    "cooldown": 365,
     "loc": [
       "新竹市",
       "新竹縣",
@@ -3267,7 +3577,17 @@
     },
     "local": {
       "wealth": 3
-    }
+    },
+    "variants": [
+      {
+        "title": "AI伺服器出貨創新高",
+        "desc": "國際雲端業者擴大資本支出，{county}伺服器廠出貨創新高。"
+      },
+      {
+        "title": "AI晶片供不應求",
+        "desc": "AI晶片需求持續爆發，{county}封測廠擴產仍供不應求。"
+      }
+    ]
   },
   {
     "id": "int_n_summit_statement",
@@ -3282,12 +3602,22 @@
         "k": 0.6
       }
     ],
-    "cooldown": 330,
+    "cooldown": 365,
     "loc": "world",
     "effects": {
       "intl": 0.8,
       "tension": 0.3
-    }
+    },
+    "variants": [
+      {
+        "title": "外長聲明重視台海",
+        "desc": "多國外長會議聯合聲明，強調台海和平穩定攸關區域繁榮。"
+      },
+      {
+        "title": "區域論壇關注台海",
+        "desc": "區域安全論壇閉幕聲明提及台海，呼籲以對話化解分歧。"
+      }
+    ]
   },
   {
     "id": "int_n_visa_free",
@@ -3296,12 +3626,22 @@
     "title": "國人免簽待遇再擴大",
     "desc": "又有國家宣布給予台灣護照免簽入境，免簽國數創新高。",
     "rate": 0.6,
-    "cooldown": 300,
+    "cooldown": 365,
     "loc": "world",
     "effects": {
       "intl": 0.5,
       "wealth": 0.2
-    }
+    },
+    "variants": [
+      {
+        "title": "再添免簽國家",
+        "desc": "又一國家宣布給予國人免簽待遇，旅行社推出新行程。"
+      },
+      {
+        "title": "護照便利度排名上升",
+        "desc": "國際護照便利度排名公布，台灣護照免簽國家數增加。"
+      }
+    ]
   },
   {
     "id": "int_n_baseball",
@@ -3316,7 +3656,17 @@
       "stability": 1,
       "intl": 0.3,
       "trust": 0.3
-    }
+    },
+    "variants": [
+      {
+        "title": "國家隊擊敗強敵晉級",
+        "desc": "國家隊在國際棒球賽擊敗強敵晉級，球迷徹夜狂歡。"
+      },
+      {
+        "title": "少棒奪世界冠軍",
+        "desc": "少棒隊奪下世界冠軍，凱旋返國受到熱烈歡迎。"
+      }
+    ]
   },
   {
     "id": "int_n_shipping_disrupt",
@@ -3325,12 +3675,22 @@
     "title": "國際航道受阻運價飆升",
     "desc": "遠方海峽遭武裝攻擊，貨輪繞道，貨櫃運價暴漲。",
     "rate": 0.6,
-    "cooldown": 360,
+    "cooldown": 365,
     "loc": "world",
     "effects": {
       "gdp": -0.5,
       "wealth": -0.3
-    }
+    },
+    "variants": [
+      {
+        "title": "貨輪繞道運費暴漲",
+        "desc": "國際航道受阻，貨輪改道繞行，海運運價數週內翻倍。"
+      },
+      {
+        "title": "國際港口壅塞",
+        "desc": "多國港口壅塞，貨櫃一櫃難求，出口廠商交期延誤。"
+      }
+    ]
   },
   {
     "id": "int_n_flu_outbreak",
@@ -3344,7 +3704,17 @@
     "effects": {
       "stability": -0.5,
       "gdp": -0.5
-    }
+    },
+    "variants": [
+      {
+        "title": "鄰國爆發流感疫情",
+        "desc": "鄰近國家爆發新型流感，國際機場啟動發燒篩檢。"
+      },
+      {
+        "title": "國際示警新型病毒",
+        "desc": "國際衛生機構示警新型病毒擴散，邊境檢疫升級。"
+      }
+    ]
   },
   {
     "id": "int_n_export_control",
@@ -3353,7 +3723,7 @@
     "title": "晶片出口管制再升級",
     "desc": "盟國擴大先進晶片出口管制，國內業者對岸訂單受限。",
     "rate": 0.7,
-    "cooldown": 300,
+    "cooldown": 365,
     "loc": [
       "新竹市",
       "新竹縣",
@@ -3364,7 +3734,17 @@
       "gdp": -0.3,
       "tension": 0.3,
       "intl": 0.3
-    }
+    },
+    "variants": [
+      {
+        "title": "先進製程管制擴大",
+        "desc": "盟國擴大先進製程設備管制，業者調整對岸客戶出貨。"
+      },
+      {
+        "title": "晶片管制清單更新",
+        "desc": "主要國家更新晶片出口管制清單，國內業者評估衝擊。"
+      }
+    ]
   },
   {
     "id": "int_n_rep_office",
@@ -3384,7 +3764,17 @@
     "effects": {
       "intl": 0.8,
       "tension": 0.5
-    }
+    },
+    "variants": [
+      {
+        "title": "駐外辦事處揭牌",
+        "desc": "台灣在一個歐洲國家設立新辦事處，對岸表達不滿。"
+      },
+      {
+        "title": "互設經貿辦事處",
+        "desc": "台灣與一個非洲國家互設經貿辦事處，深化雙邊往來。"
+      }
+    ]
   },
   {
     "id": "int_n_wargame_report",
@@ -3399,12 +3789,303 @@
         "k": 0.6
       }
     ],
-    "cooldown": 300,
+    "cooldown": 365,
     "loc": "world",
     "effects": {
       "intl": 0.3,
       "defense": 0.3,
       "tension": 0.3
-    }
+    },
+    "variants": [
+      {
+        "title": "國際兵推模擬台海",
+        "desc": "國際研究機構發布台海兵推報告，強調嚇阻與韌性。"
+      },
+      {
+        "title": "智庫示警防衛缺口",
+        "desc": "國外智庫報告指出防衛整備缺口，建議提升彈藥儲備。"
+      }
+    ]
+  },
+  {
+    "id": "int_partner_cooling",
+    "cat": "intl",
+    "tier": "general",
+    "title": "盟國合作暫緩",
+    "desc": "盟國對台灣的政策走向產生疑慮，宣布暫緩部分軍事交流與科技合作計畫，並重新評估敏感技術的出口許可。",
+    "rate": 0.8,
+    "mods": [
+      {
+        "stat": "govLean",
+        "k": -1.5
+      },
+      {
+        "stat": "dep",
+        "k": 0.8
+      }
+    ],
+    "cond": [
+      [
+        "govLean",
+        "<=",
+        10
+      ]
+    ],
+    "cooldown": 600,
+    "loc": "world",
+    "options": [
+      {
+        "text": "派特使說明立場",
+        "result": "說明取得部分諒解，合作規模仍縮小。",
+        "weight": 2.5,
+        "effects": {
+          "intl": -1.5,
+          "trust": -0.5,
+          "defense": -1
+        }
+      },
+      {
+        "text": "加碼自主國防",
+        "result": "自主研發補上缺口，但財政壓力增加。",
+        "weight": 2,
+        "effects": {
+          "defense": 1,
+          "gdp": -2,
+          "tech": 0.5,
+          "intl": -1
+        }
+      },
+      {
+        "text": "接受合作暫緩",
+        "result": "多項計畫喊停，國防與科技交流明顯降溫。",
+        "weight": 2,
+        "mods": [
+          {
+            "stat": "govLean",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "intl": -3,
+          "defense": -2.5,
+          "tech": -1,
+          "tension": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "int_ally_fab_invest",
+    "cat": "intl",
+    "tier": "general",
+    "title": "盟國企業來台擴廠",
+    "desc": "多家盟國科技與能源企業宣布在{county}設立研發中心與新廠，投資金額創新高，被視為對台灣產業前景的信任票。",
+    "rate": 0.8,
+    "mods": [
+      {
+        "stat": "govLean",
+        "k": 1.2
+      },
+      {
+        "stat": "intl",
+        "k": 0.6
+      }
+    ],
+    "cooldown": 700,
+    "loc": [
+      "高雄市",
+      "台南市",
+      "桃園市",
+      "台中市",
+      "新竹縣"
+    ],
+    "options": [
+      {
+        "text": "提供土地租稅優惠",
+        "result": "投資迅速落地，地方土地與水電吃緊。",
+        "weight": 2.5,
+        "effects": {
+          "gdp": 3,
+          "tech": 1.5,
+          "intl": 1,
+          "dep": -2
+        },
+        "local": {
+          "wealth": 3,
+          "stability": -2
+        }
+      },
+      {
+        "text": "要求在地人才培育",
+        "result": "合作附帶培訓計畫，長期扎根本地人才。",
+        "weight": 2,
+        "effects": {
+          "gdp": 1.5,
+          "tech": 1.5,
+          "trust": 1,
+          "dep": -1
+        },
+        "policy": [
+          {
+            "stat": "tech",
+            "shift": 4,
+            "days": 2190
+          }
+        ]
+      },
+      {
+        "text": "審慎評估環境影響",
+        "result": "審查耗時，部分投資轉往他國。",
+        "weight": 1.5,
+        "effects": {
+          "gdp": 0.5,
+          "intl": -0.5,
+          "stability": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "int_tech_alliance",
+    "cat": "intl",
+    "tier": "general",
+    "title": "國際科技研發合作",
+    "desc": "多個盟國邀請台灣加入次世代通訊與量子運算聯合研發計畫，可取得關鍵技術，並參與國際標準的制定。",
+    "rate": 0.8,
+    "mods": [
+      {
+        "stat": "govLean",
+        "k": 1.2
+      },
+      {
+        "stat": "tech",
+        "k": 0.6
+      }
+    ],
+    "cooldown": 700,
+    "loc": "world",
+    "options": [
+      {
+        "text": "全面加入研發計畫",
+        "result": "台灣團隊進入核心研發，科技實力提升。",
+        "weight": 2,
+        "effects": {
+          "tech": 3,
+          "intl": 2,
+          "gdp": -1,
+          "tension": 1
+        },
+        "policy": [
+          {
+            "stat": "tech",
+            "shift": 5,
+            "days": 2555
+          }
+        ]
+      },
+      {
+        "text": "選擇性參與",
+        "result": "參與部分項目，成果穩健。",
+        "weight": 2.5,
+        "effects": {
+          "tech": 1.5,
+          "intl": 1
+        }
+      },
+      {
+        "text": "婉拒以免爭議",
+        "result": "錯失合作機會，外界評價保守。",
+        "weight": 1,
+        "mods": [
+          {
+            "stat": "govLean",
+            "k": -1
+          }
+        ],
+        "effects": {
+          "intl": -1,
+          "tension": -0.5
+        }
+      }
+    ]
+  },
+  {
+    "id": "int_org_breakthrough",
+    "cat": "intl",
+    "tier": "major",
+    "title": "國際組織參與突破",
+    "desc": "在多國支持下，台灣獲邀以專業身分參與一個重要國際組織的年會與技術會議，是多年爭取以來最大的進展，對岸表達強烈反對。",
+    "rate": 0.4,
+    "mods": [
+      {
+        "stat": "govLean",
+        "k": 1.5
+      },
+      {
+        "stat": "intl",
+        "k": 0.8
+      }
+    ],
+    "cond": [
+      [
+        "govLean",
+        ">=",
+        15
+      ]
+    ],
+    "cooldown": 1500,
+    "loc": "world",
+    "options": [
+      {
+        "text": "全力爭取正式身分",
+        "result": "國際支持度大增，但兩岸關係轉趨緊繃。",
+        "weight": 1.5,
+        "mods": [
+          {
+            "stat": "govLean",
+            "k": 1
+          }
+        ],
+        "effects": {
+          "intl": 8,
+          "trust": 2,
+          "tension": 4
+        },
+        "policy": [
+          {
+            "stat": "intl",
+            "shift": 6,
+            "days": 2555
+          }
+        ]
+      },
+      {
+        "text": "務實以專業身分參與",
+        "result": "專業參與成效獲肯定，國際能見度提升。",
+        "weight": 2.5,
+        "effects": {
+          "intl": 5,
+          "tech": 1,
+          "trust": 1,
+          "tension": 1.5
+        },
+        "policy": [
+          {
+            "stat": "intl",
+            "shift": 3,
+            "days": 1825
+          }
+        ]
+      },
+      {
+        "text": "低調參與技術會議",
+        "result": "以技術交流為主，進展有限但風波較小。",
+        "weight": 2,
+        "effects": {
+          "intl": 3,
+          "tension": 0.5
+        }
+      }
+    ]
   }
 ]

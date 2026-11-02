@@ -53,6 +53,24 @@ export const SYSTEM_EVENTS: EventDef[] = [
     ],
   },
   {
+    // 與「海峽危機邊緣」鏡像：依賴度過高時的經濟命脈危機
+    id: 'sys_dep_crisis', cat: 'economy', tier: 'major', chainOnly: true, rate: 0,
+    title: '經濟命脈危機',
+    desc: '對單一市場的依賴升至數十年來最高點，對方一紙禁令就足以癱瘓多個產業。資金與人才開始觀望，整座島的經濟命脈繫於一線。',
+    loc: 'mainland',
+    options: [
+      { text: '緊急分散市場', result: '付出代價轉單他國，依賴暫時降溫。', weight: 45,
+        mods: [{ stat: 'intl', k: 1 }, { stat: 'govLean', k: 0.6 }],
+        effects: { dep: -18, gdp: -3, stability: 2 } },
+      { text: '硬撐維持現況', result: '僵持數月後市場回穩，風險未消。', weight: 40,
+        mods: [{ stat: 'tech', k: 1 }],
+        effects: { dep: -6, wealth: 3, intl: -3, stability: -3 } },
+      { text: '經濟命脈斷裂', result: '關鍵市場驟然關閉，經濟崩潰。', weight: 9,
+        mods: [{ stat: 'dep', k: 2 }, { stat: 'tech', k: -1.4 }, { stat: 'intl', k: -1.2 }],
+        ending: 'bankrupt' },
+    ],
+  },
+  {
     id: 'sys_indep', cat: 'politics', tier: 'major', chainOnly: true, rate: 0,
     title: '宣告獨立的十字路口',
     desc: '政府與多數民意都已站在獨立一端，正式宣告的法案送進國會。這一步一旦踏出，將沒有回頭路。',

@@ -2,7 +2,8 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="theme-color" content="#03090f" />
   <meta name="description" content="三十年，一座島。你是看不見的手。" />
   <title>上帝之手：台灣</title>
@@ -62,6 +63,7 @@
   <div id="modal" hidden><div class="card" role="dialog" aria-modal="true"></div></div>
   <div id="menuDlg" hidden><div class="card"></div></div>
   <div id="historyDlg" hidden><div class="card"></div></div>
+  <div id="reviewDlg" hidden><div class="card"></div></div>
   <div id="ending" hidden><div class="card"></div></div>
 
   <div id="title">
@@ -73,14 +75,16 @@
         <button id="btnNew" class="primary" disabled>地圖生成中…</button>
         <button id="btnContinue" hidden>繼續上一局</button>
       </div>
+      <label class="seed">種子（選填，同一個種子會遇到同樣的天意）<input id="seedInput" inputmode="numeric" placeholder="留空則隨機" autocomplete="off" /></label>
+      <details id="records" class="howto" hidden></details>
       <details class="howto">
-        <summary>怎麼玩</summary>
+        <summary>玩法說明</summary>
         <ul>
-          <li>遊戲從<b>此刻的真實時間</b>開始，時間會逐漸加速，一局橫跨 30 年（標準速度約 1 小時）。</li>
-          <li>島上每天都可能發生事件。地圖冒出的<b>泡泡</b>可以點開干預；重大事件會暫停時間等你決定。</li>
-          <li>干預需要消耗<b>神力</b>，越違逆天意越貴。選擇「順其自然」則依事件機率決定，重大事件順其自然可回復 1 點神力。</li>
-          <li>撐過 30 年而社會不崩潰、經濟不枯竭、兩岸不開戰，即為守護成功。結局由你的選擇與天意共同寫成。</li>
-          <li>本遊戲不涉及任何政黨，只呈現整座島的整體狀態。</li>
+          <li>遊戲將由今天此刻開始，橫跨台灣的未來 30 年時間（標準速度一局約一小時）。</li>
+          <li>這座島上每天都有可能發生大大小小的事件。你可以點擊地圖冒出的泡泡進行干預，務必深思熟慮。</li>
+          <li>干預需要消耗神力，越小機率的結果需要花費越多神力。每個選項下方會顯示影響方向，虛線框則是長期影響。若是選擇順其自然，則會依照事件機率隨機決定；重大事件選擇順其自然還會恢復 1 點神力。</li>
+          <li>30 年時間一到，這座小島的命運將會由你的選擇與天意共同寫成。</li>
+          <li>本遊戲不涉及任何政黨，也不對任何看法贊同或反對，只呈現我們這座小島的整體狀態。</li>
         </ul>
       </details>
       <details class="howto credits">

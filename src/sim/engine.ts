@@ -14,9 +14,12 @@ export const DIVINE_EVERY = 24; // 每 N 天 +1 神力
 
 /** 各層級每年平均事件數 */
 const TIER_RATE: Record<Tier, number> = { news: 26, general: 12, major: 2.4 };
-const DEFAULT_COOLDOWN: Record<Tier, number> = { news: 150, general: 365, major: 900 };
-const GENERAL_WINDOW = 30; // 一般事件等待干預的天數
-const MAX_PENDING = 3;
+const DEFAULT_COOLDOWN: Record<Tier, number> = { news: 365, general: 365, major: 900 };
+/** 一般事件不倒數；同時待決超過此數時，最舊的一件交給天意 */
+export const MAX_PENDING = 5;
+/** 每五年一次回顧 */
+export const REVIEW_DAYS = 1826;
+const POLICY_STATS: StatKey[] = ['gdp', 'trust', 'tension', 'intl', 'defense', 'tech', 'demo', 'stability', 'wealth'];
 
 export const STAT_ORDER: StatKey[] = [
   'govLean', 'popLean', 'intl', 'gdp', 'wealth', 'stability', 'tension', 'trust', 'defense', 'tech', 'demo',
@@ -55,6 +58,8 @@ export interface LogEntry {
   point: string | null;
   option: number;
   optionText?: string;
+  /** 新聞實際顯示的內文（可能是變體） */
+  desc?: string;
   intervened: boolean;
   result?: string;
   deltas?: Partial<Record<StatKey, number>>;
@@ -81,8 +86,18 @@ export interface GameState {
   endDay: number;
   stats: Record<StatKey, number>;
   counties: County[];
-  hidden: { econ: number; stance: number; identity: number; mood: number };
+  /** 隱藏因子：全球景氣、對岸態度、世代認同、社會氛圍（-1…1）；經濟依賴度 dep（0…100） */
+  hidden: { econ: number; stance: number; identity: number; mood: number; dep: number };
+  /** 生效中的長期政策（移動平衡點） */
+  policies: { stat: StatKey; shift: number; until: number }[];
   divine: number;
+  /** 累計干預次數 */
+  interventions: number;
+  /** 已達成的里程碑與其連續天數計數 */
+  achieved: string[];
+  streak: Record<string, number>;
+  /** 已完成的五年回顧次數 */
+  reviews: number;
   cooldown: Record<string, number>;
   once: string[];
   ongoing: { perDay: Effects; days: number }[];
@@ -103,6 +118,29 @@ export interface EngineHooks {
   resolved(e: LogEntry, p: Pending): void;
   ended(e: Ending): void;
   divine(n: number): void;
+  achieved(m: Milestone): void;
+}
+
+export interface Milestone { id: string; title: string; desc: string }
+
+/** 里程碑：check 回傳 true 的連續天數達 days 即達成 */
+const MILESTONES: (Milestone & { days: number; check: (e: Engine) => boolean })[] = [
+  { id: 'term', title: '撐過第一個任期', desc: '守護島嶼滿 4 年', days: 1, check: e => e.s.day >= 1461 },
+  { id: 'decade', title: '十年守護', desc: '守護島嶼滿 10 年', days: 1, check: e => e.s.day >= 3652 },
+  { id: 'calm', title: '風平浪靜', desc: '兩岸緊張度連續 2 年不高於 30', days: 730, check: e => e.s.stats.tension <= 30 },
+  { id: 'settled', title: '安居樂業', desc: '社會狀態連續 5 年不低於 65', days: 1826, check: e => e.s.stats.stability >= 65 },
+  { id: 'rich', title: '藏富於民', desc: '人民財富達到 72', days: 1, check: e => e.s.stats.wealth >= 72 },
+  { id: 'shield', title: '矽之盾', desc: '科技產業 85 以上且國際看法 75 以上', days: 1, check: e => e.s.stats.tech >= 85 && e.s.stats.intl >= 75 },
+  { id: 'youth', title: '人口回春', desc: '第 5 年後人口活力回到 50', days: 1, check: e => e.s.day > 1826 && e.s.stats.demo >= 50 },
+  { id: 'trust', title: '民心所向', desc: '政府信任度達到 75', days: 1, check: e => e.s.stats.trust >= 75 },
+  { id: 'wuwei', title: '無為而治', desc: '前 10 年完全不出手干預', days: 1, check: e => e.s.day >= 3652 && e.s.interventions === 0 },
+];
+export const MILESTONE_LIST: Milestone[] = MILESTONES.map(({ id, title, desc }) => ({ id, title, desc }));
+
+/** 守護指數：結局評分與即時顯示共用；緊張與依賴是對稱的兩種外部風險 */
+export function guardianScore(st: Record<StatKey, number>, dep: number): number {
+  return Math.round((st.stability + st.wealth + st.gdp + st.trust + st.intl) / 5
+    - Math.max(0, st.tension - 50) * 0.5 - Math.max(0, dep - 50) * 0.5 + st.demo * 0.1);
 }
 
 const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
@@ -123,6 +161,20 @@ export class Engine {
       if (!d.chainOnly) this.byTier[d.tier].push(d);
     }
     this.rng = new Rng(s.rng);
+    Engine.migrate(s, this.defs);
+  }
+
+  /** 舊存檔補上新欄位，並移除已不存在的事件，避免讀檔後出錯 */
+  private static migrate(s: GameState, defs: Map<string, EventDef>) {
+    s.hidden.dep ??= 40;
+    s.policies ??= [];
+    s.interventions ??= s.log.filter(l => l.intervened).length;
+    s.achieved ??= [];
+    s.streak ??= {};
+    s.reviews ??= Math.floor(s.day / REVIEW_DAYS);
+    s.pending = s.pending.filter(p => defs.has(p.eventId));
+    for (const p of s.pending) p.expiresDay = Infinity;
+    s.scheduled = s.scheduled.filter(x => defs.has(x.id));
   }
 
   // ---------- 開局 ----------
@@ -159,7 +211,8 @@ export class Engine {
         govLean: clamp(rng.normal() * 5, -100, 100), popLean: 0, intl: 60, gdp: 62, wealth: 0, stability: 0,
         tension: 45, trust: 50, defense: 45, tech: 80, demo: 40,
       },
-      counties, hidden: { econ: 0, stance: 0, identity: 0, mood: 0 }, divine: 5,
+      counties, hidden: { econ: 0, stance: 0, identity: 0, mood: 0, dep: 40 }, policies: [], divine: 5,
+      interventions: 0, achieved: [], streak: {}, reviews: 0,
       cooldown: {}, once: [], ongoing: [], scheduled: [], pending: [], history: [], log: [], uid: 1,
       lowStab: 0, lowEcon: 0, ended: null,
     };
@@ -200,6 +253,7 @@ export class Engine {
       case 'absPop': return Math.abs(st.popLean);
       case 'elapsed': return this.s.day / 365.25;
       case 'year': return new Date(this.dateTw()).getUTCFullYear();
+      case 'dep': return this.s.hidden.dep;
       default: return st[k];
     }
   }
@@ -208,7 +262,7 @@ export class Engine {
     const v = this.read(k);
     if (k === 'govLean' || k === 'popLean' || k === 'gap' || k === 'absGov' || k === 'absPop') return v / 100;
     if (k === 'elapsed') return v / YEARS;
-    if (k === 'year') return (v - 2026) / YEARS;
+    if (k === 'year') return (v - new Date(this.s.startTw).getUTCFullYear()) / YEARS;
     return (v - 50) / 50;
   }
 
@@ -247,12 +301,10 @@ export class Engine {
     s.scheduled = s.scheduled.filter(x => x.day > s.day);
     for (const d of due) {
       const def = this.defs.get(d.id);
-      if (def) this.fire(def);
-    }
-
-    // 逾期未干預的一般事件：交給天意
-    for (const p of [...s.pending]) {
-      if (p.tier !== 'major' && p.expiresDay <= s.day) this.resolve(p.uid, null);
+      if (!def) continue;
+      // 同一天只能有一件重大事件，其餘順延一天
+      if (def.tier === 'major' && this.blocking()) s.scheduled.push({ day: s.day + 1, id: d.id });
+      else this.fire(def);
     }
 
     // 隨機事件
@@ -265,6 +317,7 @@ export class Engine {
     }
 
     this.systemChecks();
+    this.checkMilestones();
 
     if (s.day % 30 === 0) s.history.push({ day: s.day, s: STAT_ORDER.map(k => +s.stats[k].toFixed(1)) });
     if (s.day >= s.endDay && !s.ended) this.end('timeup');
@@ -279,22 +332,32 @@ export class Engine {
     };
     const elapsed = s.day / 365.25;
     const gap = Math.abs(st.govLean - st.popLean);
+    s.policies = s.policies.filter(p => p.until > s.day);
+    // 政策移動平衡點；多項政策可疊加，但效果減半避免長期一路墊高
+    const pol = (k: StatKey) => s.policies.reduce((a, p) => (p.stat === k ? a + p.shift : a), 0) * 0.5;
 
     // 隱藏因子（AR(1) 隨機漫步）：全球景氣、對岸態度、世代認同趨勢、社會氛圍
     h.econ = clamp(h.econ * 0.998 + r.normal() * 0.032, -1, 1);
-    h.stance = clamp(h.stance * 0.999 + r.normal() * 0.03, -1, 1);
-    h.identity = clamp(h.identity * 0.999 + r.normal() * 0.022, -1, 1);
+    h.stance = clamp(h.stance * 0.999 + r.normal() * 0.04, -1, 1);
+    h.identity = clamp(h.identity * 0.999 + r.normal() * 0.016, -1, 1);
     h.mood = clamp(h.mood * 0.998 + r.normal() * 0.03, -1, 1);
+    // 經濟依賴度：與兩岸緊張度完全鏡像（同一起點、相反斜率、同樣的影響與門檻），
+    // 偏向獨立推高緊張、偏向統一推高依賴，兩端各有代價
+    // 斜率略大於緊張度，用以抵銷事件層面施壓事件較多的落差（以 tools/simulate.ts 的偏統／偏獨機器人校準）
+    h.dep = clamp(h.dep + (40 - st.govLean * 0.5 - st.popLean * 0.1 - h.stance * 30
+      - (st.tech - 80) * 0.05 - (st.intl - 50) * 0.05 - h.dep) * 0.004, 0, 100);
 
     relax('gdp', 0.3 * st.tech + 0.15 * st.intl + 0.15 * st.stability + 0.15 * (100 - st.tension)
-      + 0.1 * st.demo + 0.15 * st.trust + h.econ * 20, 0.0025);
-    relax('trust', 20 + 0.25 * st.stability + 0.25 * st.wealth - gap * 0.25, 0.003);
+      - 0.15 * (h.dep - 40) + 0.1 * st.demo + 0.15 * st.trust + h.econ * 22 - 6 + pol('gdp'), 0.0025);
+    relax('trust', 20 + 0.25 * st.stability + 0.25 * st.wealth - gap * 0.25 + pol('trust'), 0.003);
     relax('tension', 40 + st.govLean * 0.4 + st.popLean * 0.1 + h.stance * 30
-      - (st.defense - 50) * 0.05 - (st.intl - 50) * 0.05, 0.004);
-    relax('intl', 10 + 0.4 * st.tech + 0.2 * st.gdp + 0.2 * st.tension + Math.abs(st.govLean) * 0.05, 0.002);
-    relax('defense', 10 + 0.25 * st.gdp + 0.35 * st.tension + 0.1 * st.intl, 0.0012);
-    relax('tech', 25 + 0.3 * st.gdp + 0.15 * st.intl + 0.15 * st.demo + 0.1 * st.stability, 0.0008);
-    relax('demo', 10 + 0.25 * st.wealth + 0.15 * st.stability + 0.05 * st.trust - elapsed * 0.6, 0.0006);
+      - (st.defense - 50) * 0.05 - (st.intl - 50) * 0.05 + pol('tension'), 0.004);
+    // 國際關注隨任一種外部風險升高（緊張或依賴）
+    relax('intl', 10 + 0.4 * st.tech + 0.2 * st.gdp + 0.2 * Math.max(st.tension, h.dep) + Math.abs(st.govLean) * 0.05
+      + pol('intl'), 0.002);
+    relax('defense', 10 + 0.25 * st.gdp + 0.35 * st.tension + 0.1 * st.intl + pol('defense'), 0.0012);
+    relax('tech', 25 + 0.3 * st.gdp + 0.15 * st.intl + 0.15 * st.demo + 0.1 * st.stability + pol('tech'), 0.0008);
+    relax('demo', 10 + 0.25 * st.wealth + 0.15 * st.stability + 0.05 * st.trust - elapsed * 0.6 + pol('demo'), 0.0006);
     // 政府逐步回應民意（信任越高越穩定、越不需要急轉）
     relax('govLean', st.popLean, 0.0005);
 
@@ -307,13 +370,13 @@ export class Engine {
         + (avgOf(c, 'popLean') - c.popLean) * 0.003
         + (st.popLean - c.popLean) * 0.002
         + (st.govLean - c.popLean) * 0.0003
-        - c.popLean * 0.0001
+        - c.popLean * 0.0004
         + shared + r.normal() * 0.12,
       stability: c.stability
         + (avgOf(c, 'stability') - c.stability) * 0.004
-        + (0.35 * c.wealth + 0.3 * st.trust - (st.tension - 50) * 0.25 + 32 + h.mood * 18
-          - Math.abs(st.govLean - c.popLean) * 0.35 - c.stability) * 0.004,
-      wealth: c.wealth + (st.gdp * 0.85 + 5 + c.wealthOffset - c.wealth) * 0.0015,
+        + (0.35 * c.wealth + 0.3 * st.trust - (st.tension - 50) * 0.25 - (h.dep - 50) * 0.25 + 23 + h.mood * 22
+          - Math.abs(st.govLean - c.popLean) * 0.35 + pol('stability') - c.stability) * 0.004,
+      wealth: c.wealth + (st.gdp * 0.85 + 5 + c.wealthOffset + pol('wealth') - c.wealth) * 0.0015,
     }));
     cs.forEach((c, i) => {
       c.popLean = clamp(next[i].popLean, -100, 100);
@@ -337,9 +400,10 @@ export class Engine {
     const s = this.s, st = s.stats;
     const ready = (id: string) => (s.cooldown[id] ?? 0) <= s.day;
     if (!this.blocking()) {
-      if (st.tension >= 90 && ready('sys_brink')) this.fire(this.defs.get('sys_brink')!);
-      else if (st.govLean >= 85 && st.popLean >= 45 && ready('sys_indep')) this.fire(this.defs.get('sys_indep')!);
-      else if (st.govLean <= -85 && st.popLean <= -45 && ready('sys_unify')) this.fire(this.defs.get('sys_unify')!);
+      if (st.tension >= 85 && ready('sys_brink')) this.fire(this.defs.get('sys_brink')!);
+      else if (s.hidden.dep >= 85 && ready('sys_dep_crisis')) this.fire(this.defs.get('sys_dep_crisis')!);
+      else if (st.govLean >= 75 && st.popLean >= 40 && ready('sys_indep')) this.fire(this.defs.get('sys_indep')!);
+      else if (st.govLean <= -75 && st.popLean <= -40 && ready('sys_unify')) this.fire(this.defs.get('sys_unify')!);
     }
     s.lowStab = st.stability <= 8 ? s.lowStab + 1 : Math.max(0, s.lowStab - 2);
     s.lowEcon = st.gdp <= 10 && st.wealth <= 15 ? s.lowEcon + 1 : Math.max(0, s.lowEcon - 2);
@@ -402,13 +466,16 @@ export class Engine {
     const opts = def.options ?? [];
 
     if (def.tier === 'news' || !opts.length) {
+      // 隨機挑一種寫法，避免同一句反覆出現
+      const forms = [{ title: def.title, desc: def.desc }, ...(def.variants ?? [])];
+      const form = forms[Math.floor(this.rng.next() * forms.length)];
       const before = this.snapshot();
       if (def.effects) this.applyEffects(def.effects);
       if (def.local && loc.county !== null) this.applyLocal(def.local, loc.county);
       Engine.aggregate(s);
       const e: LogEntry = {
-        day: s.day, eventId: def.id, title: def.title, cat: def.cat, tier: 'news',
-        place: this.placeName(loc), ...loc, option: -1, intervened: false, deltas: this.diff(before),
+        day: s.day, eventId: def.id, title: this.text(form.title, loc), desc: this.text(form.desc ?? def.desc, loc),
+        cat: def.cat, tier: 'news', place: this.placeName(loc), ...loc, option: -1, intervened: false, deltas: this.diff(before),
       };
       this.pushLog(e);
       this.hooks.news?.(e);
@@ -421,7 +488,7 @@ export class Engine {
     }
     const p: Pending = {
       uid: s.uid++, eventId: def.id, tier: def.tier, ...loc,
-      createdDay: s.day, expiresDay: def.tier === 'major' ? Infinity : s.day + GENERAL_WINDOW,
+      createdDay: s.day, expiresDay: Infinity,
     };
     s.pending.push(p);
     if (def.tier === 'major') this.hooks.major?.(p);
@@ -466,6 +533,7 @@ export class Engine {
       const c = this.cost(def, i);
       if (s.divine < c) return null;
       s.divine -= c;
+      s.interventions++;
     } else {
       i = this.rng.pick(this.probs(def));
       if (def.tier === 'major') s.divine = Math.min(DIVINE_MAX, s.divine + 1); // 順其自然的回饋
@@ -491,6 +559,9 @@ export class Engine {
 
   private applyOption(o: OptionDef, p: Pending) {
     if (o.effects) this.applyEffects(o.effects);
+    for (const pl of o.policy ?? []) {
+      if (POLICY_STATS.includes(pl.stat)) this.s.policies.push({ stat: pl.stat, shift: pl.shift, until: this.s.day + pl.days });
+    }
     if (o.local && p.county !== null) this.applyLocal(o.local, p.county);
     if (o.over && o.over.days > 0) {
       const d = o.over.days;
@@ -513,6 +584,7 @@ export class Engine {
       const v = raw as number;
       if (k === 'govToPop') st.govLean += (st.popLean - st.govLean) * v;
       else if (k === 'popToGov') for (const c of s.counties) c.popLean += (st.govLean - c.popLean) * v;
+      else if (k === 'dep') s.hidden.dep = clamp(s.hidden.dep + v, 0, 100);
       else if ((COUNTY_KEYS as string[]).includes(k)) for (const c of s.counties) (c as any)[k] += v;
       else if (k in st) st[k as StatKey] += v;
     }
@@ -544,14 +616,41 @@ export class Engine {
     if (this.s.log.length > 400) this.s.log.splice(0, this.s.log.length - 400);
   }
 
+  private checkMilestones() {
+    const s = this.s;
+    for (const m of MILESTONES) {
+      if (s.achieved.includes(m.id)) continue;
+      s.streak[m.id] = m.check(this) ? (s.streak[m.id] ?? 0) + 1 : 0;
+      if (s.streak[m.id] >= m.days) {
+        s.achieved.push(m.id);
+        this.hooks.achieved?.({ id: m.id, title: m.title, desc: m.desc });
+      }
+    }
+  }
+
+  /** 目前的守護指數 */
+  score() { return guardianScore(this.s.stats, this.s.hidden.dep); }
+
+  /**
+   * 平行世界：同一個種子、同一個開局時刻，全程順其自然跑到 untilDay。
+   * 引擎是確定性的，因此可以和玩家實際走過的這一局直接比較。
+   */
+  static baseline(events: EventDef[], counties: { name: string; neighbors: string[] }[], s0: GameState, untilDay: number) {
+    const s = Engine.newGame(counties, s0.seed, s0.startTw - TW_OFFSET);
+    const e = new Engine(events, s);
+    while (!s.ended && s.day < untilDay) {
+      const b = e.blocking();
+      if (b) e.resolve(b.uid, null); else e.tick();
+    }
+    return { history: s.history, score: e.score(), ended: s.ended };
+  }
+
   // ---------- 結局 ----------
 
   private end(id: EndingId) {
     const s = this.s, st = s.stats;
     if (s.ended) return;
-    const score = Math.round(
-      (st.stability + st.wealth + st.gdp + st.trust + st.intl) / 5
-      - Math.max(0, st.tension - 50) * 0.5 + st.demo * 0.1);
+    const score = guardianScore(st, s.hidden.dep);
     const years = (s.day / 365.25).toFixed(1);
     let title = '', text = '';
     const leanDesc = describeLean(st.govLean);
@@ -584,7 +683,7 @@ export class Engine {
         const r = (k: StatKey) => st[k];
         if (r('stability') >= 70 && r('wealth') >= 65 && r('gdp') >= 65) title = '繁榮之島';
         else if (r('tech') >= 85 && r('intl') >= 75) title = '矽之盾';
-        else if (r('tension') >= 80) title = '臨界之島';
+        else if (r('tension') >= 80 || s.hidden.dep >= 80) title = '臨界之島';
         else if (r('stability') < 35) title = '風雨飄搖';
         else if (r('demo') < 20 && r('gdp') < 45) title = '沉睡之島';
         else if (Math.abs(r('govLean')) < 25) title = '現狀的三十年';
@@ -592,7 +691,9 @@ export class Engine {
         const flavor: Record<string, string> = {
           繁榮之島: '富足與安穩並存，這是許多世代夢想中的模樣。',
           矽之盾: '晶片與技術成了島嶼最堅實的護盾，全世界都無法忽視它。',
-          臨界之島: '和平仍在，但海峽的弦繃得前所未有地緊。',
+          臨界之島: s.hidden.dep >= 80 && st.tension < 80
+            ? '島嶼的經濟命脈繫於單一市場，任何風吹草動都牽動全局。'
+            : '和平仍在，但海峽的弦繃得前所未有地緊。',
           風雨飄搖: '島嶼撐了下來，卻是在一次次的動盪之中勉強站穩。',
           沉睡之島: '人口老去、經濟停滯，島嶼在安靜中慢慢沉睡。',
           現狀的三十年: '三十年來，島嶼始終在兩端之間找到平衡。',

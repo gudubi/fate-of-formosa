@@ -1,16 +1,22 @@
 import './style.css';
 import * as THREE from 'three';
 import { MapScene } from './render/mapScene';
-import { COUNTIES } from './map/mapData';
+import { COUNTIES, loadRaster } from './map/mapData';
 import { lonLatToKm } from './map/projection';
-import { Engine, DAY_MS, DIVINE_MAX, STAT_ORDER, describeLean, type GameState, type LogEntry, type Pending, type Ending } from './sim/engine';
+import {
+  Engine, DAY_MS, DIVINE_MAX, STAT_ORDER, MAX_PENDING, REVIEW_DAYS, MILESTONE_LIST, describeLean,
+  type GameState, type LogEntry, type Pending, type Ending,
+} from './sim/engine';
 import { NAMED_POINTS } from './sim/countyData';
 import type { StatKey } from './sim/types';
 import { ALL_EVENTS } from './data/events';
 import { validateEvents } from './sim/validate';
 import { STAT_META, CAT_META, LAYERS, ramp, iconSvg, HAND_ICON, catColor, LEAN_NEG, LEAN_POS, type LayerKey } from './ui/meta';
 import { sfx } from './audio/sfx';
-import { entriesOn, entriesOnSync, KIND_LABEL, type HistoryKind } from './data/history';
+import { entriesOn, entriesOnSync, loadMonth, KIND_LABEL, type HistoryKind } from './data/history';
+import { optionPreview, lastingNote } from './ui/preview';
+import { addRecord, loadRecords } from './ui/records';
+import { renderShareCard, shareOrDownload } from './ui/share';
 
 const SPEEDS = [0, 4, 8, 16];       // 天／秒
 // 開場：日期從中華民國建立（1912-01-01）開始以遊戲速度跳動，
@@ -35,9 +41,17 @@ if (import.meta.env.DEV) {
 
 // ---------- 設定 ----------
 type CamMode = 'all' | 'major' | 'off';
-const settings: { cam: CamMode } = { cam: 'all' };
+type MotionMode = 'auto' | 'full' | 'reduce';
+// 預設只在重大事件移動鏡頭，避免畫面每幾秒就晃動
+const settings: { cam: CamMode; motion: MotionMode } = { cam: 'major', motion: 'auto' };
 try { Object.assign(settings, JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? '{}')); } catch { /* ignore */ }
 const saveSettings = () => { try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch { /* ignore */ } };
+const reducedMotion = () => settings.motion === 'reduce'
+  || (settings.motion === 'auto' && matchMedia('(prefers-reduced-motion: reduce)').matches);
+function applyMotion() {
+  document.body.classList.toggle('reduce-motion', reducedMotion());
+  if (map) map.reducedMotion = reducedMotion();
+}
 
 // ---------- 遊戲狀態 ----------
 let map!: MapScene;
@@ -53,6 +67,7 @@ let selCounty: number | null = null;
 let lastInteract = 0;
 let lastSaveDay = 0;
 let historyOpen = false;
+let reviewOpen = false;
 const bubbles = new Map<number, HTMLButtonElement>();
 
 // ---------- 地點 ----------
@@ -93,14 +108,16 @@ function place(el: HTMLElement, x: number, yw: number, z: number): boolean {
   return true;
 }
 
+let labelY: number[] = [];
 function updateLabels() {
   const d = map.cameraDistance();
   const showCounty = d < (isMobile() ? 430 : 560);
+  if (!labelY.length) labelY = map.raster.labels.map(l => map.surfaceY(l.x, l.y) + 1);
   countyLabels.forEach((el, i) => {
     el.style.opacity = showCounty ? '1' : '0';
     if (!showCounty) return;
     const l = map.raster.labels[i];
-    place(el, l.x, map.surfaceY(l.x, l.y) + 1, l.y);
+    place(el, l.x, labelY[i], l.y);
   });
   for (const n of neighborLabels) place(n.el, n.x, 1, n.y);
   for (const [uid, el] of bubbles) {
@@ -127,7 +144,7 @@ function currentRate(): number {
 }
 
 function frozen() {
-  return !eng || !!eng.s.ended || !!eng.blocking() || openUid !== null || userPaused || historyOpen;
+  return !eng || !!eng.s.ended || !!eng.blocking() || openUid !== null || userPaused || historyOpen || reviewOpen;
 }
 
 function advance(dt: number) {
@@ -148,6 +165,8 @@ function advance(dt: number) {
   }
   if (e.blocking() || e.s.ended) gameTw = Math.min(gameTw, e.dateTw(e.s.day + 1) - 1);
   if (e.s.day - lastSaveDay >= 60) { lastSaveDay = e.s.day; save(); }
+  // 每五年回顧一次（重大事件處理完之後）
+  if (phase === 'play' && !e.blocking() && !e.s.ended && Math.floor(e.s.day / REVIEW_DAYS) > e.s.reviews) openReview();
 }
 
 /** 滴答聲：每跨過一天一聲，加速後受最短間隔限制，形成由慢而快再放慢的節奏 */
@@ -171,6 +190,7 @@ function endIntro() {
 
 let last = performance.now();
 let uiAcc = 0;
+let altAcc = 0;
 function frame(now: number) {
   const dt = Math.min(0.1, (now - last) / 1000);
   last = now;
@@ -182,6 +202,8 @@ function frame(now: number) {
   if (eng && phase !== 'title') {
     histAcc += dt;
     if (histAcc > HISTORY_EVERY) nextHistory();
+    altAcc += dt;
+    if (altAcc > 6) { altAcc = 0; $('hud').classList.toggle('alt'); }
   }
   if (phase === 'title') refreshTitleClock();
   requestAnimationFrame(frame);
@@ -215,7 +237,7 @@ function refreshTop() {
   const status = e.blocking() || openUid !== null ? '<b>等待你的決定</b>' : userPaused ? '<b>暫停中</b>' : '';
   $('time').innerHTML = phase === 'intro' ? '&nbsp;' : rate < 3600 * 6
     ? `${timeStr(gameTw)} 台北時間 ${status}`
-    : `第 ${year} 年 · ${SPEEDS[speed]} 天/秒 ${status}`;
+    : `第 ${year} 年 · ${SPEEDS[speed]} 天/秒 · 守護 <b class="gs">${e.score()}</b> ${status}`;
   ($('progress').firstElementChild as HTMLElement).style.width = `${(e.s.day / e.s.endDay) * 100}%`;
   $('divine').innerHTML = `${HAND_ICON}<span>${e.s.divine}</span><small style="opacity:.6">/${DIVINE_MAX}</small>`;
   document.querySelectorAll<HTMLButtonElement>('#speed button').forEach(b => {
@@ -226,7 +248,9 @@ function refreshTop() {
     const acc = $('accel');
     acc.hidden = false;
     const d = new Date(gameTw);
-    acc.innerHTML = `<div class="big">${d.getUTCFullYear()}<small>年</small>${String(d.getUTCMonth() + 1).padStart(2, '0')}<small>月</small>${String(d.getUTCDate()).padStart(2, '0')}<small>日</small></div>`;
+    const flash = introFlash();
+    acc.innerHTML = `<div class="big">${d.getUTCFullYear()}<small>年</small>${String(d.getUTCMonth() + 1).padStart(2, '0')}<small>月</small>${String(d.getUTCDate()).padStart(2, '0')}<small>日</small></div>`
+      + (flash ? `<div class="flash">${esc(flash)}</div>` : '');
   }
 }
 
@@ -248,6 +272,25 @@ function buildStats() {
       fill: div.querySelector('.fill')!, mark: div.querySelector('.mark') ?? undefined,
     });
   }
+  const w = document.createElement('div');
+  w.id = 'weather';
+  root.appendChild(w);
+}
+
+/** 天候：玩家看不到數值、卻會推動局勢的背景因子 */
+function weatherHtml(e: Engine) {
+  const h = e.s.hidden;
+  const tri = (v: number, lo: string, mid: string, hi: string) => (v > 0.25 ? hi : v < -0.25 ? lo : mid);
+  const arrow = (v: number) => (v > 0.25 ? '▲' : v < -0.25 ? '▼' : '－');
+  const items: [string, string, string, string][] = [
+    ['全球景氣', arrow(h.econ), tri(h.econ, '低迷', '持平', '繁榮'), h.econ < -0.25 ? 'n' : h.econ > 0.25 ? 'p' : ''],
+    ['對岸態度', arrow(h.stance), tri(h.stance, '和緩', '平穩', '強硬'), h.stance > 0.25 ? 'n' : h.stance < -0.25 ? 'p' : ''],
+    ['世代認同', h.identity > 0.25 ? '→' : h.identity < -0.25 ? '←' : '－', tri(h.identity, '趨向統一', '穩定', '趨向獨立'), 'l'],
+    ['社會氛圍', arrow(h.mood), tri(h.mood, '低迷', '平常', '樂觀'), h.mood < -0.25 ? 'n' : h.mood > 0.25 ? 'p' : ''],
+    ['經濟依賴', h.dep >= 60 ? '▲' : h.dep <= 35 ? '▼' : '－', h.dep >= 60 ? '偏高' : h.dep <= 35 ? '分散' : '中等', h.dep >= 60 ? 'n' : ''],
+  ];
+  return `<div class="w-title">天候<small>看不見、但推動局勢的背景因子</small></div><div class="w-grid">${items.map(([k, a, t, c]) =>
+    `<div class="w ${c}"><span>${k}</span><b>${a} ${t}</b></div>`).join('')}</div>`;
 }
 
 function isDanger(k: StatKey, v: number) {
@@ -283,6 +326,8 @@ function refreshStats() {
   }
   if (anyDanger && !wasDanger) sfx.play('warn');
   wasDanger = anyDanger;
+  const w = document.getElementById('weather');
+  if (w) w.innerHTML = weatherHtml(e);
 
   const mini: StatKey[] = ['stability', 'wealth', 'gdp', 'tension', 'govLean', 'popLean', 'intl', 'trust'];
   $('mini').innerHTML = mini.map(k => {
@@ -331,13 +376,14 @@ function deltaChips(d?: Partial<Record<StatKey, number>>) {
 
 function refreshFeed() {
   const e = eng!;
-  const pend = e.s.pending.filter(p => p.tier !== 'major');
-  $('pendingList').innerHTML = pend.length ? pend.map(p => {
+  const pend = [...e.s.pending].sort((a, b) => (a.tier === 'major' ? -1 : 0) - (b.tier === 'major' ? -1 : 0));
+  const general = pend.filter(p => p.tier !== 'major').length;
+  $('pendingList').innerHTML = pend.length ? `<p class="queue">事件不會倒數，慢慢想。待決 ${general}/${MAX_PENDING}，再多一件時最舊的交給天意。</p>` + pend.map(p => {
     const d = e.defs.get(p.eventId)!, c = CAT_META[d.cat];
-    const left = Math.max(0, p.expiresDay - e.s.day), frac = left / (p.expiresDay - p.createdDay);
-    return `<div class="ev pend" data-uid="${p.uid}" style="--c:${c.color}"><span class="ic">${iconSvg(d.cat)}</span>
-      <div class="body"><div class="t">${esc(d.title)}</div><div class="m">${c.label} · ${esc(e.placeName(p))} · 剩 ${left} 天</div>
-      <div class="timer"><div style="width:${frac * 100}%"></div></div></div></div>`;
+    const waited = e.s.day - p.createdDay;
+    return `<div class="ev pend ${p.tier === 'major' ? 'major' : ''}" data-uid="${p.uid}" style="--c:${c.color}"><span class="ic">${iconSvg(d.cat)}</span>
+      <div class="body"><div class="t">${p.tier === 'major' ? '<span class="tag-major">重大</span>' : ''}${esc(d.title)}</div>
+      <div class="m">${c.label} · ${esc(e.placeName(p))} · ${waited ? `已等待 ${waited} 天` : '剛發生'}</div></div></div>`;
   }).join('') : '<p class="empty">目前沒有待決事件</p>';
   $('pendingList').querySelectorAll<HTMLElement>('[data-uid]').forEach(el => el.onclick = () => openModal(Number(el.dataset.uid)));
   const badge = $('badge');
@@ -446,6 +492,7 @@ function nextTicker() {
   const el = $('tickerText');
   el.classList.remove('in'); void el.offsetWidth; el.classList.add('in');
   el.innerHTML = `<span class="d">${shortDate(l.day)}</span>${esc(l.title)}${l.place ? `（${esc(l.place)}）` : ''} ${deltaChips(l.deltas)}`;
+  el.title = l.desc ?? '';
   setTimeout(nextTicker, 3200);
 }
 
@@ -454,7 +501,7 @@ function toast(html: string, color: string, ms = 4200) {
   const el = document.createElement('div');
   el.className = 'toast'; el.style.setProperty('--c', color); el.innerHTML = html;
   box.prepend(el);
-  while (box.children.length > 3) box.lastElementChild!.remove();
+  while (box.children.length > (isMobile() ? 1 : 3)) box.lastElementChild!.remove();
   setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 500); }, ms);
 }
 
@@ -493,7 +540,9 @@ function attachHooks(e: Engine) {
       sfx.play(d.cat);
       const idle = performance.now() - lastInteract > 6000;
       // 4 倍速時一般事件太密集，只在 1、2 倍速自動移動鏡頭
-      if (settings.cam === 'all' && idle && openUid === null && speed < 3) map.flyTo(x, y, isMobile() ? 360 : 300, 1.6, 0.7);
+      if (settings.cam === 'all' && idle && openUid === null && speed < 3 && !reducedMotion()) {
+        map.flyTo(x, y, isMobile() ? 360 : 300, 1.6, 0.7);
+      }
       refreshFeed();
     },
     major: p => {
@@ -504,7 +553,10 @@ function attachHooks(e: Engine) {
       sfx.play('major');
       setTimeout(() => sfx.play(d.cat), 400);
       if (settings.cam !== 'off') map.flyTo(x, y, zoom * (isMobile() ? 1.35 : 1), 1.3, 0.85);
-      setTimeout(() => { if (e === eng && e.s.pending.some(q => q.uid === p.uid)) openModal(p.uid); }, settings.cam === 'off' ? 300 : 1300);
+      // 若已有對話框開著，關閉時會自動接著打開這一件
+      setTimeout(() => {
+        if (e === eng && openUid === null && !historyOpen && !reviewOpen && e.s.pending.some(q => q.uid === p.uid)) openModal(p.uid);
+      }, settings.cam === 'off' ? 300 : 1300);
     },
     resolved: (l, p) => {
       removeBubble(p.uid);
@@ -514,6 +566,10 @@ function attachHooks(e: Engine) {
       refreshLog(); refreshFeed();
     },
     ended: end => setTimeout(() => showEnding(end), 1200),
+    achieved: m => {
+      sfx.play('divine');
+      toast(`<div class="t">🏅 里程碑：${esc(m.title)}</div><div>${esc(m.desc)}</div>`, '#ffd36b', 5200);
+    },
     divine: () => { const el = $('divine'); el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); },
   };
 }
@@ -532,7 +588,6 @@ function openModal(uid: number) {
   const card = $('modal').querySelector('.card') as HTMLElement;
   card.style.setProperty('--c', c.color);
   const isMajor = p.tier === 'major';
-  const left = isMajor ? 0 : Math.max(0, p.expiresDay - e.s.day);
   card.innerHTML = `
     <div class="ev-hero" style="background-image:radial-gradient(120% 140% at 20% 0%, ${c.color}, transparent 60%), url('/assets/events/${d.cat}.webp')"><span class="ic">${iconSvg(d.cat, 40)}</span></div>
     <div class="ev-head">
@@ -545,9 +600,10 @@ function openModal(uid: number) {
         <div class="p" style="width:${probs[i] * 100}%"></div>
         <div class="row"><span class="tx">${esc(o.text)}</span><span class="pr">天意 ${Math.round(probs[i] * 100)}%</span>
         <span class="cost">${HAND_ICON}${costs[i]}</span></div>
+        <div class="pvs">${optionPreview(o)}</div>
       </button>`).join('')}</div>
     <div class="ev-foot">
-      <span class="note">點選項＝以神力干預 ｜ 目前神力 ${e.s.divine}${isMajor ? ' ｜ 順其自然 +1 神力' : ` ｜ ${left} 天後自動交給天意`}</span>
+      <span class="note">點選項＝以神力干預 ｜ 目前神力 ${e.s.divine}${isMajor ? ' ｜ 順其自然 +1 神力' : ' ｜ 不會倒數，可以慢慢想'}<br>▲▼ 為影響方向與幅度，虛線框為長期影響</span>
       ${isMajor ? '' : '<button class="btn" id="mLater">稍後</button>'}
       <button class="btn fate" id="mFate">順其自然</button>
     </div>`;
@@ -556,11 +612,15 @@ function openModal(uid: number) {
   $('mFate').onclick = () => choose(uid, null);
   const later = document.getElementById('mLater');
   if (later) later.onclick = () => closeModal();
+  card.querySelector<HTMLButtonElement>('.opt:not(:disabled)')?.focus({ preventScroll: true });
 }
 
 function closeModal(returnCam = false) {
   $('modal').hidden = true;
   openUid = null;
+  // 同一天若還有重大事件在等待，接著打開
+  const next = eng?.blocking();
+  if (next) { setTimeout(() => { if (openUid === null) openModal(next.uid); }, 350); return; }
   if (returnCam && settings.cam !== 'off') map.overview(true);
 }
 
@@ -578,7 +638,9 @@ function choose(uid: number, i: number | null) {
     opts[res.option]?.classList.add('picked');
     sfx.play('resolve');
     const foot = card.querySelector('.ev-foot')!;
-    foot.insertAdjacentHTML('beforebegin', `<div class="result"><b>${res.intervened ? '✋ 你出手了：' : '天意：'}${esc(res.optionText ?? '')}</b><br>${esc(res.result ?? '')}<div>${deltaChips(res.deltas)}</div></div>`);
+    const opt = e.defs.get(p.eventId)!.options![res.option];
+    const lasting = lastingNote(opt, d => (d >= 365 ? `約 ${Math.round(d / 365)} 年` : `${d} 天`));
+    foot.insertAdjacentHTML('beforebegin', `<div class="result"><b>${res.intervened ? '✋ 你出手了：' : '天意：'}${esc(res.optionText ?? '')}</b><br>${esc(res.result ?? '')}<div>${deltaChips(res.deltas)}</div>${lasting ? `<div class="lasting">⏳ ${esc(lasting)}</div>` : ''}</div>`);
     foot.innerHTML = `<span class="note"></span><button class="btn primary" id="mOk">繼續</button>`;
     $('mOk').onclick = () => { sfx.play('click'); closeModal(isMajor); };
     refreshHud();
@@ -595,6 +657,43 @@ function choose(uid: number, i: number | null) {
     };
     spin();
   } else finish();
+}
+
+// ---------- 五年回顧 ----------
+function openReview() {
+  const e = eng!;
+  e.s.reviews = Math.floor(e.s.day / REVIEW_DAYS);
+  reviewOpen = true;
+  sfx.play('politics');
+  const from = Math.max(0, e.s.day - REVIEW_DAYS);
+  const h = e.s.history;
+  const then = [...h].reverse().find(x => x.day <= from) ?? h[0];
+  const events = e.s.log.filter(l => l.day > from && l.tier !== 'news');
+  const majors = events.filter(l => l.tier === 'major').slice(-4);
+  const acted = events.filter(l => l.intervened).length;
+  const card = $('reviewDlg').querySelector('.card') as HTMLElement;
+  card.innerHTML = `
+    <div class="end-kicker">第 ${e.s.reviews * 5} 年回顧・${shortDate(from)} → ${shortDate(e.s.day)}</div>
+    <h2>五年過去了</h2>
+    <div class="rv-grid">${STAT_ORDER.map((k, i) => {
+      const a = then.s[i], b = e.s.stats[k], d = b - a, m = STAT_META[k];
+      const good = m.lean ? 'l' : (m.danger === 'high' ? d < 0 : d > 0) ? 'p' : 'n';
+      const fmtV = (v: number) => (m.lean ? `${v > 0 ? '+' : ''}${Math.round(v)}` : String(Math.round(v)));
+      return `<div><span>${m.label}</span><b>${fmtV(a)} → ${fmtV(b)}</b>${Math.abs(d) >= 1 ? `<i class="${good}">${d > 0 ? '▲' : '▼'}${Math.abs(Math.round(d))}</i>` : ''}</div>`;
+    }).join('')}</div>
+    <p class="rv-line">這五年發生 ${events.length} 件事件，你出手干預了 <b>${acted}</b> 次，守護指數目前 <b>${e.score()}</b>。</p>
+    ${majors.length ? `<div class="rv-major"><div class="w-title">這五年的重大事件</div>${majors.map(l =>
+      `<div>${shortDate(l.day)}・${esc(l.title)}・<span>${esc(l.optionText ?? '')}</span>${l.intervened ? '<span class="tag-int">✋</span>' : ''}</div>`).join('')}</div>` : ''}
+    <div class="menu-btns"><button class="btn primary" id="rvOk">繼續守護</button></div>`;
+  $('reviewDlg').hidden = false;
+  $('rvOk').onclick = closeReview;
+}
+
+function closeReview() {
+  sfx.play('click');
+  $('reviewDlg').hidden = true;
+  reviewOpen = false;
+  save();
 }
 
 // ---------- 縣市卡 ----------
@@ -624,26 +723,41 @@ function showEnding(end: Ending) {
   const e = eng!;
   const card = $('ending').querySelector('.card') as HTMLElement;
   const years = (end.day / 365.25).toFixed(1);
-  const intervened = e.s.log.filter(l => l.intervened).length;
+  const intervened = e.s.interventions;
+  // 平行世界：同一個種子全程順其自然，量化玩家這一局造成的差別
+  const base = Engine.baseline(ALL_EVENTS, COUNTIES, e.s, end.day);
+  const diff = end.score - base.score;
+  const ms = MILESTONE_LIST.filter(m => e.s.achieved.includes(m.id));
+  const rank = addRecord({
+    score: end.score, title: end.title, years: +years, seed: e.s.seed, survived: end.survived,
+    at: new Date().toISOString(), milestones: ms.length,
+  });
   card.innerHTML = `
     <div class="end-kicker">${end.survived ? '守護之路・' : '終局・'}${shortDate(end.day)}・第 ${years} 年</div>
     <div class="end-title">${esc(end.title)}</div>
     <img class="end-img" src="/assets/endings/${end.id}.webp" alt="" onerror="this.remove()">
     <p class="end-text">${esc(end.text)}</p>
+    <div class="parallel">在無人干預的平行世界裡，這座島${base.ended && base.ended.day <= end.day && base.ended.id !== 'timeup'
+      ? `走向了「${esc(base.ended.title)}」`
+      : '同樣走到了這一天'}，守護指數 <b>${base.score}</b>。你的出手讓結果${diff > 0 ? `好了 <b class="up">${diff}</b> 分` : diff < 0 ? `差了 <b class="down">${-diff}</b> 分` : '幾乎沒有差別'}。</div>
     <div class="end-grid">
-      <div>綜合評分<b>${end.score}</b></div>
+      <div>守護指數<b>${end.score}</b></div>
+      <div>平行世界<b>${base.score}</b></div>
       <div>守護年數<b>${years}</b></div>
       <div>出手干預<b>${intervened} 次</b></div>
+      ${rank ? `<div>本機紀錄<b>第 ${rank} 名</b></div>` : ''}
       ${STAT_ORDER.map(k => `<div>${STAT_META[k].label}<b>${STAT_META[k].lean ? describeLean(e.s.stats[k]) : Math.round(e.s.stats[k])}</b></div>`).join('')}
     </div>
+    ${ms.length ? `<div class="end-ms">🏅 ${ms.map(m => esc(m.title)).join('、')}</div>` : ''}
     <canvas id="endChart"></canvas>
     <div class="chart-keys"></div>
-    <div class="menu-btns"><button class="btn primary" id="eNew">再守護一次</button><button class="btn" id="eView">回到地圖</button></div>`;
+    <p class="chart-note">實線為你的這一局，虛線為無人干預的平行世界</p>
+    <div class="menu-btns"><button class="btn primary" id="eShare">分享結果</button><button class="btn" id="eNew">再守護一次</button><button class="btn" id="eView">回到地圖</button></div>`;
   $('ending').hidden = false;
   const shown = new Set<StatKey>(['govLean', 'popLean', 'stability', 'gdp', 'tension']);
   const palette = ['#9d6bd8', '#e2a93b', '#3fd0ff', '#ffd166', '#f28482', '#4fb0c6', '#ff4d5e', '#b8c0ff', '#90be6d', '#c77dff', '#f9c74f'];
   const keys = card.querySelector('.chart-keys')!;
-  const draw = () => drawChart($('endChart') as HTMLCanvasElement, e.s, shown, palette);
+  const draw = () => drawChart($('endChart') as HTMLCanvasElement, e.s, shown, palette, base.history);
   keys.innerHTML = STAT_ORDER.map((k, i) => `<button data-k="${k}" style="--k:${palette[i]}" class="${shown.has(k) ? '' : 'off'}">${STAT_META[k].label}</button>`).join('');
   keys.querySelectorAll<HTMLButtonElement>('button').forEach(b => b.onclick = () => {
     const k = b.dataset.k as StatKey;
@@ -654,9 +768,23 @@ function showEnding(end: Ending) {
   requestAnimationFrame(draw);
   $('eNew').onclick = () => { $('ending').hidden = true; newGame(); };
   $('eView').onclick = () => { $('ending').hidden = true; };
+  $('eShare').onclick = async () => {
+    sfx.play('click');
+    const btn = $<HTMLButtonElement>('eShare');
+    btn.disabled = true;
+    try {
+      const blob = await renderShareCard({
+        title: end.title, kicker: `${end.survived ? '守護之路' : '終局'}・${shortDate(end.day)}・第 ${years} 年`,
+        text: end.text, score: end.score, baseline: base.score, years, interventions: intervened,
+        milestones: ms.map(m => m.title), seed: e.s.seed,
+        stats: STAT_ORDER.map(k => ({ label: STAT_META[k].label, value: STAT_META[k].lean ? describeLean(e.s.stats[k]) : String(Math.round(e.s.stats[k])) })),
+      }, `/assets/endings/${end.id}.webp`, '/assets/icon-192.png');
+      await shareOrDownload(blob, `上帝之手-${end.title}-${end.score}.png`, `我在《上帝之手：台灣》守護了 ${years} 年，結局「${end.title}」，守護指數 ${end.score}。`);
+    } finally { btn.disabled = false; }
+  };
 }
 
-function drawChart(cv: HTMLCanvasElement, s: GameState, shown: Set<StatKey>, palette: string[]) {
+function drawChart(cv: HTMLCanvasElement, s: GameState, shown: Set<StatKey>, palette: string[], baseline?: GameState['history']) {
   const dpr = Math.min(2, window.devicePixelRatio);
   const w = cv.clientWidth, h = cv.clientHeight;
   cv.width = w * dpr; cv.height = h * dpr;
@@ -670,21 +798,29 @@ function drawChart(cv: HTMLCanvasElement, s: GameState, shown: Set<StatKey>, pal
   for (let v = 0; v <= 100; v += 25) { ctx.beginPath(); ctx.moveTo(pad.l, Y(v)); ctx.lineTo(w - pad.r, Y(v)); ctx.stroke(); }
   const startYear = new Date(s.startDayTw).getUTCFullYear();
   for (let y = 0; y <= maxDay / 365.25; y += 5) ctx.fillText(String(startYear + y), X(y * 365.25) - 12, h - 6);
-  STAT_ORDER.forEach((k, i) => {
-    if (!shown.has(k)) return;
-    const lean = STAT_META[k].lean;
-    ctx.strokeStyle = palette[i]; ctx.lineWidth = 1.8; ctx.beginPath();
-    s.history.forEach((p, j) => {
+  const line = (hist: GameState['history'], i: number, lean: boolean) => {
+    ctx.beginPath();
+    hist.forEach((p, j) => {
+      if (p.day > maxDay) return;
       const v = lean ? (p.s[i] + 100) / 2 : p.s[i];
       if (j) ctx.lineTo(X(p.day), Y(v)); else ctx.moveTo(X(p.day), Y(v));
     });
     ctx.stroke();
+  };
+  STAT_ORDER.forEach((k, i) => {
+    if (!shown.has(k)) return;
+    const lean = !!STAT_META[k].lean;
+    ctx.strokeStyle = palette[i];
+    if (baseline) { ctx.lineWidth = 1.2; ctx.globalAlpha = 0.55; ctx.setLineDash([5, 4]); line(baseline, i, lean); }
+    ctx.globalAlpha = 1; ctx.setLineDash([]); ctx.lineWidth = 1.8;
+    line(s.history, i, lean);
   });
 }
 
 // ---------- 存檔 ----------
 function save() {
-  if (!eng || eng.s.ended) return;
+  // 開場時鐘還在 1912–今天之間時不存檔，避免讀檔後時間錯亂
+  if (!eng || eng.s.ended || phase === 'intro') return;
   try { localStorage.setItem(SAVE_KEY, JSON.stringify({ s: eng.s, gameTw, speed })); } catch { /* 空間不足或無痕模式 */ }
 }
 function loadSave(): { s: GameState; gameTw: number; speed: number } | null {
@@ -693,7 +829,8 @@ function loadSave(): { s: GameState; gameTw: number; speed: number } | null {
     if (!raw) return null;
     const d = JSON.parse(raw);
     if (d?.s?.version !== 1) return null;
-    for (const p of d.s.pending) if (p.tier === 'major') p.expiresDay = Infinity;
+    for (const p of d.s.pending) p.expiresDay = Infinity;
+    d.gameTw = Math.max(d.gameTw ?? 0, d.s.startTw + d.s.day * DAY_MS - DAY_MS / 2);
     return d;
   } catch { return null; }
 }
@@ -715,11 +852,13 @@ function startEngine(s: GameState) {
   sfx.ambient(0.55);
 }
 
-function newGame() {
+function newGame(fromTitle = false) {
   sfx.unlock();
   sfx.play('click');
+  if (fromTitle && loadSave() && !confirm('開始新局會覆蓋目前的存檔，確定嗎？')) return;
   clearSave();
-  const seed = (Math.random() * 2 ** 32) >>> 0;
+  const typed = fromTitle ? Number(($<HTMLInputElement>('seedInput')).value.trim()) : NaN;
+  const seed = Number.isInteger(typed) && typed > 0 ? typed >>> 0 : (Math.random() * 2 ** 32) >>> 0;
   const s = Engine.newGame(COUNTIES, seed, Date.now());
   gameTw = ROC_START_TW;
   speed = 1; userPaused = false; introT = 0;
@@ -727,8 +866,32 @@ function newGame() {
   closeModal(); showCounty(null);
   startEngine(s);
   histAcc = HISTORY_EVERY;
+  prepareIntroFlashes(s.startTw);
   map.introFrom();
   map.flyTo(-25, 10, overviewDistance(), 9, 0.5);
+}
+
+// ---------- 開場：時鐘經過的歷史大事 ----------
+let introEvents: { ts: number; text: string }[] = [];
+let introIdx = 0;
+let introShown = { text: '', at: 0 };
+async function prepareIntroFlashes(untilTw: number) {
+  introEvents = []; introIdx = 0; introShown = { text: '', at: 0 };
+  const months = await Promise.all(Array.from({ length: 12 }, (_, i) => loadMonth(i + 1)));
+  const list: { ts: number; text: string }[] = [];
+  months.forEach(m => Object.entries(m).forEach(([k, arr]) => {
+    const [mm, dd] = k.split('-').map(Number);
+    for (const h of arr) if (h.k === 'event' && h.y >= 1912) list.push({ ts: Date.UTC(h.y, mm - 1, dd), text: `${h.y}・${h.t}` });
+  }));
+  introEvents = list.filter(x => x.ts <= untilTw).sort((a, b) => a.ts - b.ts);
+}
+/** 回傳目前要顯示的大事；換字至少間隔 0.45 秒，高速時只挑最近經過的一件 */
+function introFlash(): string {
+  while (introIdx < introEvents.length && introEvents[introIdx].ts <= gameTw) introIdx++;
+  const now = performance.now();
+  const latest = introEvents[introIdx - 1];
+  if (latest && latest.text !== introShown.text && now - introShown.at > 450) introShown = { text: latest.text, at: now };
+  return introShown.text;
 }
 
 function overviewDistance() {
@@ -760,6 +923,8 @@ function openMenu() {
   card.innerHTML = `<h2>選單</h2>
     <div class="setting"><span>事件鏡頭</span><div class="seg">${camBtns}</div></div>
     <div class="setting"><span>音效</span><div class="seg"><button data-snd="1" class="${sfx.muted ? '' : 'on'}">開</button><button data-snd="0" class="${sfx.muted ? 'on' : ''}">關</button></div></div>
+    <div class="setting"><span>動態效果</span><div class="seg">${(['auto', 'full', 'reduce'] as MotionMode[]).map(m =>
+      `<button data-motion="${m}" class="${settings.motion === m ? 'on' : ''}">${{ auto: '跟隨系統', full: '完整', reduce: '減少' }[m]}</button>`).join('')}</div></div>
     <div class="setting"><span>隨機種子</span><span style="color:var(--dim)">${eng?.s.seed ?? '-'}</span></div>
     <div class="menu-btns">
       <button class="btn primary" id="mResume">繼續</button>
@@ -769,6 +934,7 @@ function openMenu() {
   $('menuDlg').hidden = false;
   card.querySelectorAll<HTMLButtonElement>('[data-cam]').forEach(b => b.onclick = () => { settings.cam = b.dataset.cam as CamMode; saveSettings(); openMenuRefresh(); });
   card.querySelectorAll<HTMLButtonElement>('[data-snd]').forEach(b => b.onclick = () => { sfx.setMuted(b.dataset.snd === '0'); refreshMute(); openMenuRefresh(); });
+  card.querySelectorAll<HTMLButtonElement>('[data-motion]').forEach(b => b.onclick = () => { settings.motion = b.dataset.motion as MotionMode; saveSettings(); applyMotion(); openMenuRefresh(); });
   const close = () => { $('menuDlg').hidden = true; userPaused = wasPaused; };
   const openMenuRefresh = () => { close(); openMenu(); userPaused = true; };
   $('mResume').onclick = () => { sfx.play('click'); close(); };
@@ -782,8 +948,16 @@ function toTitle() {
   $('hud').hidden = true;
   $('title').hidden = false;
   $('btnContinue').hidden = !loadSave();
-  map.controls.autoRotate = true;
+  renderRecords();
+  map.controls.autoRotate = !reducedMotion();
   map.overview(true);
+}
+
+function renderRecords() {
+  const list = loadRecords().slice(0, 5);
+  $('records').innerHTML = list.length ? `<summary>本機最佳紀錄</summary><ol>${list.map(r =>
+    `<li><b>${r.score}</b> ${esc(r.title)}・${r.years} 年${r.milestones ? `・🏅${r.milestones}` : ''}<small>種子 ${r.seed}</small></li>`).join('')}</ol>` : '';
+  $('records').hidden = !list.length;
 }
 
 function refreshMute() {
@@ -795,6 +969,7 @@ function refreshMute() {
 // ---------- 輸入 ----------
 function bindInput() {
   document.querySelectorAll<HTMLButtonElement>('#speed button').forEach(b => b.onclick = () => {
+    if (!eng) return;
     sfx.play('click');
     const v = Number(b.dataset.speed);
     if (v === 0) userPaused = !userPaused;
@@ -804,7 +979,7 @@ function bindInput() {
   $('btnOverview').onclick = () => { sfx.play('click'); map.overview(true); };
   $('btnMute').onclick = () => { sfx.unlock(); sfx.setMuted(!sfx.muted); refreshMute(); };
   $('btnMenu').onclick = openMenu;
-  $('btnNew').onclick = newGame;
+  $('btnNew').onclick = () => newGame(true);
   $('btnContinue').onclick = continueGame;
   $('history').onclick = () => void openHistory(...histDate);
   $('historyDlg').onclick = ev => { if (ev.target === $('historyDlg')) closeHistory(); };
@@ -844,9 +1019,13 @@ function bindInput() {
       showCounty(null);
       if (!$('menuDlg').hidden) $('menuDlg').hidden = true;
       if (historyOpen) closeHistory();
+      if (reviewOpen) closeReview();
+      // 一般事件可以稍後再決定；重大事件必須做出選擇
+      const p = openUid !== null ? eng.s.pending.find(x => x.uid === openUid) : null;
+      if (p && p.tier !== 'major') closeModal();
     }
   });
-  window.addEventListener('resize', () => map.resize());
+  window.addEventListener('resize', () => { map.resize(); labelY = []; });
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && eng && (phase === 'play' || phase === 'intro')) { userPaused = true; save(); }
   });
@@ -854,12 +1033,14 @@ function bindInput() {
 }
 
 // ---------- 啟動 ----------
-function boot() {
-  map = new MapScene($<HTMLCanvasElement>('gl'));
-  map.controls.autoRotate = true;
+async function boot() {
+  map = await MapScene.create($<HTMLCanvasElement>('gl'), await loadRaster());
+  map.controls.autoRotate = !reducedMotion();
   map.controls.autoRotateSpeed = 0.25;
+  applyMotion();
   bindInput();
   refreshMute();
+  renderRecords();
   const btn = $<HTMLButtonElement>('btnNew');
   btn.disabled = false;
   btn.textContent = '降臨・開始新局';
@@ -868,8 +1049,13 @@ function boot() {
 }
 
 refreshTitleClock();
-// 先讓標題畫面繪出，再建構地圖（約需數百毫秒）
-setTimeout(boot, 50);
+// 先讓標題畫面繪出，再建構地圖
+setTimeout(() => void boot(), 50);
+
+// 離線遊玩：正式版註冊 Service Worker
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(() => { /* 不支援時照常遊玩 */ }); });
+}
 
 // 開發用：主控台輸入 __dbg.ff(365) 快轉一年
 if (import.meta.env.DEV) {
@@ -885,5 +1071,6 @@ if (import.meta.env.DEV) {
       refreshHud(); refreshLog(); refreshFeed();
     },
     draw(dt = 0.016) { map.render(dt); updateLabels(); },
+    review: () => openReview(),
   };
 }
