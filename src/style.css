@@ -50,7 +50,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 .lbl.nb { color: #93a7b8; font-size: 13px; letter-spacing: 3px; }
 .bubble {
-  position: absolute; left: 0; top: 0; width: 40px; height: 40px; margin: -46px 0 0 -20px;
+  /* 水滴圖釘：直角那個角（左下角）正好放在事件點上，以它為軸旋轉 -45° 後尖端朝下、本體在正上方 */
+  position: absolute; left: 0; top: 0; width: 40px; height: 40px; margin: -40px 0 0 0;
   border-radius: 50% 50% 50% 0; transform-origin: 0 100%;
   border: 2px solid #fff; background: var(--c); color: #111; pointer-events: auto;
   display: grid; place-items: center; box-shadow: 0 0 0 0 var(--c), 0 4px 14px rgba(0,0,0,.5);
@@ -59,7 +60,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 .bubble svg { rotate: 45deg; }
 .bubble .ttl { position: absolute; inset: -4px; border-radius: inherit; border: 3px solid transparent; }
-.bubble.major { width: 48px; height: 48px; margin: -56px 0 0 -24px; }
+.bubble.major { width: 48px; height: 48px; margin: -48px 0 0 0; }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 var(--c), 0 4px 14px rgba(0,0,0,.5); } 100% { box-shadow: 0 0 0 18px transparent, 0 4px 14px rgba(0,0,0,.5); } }
 @keyframes pop { from { scale: 0; } to { scale: 1; } }
 

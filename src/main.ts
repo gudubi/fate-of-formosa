@@ -106,11 +106,12 @@ const neighborLabels = NEIGHBOR_LABELS.map(([name, lon, lat]) => {
   return { el, x, y };
 });
 
-function place(el: HTMLElement, x: number, yw: number, z: number): boolean {
+/** below = true 時標籤放在定位點正下方（縣市名稱），讓事件圖釘的尖端落在名稱上方而不遮住文字 */
+function place(el: HTMLElement, x: number, yw: number, z: number, below = false): boolean {
   const p = map.toScreen(x, yw, z);
   if (!p) { el.style.display = 'none'; return false; }
   el.style.display = '';
-  el.style.transform = `translate(${p.x}px, ${p.y}px) translate(-50%, -50%)`;
+  el.style.transform = `translate(${p.x}px, ${p.y}px) translate(-50%, ${below ? '4px' : '-50%'})`;
   return true;
 }
 
@@ -123,7 +124,7 @@ function updateLabels() {
     el.style.opacity = showCounty ? '1' : '0';
     if (!showCounty) return;
     const l = map.raster.labels[i];
-    place(el, l.x, labelY[i], l.y);
+    place(el, l.x, labelY[i], l.y, true);
   });
   for (const n of neighborLabels) place(n.el, n.x, 1, n.y);
   for (const [uid, el] of bubbles) {
