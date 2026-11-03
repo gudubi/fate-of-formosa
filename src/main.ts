@@ -765,12 +765,16 @@ function attachHooks(e: Engine) {
       map.ripple(x, y, catColor(d.cat), p.county !== null ? 34 : 80, 8);
       map.highlight(p.county, catColor(d.cat), 8);
       sfx.play('major');
-      if (d.egg) eggFx(d, p, false); else setTimeout(() => sfx.play(d.cat), 400);
-      if (settings.cam !== 'off') map.flyTo(x, y, zoom * (isMobile() ? 1.35 : 1), 1.3, 0.85);
+      // 奇遇用自己的特效與運鏡，視窗晚一點打開，讓特效先演完
+      if (d.egg) eggFx(d, p);
+      else {
+        setTimeout(() => sfx.play(d.cat), 400);
+        if (settings.cam !== 'off') map.flyTo(x, y, zoom * (isMobile() ? 1.35 : 1), 1.3, 0.85);
+      }
       // 若已有對話框開著，關閉時會自動接著打開這一件
       setTimeout(() => {
         if (e === eng && openUid === null && !historyOpen && !reviewOpen && e.s.pending.some(q => q.uid === p.uid)) openModal(p.uid);
-      }, settings.cam === 'off' ? 300 : 1300);
+      }, settings.cam === 'off' ? 300 : d.egg ? 2400 : 1300);
     },
     resolved: (l, p) => {
       removeBubble(p.uid);
@@ -813,7 +817,7 @@ function openModal(uid: number) {
   card.innerHTML = `
     <div class="ev-hero" style="background-image:${eggArt}radial-gradient(120% 140% at 20% 0%, ${c.color}, transparent 60%), url('${BASE}assets/events/${d.cat}.webp')"><span class="ic">${d.egg ? '✦' : iconSvg(d.cat, 40)}</span></div>
     <div class="ev-head">
-      <div class="ev-kind">${d.egg ? `<span class="pill egg-pill">✦ 稀有事件 ${'★'.repeat(d.egg.stars)}</span>` : ''}<span class="pill">${c.label}</span><span>${isMajor ? '重大事件' : '事件'} · ${esc(e.placeName(p))} · ${shortDate(e.s.day)}</span></div>
+      <div class="ev-kind">${d.egg ? `<span class="pill egg-pill">✦ 稀有事件 ${'★'.repeat(d.egg.stars)}</span>` : ''}<span class="pill">${c.label}</span><span>${d.egg ? '奇遇' : isMajor ? '重大事件' : '事件'} · ${esc(e.placeName(p))} · ${shortDate(e.s.day)}</span></div>
       <div class="ev-title">${esc(e.text(d.title, p))}</div>
     </div>
     <div class="ev-desc">${esc(e.text(d.desc, p))}</div>

@@ -340,8 +340,8 @@ export class Engine {
     for (const d of due) {
       const def = this.defs.get(d.id);
       if (!def) continue;
-      // 同一天只能有一件重大事件，其餘順延一天
-      if (def.tier === 'major' && this.blocking()) s.scheduled.push({ day: s.day + 1, id: d.id });
+      // 同一天只能有一件重大事件（含奇遇），其餘順延一天
+      if ((def.tier === 'major' || def.egg) && this.blocking()) s.scheduled.push({ day: s.day + 1, id: d.id });
       else this.fire(def);
     }
 
@@ -556,16 +556,18 @@ export class Engine {
       return;
     }
 
-    if (def.tier === 'general') {
+    // 奇遇（彩蛋）和重大事件一樣：時間暫停、必須當下決定
+    const tier: Tier = def.egg ? 'major' : def.tier;
+    if (tier === 'general') {
       const gen = s.pending.filter(p => p.tier === 'general');
       if (gen.length >= MAX_PENDING) this.resolve(gen[0].uid, null);
     }
     const p: Pending = {
-      uid: s.uid++, eventId: def.id, tier: def.tier, ...loc,
+      uid: s.uid++, eventId: def.id, tier, ...loc,
       createdDay: s.day, expiresDay: Infinity,
     };
     s.pending.push(p);
-    if (def.tier === 'major') this.hooks.major?.(p);
+    if (tier === 'major') this.hooks.major?.(p);
     else this.hooks.pending?.(p);
   }
 
@@ -610,7 +612,7 @@ export class Engine {
       s.interventions++;
     } else {
       i = this.fate.pick(this.probs(def));
-      if (def.tier === 'major') s.divine = Math.min(DIVINE_MAX, s.divine + 1); // 順其自然的回饋
+      if (p.tier === 'major') s.divine = Math.min(DIVINE_MAX, s.divine + 1); // 順其自然的回饋（重大事件與奇遇）
     }
     s.pending = s.pending.filter(x => x.uid !== uid);
     const o = opts[i];
