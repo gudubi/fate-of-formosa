@@ -1,7 +1,9 @@
 // 無畫面批次模擬：檢查結局分布、數值走向、事件頻率，並比較不同玩法的分數
 // 執行：npx tsx tools/simulate.ts [局數]
 // 中立性守門：「固定偏統」與「固定偏獨」兩種機器人的平均分數差距超過 2 分即警告
-import { Engine, STAT_ORDER, type GameState } from '../src/sim/engine';
+import { Engine, STAT_ORDER, HAND, type GameState } from '../src/sim/engine';
+// HAND_DAYS=forever 測試出手偏移永久版；給數字則為持續天數
+if (process.env.HAND_DAYS) HAND.days = process.env.HAND_DAYS === 'forever' ? null : Number(process.env.HAND_DAYS);
 import type { EventDef, OptionDef } from '../src/sim/types';
 import { validateEvents } from '../src/sim/validate';
 import { ALL_EVENTS } from '../src/data/events';

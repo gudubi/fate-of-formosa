@@ -30,6 +30,22 @@ export const REVIEW_DAYS = 1826;
 export const OPTION_IMPACT = 1.5;
 /** 長期政策移動平衡點的倍率 */
 export const POLICY_IMPACT = 0.75;
+/**
+ * 主動出手留下的痕跡：選項立即效果的 shift 比例轉成平衡點偏移，數值不會很快被拉回原處。
+ * days 為持續天數（最後一年逐漸淡出），null 表示永久。順其自然的結果沒有這個效果。
+ */
+export const HAND = { shift: 0.6, days: 1095 as number | null };
+/** 會留下出手痕跡的數值：只限治理類，統獨傾向與兩岸緊張不受影響以維持中立 */
+const HAND_STATS: StatKey[] = ['intl', 'gdp', 'wealth', 'stability', 'trust', 'defense', 'tech', 'demo'];
+/** 快訊對數值的影響倍率：快訊是背景雜訊，壓低後玩家的選擇比較不會被淹沒 */
+const NEWS_IMPACT = 0.5;
+/** 「永久」偏移的到期日（存檔是 JSON，不能用 Infinity） */
+const FOREVER = 1e9;
+
+/** 快訊效果一律等比縮小（含經濟依賴，兩端對稱） */
+function scaleNews(e: Effects): Effects {
+  return Object.fromEntries(Object.entries(e).map(([k, v]) => [k, (v as number) * NEWS_IMPACT])) as Effects;
+}
 
 /** 依倍率放大效果；「向對方靠攏」是比例，放大後上限 0.95 */
 export function scaleEffects(e: Effects, f = OPTION_IMPACT): Effects {
@@ -115,7 +131,8 @@ export interface GameState {
   /** 隱藏因子：全球景氣、對岸態度、世代認同、社會氛圍（-1…1）；經濟依賴度 dep（0…100） */
   hidden: { econ: number; stance: number; identity: number; mood: number; dep: number };
   /** 生效中的長期政策（移動平衡點） */
-  policies: { stat: StatKey; shift: number; until: number }[];
+  /** hand：玩家出手留下的偏移（from 為開始日，最後一年淡出；永久者 until 為很大的數） */
+  policies: { stat: StatKey; shift: number; until: number; hand?: boolean; from?: number }[];
   divine: number;
   /** 累計干預次數 */
   interventions: number;
@@ -395,8 +412,8 @@ export class Engine {
     const elapsed = s.day / 365.25;
     const gap = Math.abs(st.govLean - st.popLean);
     s.policies = s.policies.filter(p => p.until > s.day);
-    // 政策移動平衡點；多項政策可疊加，但效果減半避免長期一路墊高
-    const pol = (k: StatKey) => s.policies.reduce((a, p) => (p.stat === k ? a + p.shift : a), 0) * POLICY_IMPACT;
+    // 政策移動平衡點；多項政策可疊加，但效果打折避免長期一路墊高。出手留下的偏移另外計算
+    const pol = (k: StatKey) => s.policies.reduce((a, p) => (p.stat !== k ? a : a + (p.hand ? this.handWeight(p) : POLICY_IMPACT) * p.shift), 0);
 
     // 隱藏因子（AR(1) 隨機漫步）：全球景氣、對岸態度、世代認同趨勢、社會氛圍
     h.econ = clamp(h.econ * 0.998 + r.normal() * 0.032, -1, 1);
@@ -544,8 +561,8 @@ export class Engine {
       const forms = [{ title: def.title, desc: def.desc }, ...(def.variants ?? [])];
       const form = forms[Math.floor(this.hashRand(def.id, 'form') * forms.length)];
       const before = this.snapshot();
-      if (def.effects) this.applyEffects(def.effects);
-      if (def.local && loc.county !== null) this.applyLocal(def.local, loc.county);
+      if (def.effects) this.applyEffects(scaleNews(def.effects));
+      if (def.local && loc.county !== null) this.applyLocal(scaleNews(def.local) as typeof def.local, loc.county);
       Engine.aggregate(s);
       const e: LogEntry = {
         day: s.day, eventId: def.id, title: this.text(form.title, loc), desc: this.text(form.desc ?? def.desc, loc),
@@ -617,7 +634,7 @@ export class Engine {
     s.pending = s.pending.filter(x => x.uid !== uid);
     const o = opts[i];
     const before = this.snapshot();
-    this.applyOption(o, p);
+    this.applyOption(o, p, intervened);
     if (def.id === 'sys_pres_election') {
       s.stats.govLean = clamp(s.stats.govLean + this.fate.normal() * 6, -100, 100);
     }
@@ -633,8 +650,33 @@ export class Engine {
     return e;
   }
 
-  private applyOption(o: OptionDef, p: Pending) {
-    if (o.effects) this.applyEffects(scaleEffects(o.effects));
+  /** 出手偏移目前的權重：前段全額，最後一年線性淡出 */
+  private handWeight(p: { until: number }) {
+    const left = p.until - this.s.day;
+    return left >= 365 ? 1 : Math.max(0, left / 365);
+  }
+
+  /** 主動出手：把立即效果的一部分轉成平衡點偏移 */
+  handShift(e: Effects) {
+    const s = this.s;
+    for (const k of HAND_STATS) {
+      const v = (e as any)[k] as number | undefined;
+      if (!v) continue;
+      s.policies.push({ stat: k, shift: v * HAND.shift, hand: true, from: s.day, until: HAND.days === null ? FOREVER : s.day + HAND.days });
+    }
+  }
+
+  /** 玩家目前對某數值平衡點的推動量（介面顯示用） */
+  handTotal(k: StatKey) {
+    return this.s.policies.reduce((a, p) => (p.hand && p.stat === k ? a + this.handWeight(p) * p.shift : a), 0);
+  }
+
+  private applyOption(o: OptionDef, p: Pending, intervened = false) {
+    if (o.effects) {
+      const eff = scaleEffects(o.effects);
+      this.applyEffects(eff);
+      if (intervened) this.handShift(eff);
+    }
     for (const pl of o.policy ?? []) {
       if (POLICY_STATS.includes(pl.stat)) this.s.policies.push({ stat: pl.stat, shift: pl.shift, until: this.s.day + pl.days });
     }
@@ -733,7 +775,7 @@ export class Engine {
       const b = e.blocking();
       if (b) e.resolve(b.uid, null); else e.tick();
     }
-    return { history: s.history, score: e.score(), ended: s.ended };
+    return { history: s.history, score: e.score(), ended: s.ended, stats: { ...s.stats } };
   }
 
   // ---------- 結局 ----------

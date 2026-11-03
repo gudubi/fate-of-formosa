@@ -22,6 +22,8 @@ export interface EndingRecord {
   interventions: number;
   /** 依 STAT_ORDER 排列的最終數值 */
   stats: number[];
+  /** 同一種子、全程不出手時的最終數值（較舊的紀錄沒有） */
+  baseStats?: number[];
   milestones: string[];
   eggs: { title: string; stars: number }[];
   code?: string;
@@ -55,12 +57,13 @@ interface BuildInput {
   s: GameState;
   end: Ending;
   baseline: { score: number; ended: Ending | null };
+  baseStats?: number[];
   kicker: string;
   milestones: string[];
   eggs: { title: string; stars: number }[];
 }
 
-export function buildEnding({ s, end, baseline, kicker, milestones, eggs }: BuildInput): EndingRecord {
+export function buildEnding({ s, end, baseline, baseStats, kicker, milestones, eggs }: BuildInput): EndingRecord {
   const yearOf = (day: number) => new Date(s.startDayTw + day * DAY_MS).getUTCFullYear();
   const monthOf = (day: number) => {
     const d = new Date(s.startDayTw + day * DAY_MS);
@@ -133,7 +136,7 @@ export function buildEnding({ s, end, baseline, kicker, milestones, eggs }: Buil
   return {
     v: 1, at: new Date().toISOString(), endId: end.id, title: end.title, kicker, text: end.text, recap, moments,
     score: end.score, baseline: baseline.score, years: years.toFixed(1), interventions: iv,
-    stats: STAT_ORDER.map(k => Math.round(s.stats[k])), milestones, eggs,
+    stats: STAT_ORDER.map(k => Math.round(s.stats[k])), baseStats: s.interventions ? baseStats : undefined, milestones, eggs,
     code: s.code, seed: s.seed, survived: end.survived,
   };
 }
@@ -157,7 +160,13 @@ export function endingShotHtml(r: EndingRecord, base: string) {
     <div class="end-recap">${r.recap.map(p => `<p>${p}</p>`).join('')}</div>
     ${r.moments.length ? `<div class="end-sec">關鍵抉擇</div><ol class="end-moments">${r.moments.map(m =>
       `<li><time>${m.date}</time><span class="t">${esc(m.title)}</span><span class="c">${m.intervened ? '✋' : '☁'}${esc(m.choice)}</span></li>`).join('')}</ol>` : ''}
-    <div class="end-mini">${MINI_KEYS.map(k => `<span>${STAT_META[k].short}<b>${val(k)}</b></span>`).join('')}</div>
+    <div class="end-mini">${MINI_KEYS.map(k => {
+      const b = r.baseStats?.[STAT_ORDER.indexOf(k)];
+      const d = b === undefined ? 0 : val(k) - b;
+      const good = STAT_META[k].danger === 'high' ? d < 0 : d > 0;
+      return `<span>${STAT_META[k].short}<b>${val(k)}${b !== undefined ? `<small class="${d === 0 ? '' : good ? 'up' : 'down'}">${d > 0 ? '+' : d < 0 ? '−' : '±'}${Math.abs(d)}</small>` : ''}</b></span>`;
+    }).join('')}</div>
+    ${r.baseStats ? '<div class="end-mini-note">小字為與「若不出手」相比的差距</div>' : ''}
     ${r.milestones.length ? `<div class="end-ms">🏅 ${r.milestones.map(esc).join('、')}</div>` : ''}
     ${r.eggs.length ? `<div class="end-eggs">✦ 本局奇遇：${r.eggs.map(e => `${esc(e.title)}<small>${'★'.repeat(e.stars)}</small>`).join('、')}</div>` : ''}
     <div class="end-brand">命運之手：台灣${r.code ? `・種子碼 <b>${esc(r.code)}</b>` : ''}</div>

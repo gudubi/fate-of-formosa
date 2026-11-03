@@ -340,7 +340,7 @@ function buildStats() {
     const m = STAT_META[k];
     const div = document.createElement('div');
     div.className = 'stat';
-    div.innerHTML = `<div class="stat-head"><span class="name">${m.label}</span><span class="val"></span><span class="tr"></span></div>
+    div.innerHTML = `<div class="stat-head"><span class="name">${m.label}</span><span class="hand"></span><span class="val"></span><span class="tr"></span></div>
       <div class="bar ${m.lean ? 'lean' : ''}"><div class="fill"></div>${m.lean ? '<div class="mark"></div>' : ''}</div>
       <div class="ends"><span>${m.lo}</span>${m.lean ? '<span>現狀</span>' : ''}<span>${m.hi}</span></div>`;
     root.appendChild(div);
@@ -386,6 +386,14 @@ function refreshStats() {
     const v = st[k], el = statEls.get(k)!;
     el.val.textContent = statText(k, v);
     paintBar(el.fill, el.mark, k, v);
+    // 你的出手正把這個數值往哪邊推（平衡點偏移）
+    const hd = el.root.querySelector<HTMLElement>('.hand')!, hv = e.handTotal(k);
+    if (Math.abs(hv) >= 0.5) {
+      const good = STAT_META[k].danger === 'high' ? hv < 0 : hv > 0;
+      hd.textContent = `✋${hv > 0 ? '+' : '−'}${Math.round(Math.abs(hv))}`;
+      hd.className = `hand ${good ? 'up' : 'down'}`;
+      hd.title = `你的出手讓這個數值的平衡點偏移 ${hv > 0 ? '+' : ''}${hv.toFixed(1)}`;
+    } else hd.textContent = '';
     const prev = shownVals[k];
     if (prev !== undefined && Math.abs(v - prev) >= 0.6) flashStat(k, v - prev, prev);
     shownVals[k] = v;
@@ -1037,11 +1045,26 @@ function openReview() {
       return `<div><span>${m.label}</span><b>${fmtV(a)} → ${fmtV(b)}</b>${Math.abs(d) >= 1 ? `<i class="${good}">${d > 0 ? '▲' : '▼'}${Math.abs(Math.round(d))}</i>` : ''}</div>`;
     }).join('')}</div>
     <p class="rv-line">這五年發生 ${events.length} 件事件，你出手干預了 <b>${acted}</b> 次，成果指數目前 <b>${e.score()}</b>。</p>
+    ${handVsBaseline(e)}
     ${majors.length ? `<div class="rv-major"><div class="w-title">這五年的重大事件</div>${majors.map(l =>
       `<div>${shortDate(l.day)}・${esc(l.title)}・<span>${esc(l.optionText ?? '')}</span>${l.intervened ? '<span class="tag-int">✋</span>' : ''}</div>`).join('')}</div>` : ''}
     <div class="menu-btns"><button class="btn primary" id="rvOk">繼續前進</button></div>`;
   $('reviewDlg').hidden = false;
   $('rvOk').onclick = closeReview;
+}
+
+/** 回顧用：與「若不出手」相比差最多的幾項數值 */
+function handVsBaseline(e: Engine) {
+  if (!e.s.interventions) return '';
+  const base = Engine.baseline(ALL_EVENTS, COUNTIES, e.s, e.s.day);
+  const keys: StatKey[] = ['stability', 'wealth', 'gdp', 'trust', 'intl', 'defense', 'tech', 'demo', 'tension'];
+  const diffs = keys.map(k => ({ k, d: e.s.stats[k] - base.stats[k] })).filter(x => Math.abs(x.d) >= 1)
+    .sort((a, b) => Math.abs(b.d) - Math.abs(a.d)).slice(0, 4);
+  if (!diffs.length) return '<p class="rv-line rv-hand">和不出手相比，各項數值目前差不多。</p>';
+  return `<p class="rv-line rv-hand">和不出手相比：${diffs.map(({ k, d }) => {
+    const good = STAT_META[k].danger === 'high' ? d < 0 : d > 0;
+    return `${STAT_META[k].label}<b class="${good ? 'up' : 'down'}">${d > 0 ? '+' : '−'}${Math.round(Math.abs(d))}</b>`;
+  }).join('、')}</p>`;
 }
 
 function closeReview() {
@@ -1182,7 +1205,7 @@ function showEnding(end: Ending) {
   });
   const kicker = `${end.survived ? '尾聲' : '終局'}・${shortDate(end.day)}・第 ${years} 年`;
   const rec = buildEnding({
-    s: e.s, end, baseline: base, kicker, milestones: ms.map(m => m.title),
+    s: e.s, end, baseline: base, baseStats: STAT_ORDER.map(k => Math.round(base.stats[k])), kicker, milestones: ms.map(m => m.title),
     eggs: eggsThisGame(e).map(d => ({ title: d.title.replaceAll('{county}', ''), stars: d.egg!.stars })),
   });
   saveEnding(rec);
