@@ -32,9 +32,9 @@ export const OPTION_IMPACT = 1.5;
 export const POLICY_IMPACT = 0.75;
 /**
  * 主動出手留下的痕跡：選項立即效果的 shift 比例轉成平衡點偏移，數值不會很快被拉回原處。
- * days 為持續天數（最後一年逐漸淡出），null 表示永久。順其自然的結果沒有這個效果。
+ * days 為持續天數（最後 fade 天逐漸淡出），null 表示永久。順其自然的結果沒有這個效果。
  */
-export const HAND = { shift: 0.6, days: 1095 as number | null };
+export const HAND = { shift: 0.6, days: 1826 as number | null, fade: 730 };
 /** 會留下出手痕跡的數值：只限治理類，統獨傾向與兩岸緊張不受影響以維持中立 */
 const HAND_STATS: StatKey[] = ['intl', 'gdp', 'wealth', 'stability', 'trust', 'defense', 'tech', 'demo'];
 /** 快訊對數值的影響倍率：快訊是背景雜訊，壓低後玩家的選擇比較不會被淹沒 */
@@ -131,8 +131,10 @@ export interface GameState {
   /** 隱藏因子：全球景氣、對岸態度、世代認同、社會氛圍（-1…1）；經濟依賴度 dep（0…100） */
   hidden: { econ: number; stance: number; identity: number; mood: number; dep: number };
   /** 生效中的長期政策（移動平衡點） */
-  /** hand：玩家出手留下的偏移（from 為開始日，最後一年淡出；永久者 until 為很大的數） */
+  /** hand：玩家出手留下的偏移（from 為開始日，最後 HAND.fade 天淡出；永久者 until 為很大的數） */
   policies: { stat: StatKey; shift: number; until: number; hand?: boolean; from?: number }[];
+  /** 目前生效的連鎖反應狀態 id */
+  chains: string[];
   divine: number;
   /** 累計干預次數 */
   interventions: number;
@@ -164,7 +166,29 @@ export interface EngineHooks {
   ended(e: Ending): void;
   divine(n: number): void;
   achieved(m: Milestone): void;
+  /** 連鎖反應狀態進入（on）或解除 */
+  chain(c: ChainState, on: boolean): void;
 }
+
+export interface ChainState { id: string; title: string; good: boolean; enter: string; exit: string }
+
+/**
+ * 連鎖反應：數值跨過門檻時進入的狀態，只負責讓玩家知道，效果本身寫在 dynamics 的數值連動裡。
+ * 進入與解除用不同門檻，避免在門檻附近來回跳動。
+ */
+const CHAINS: (ChainState & { on: (st: Record<StatKey, number>) => boolean; off: (st: Record<StatKey, number>) => boolean })[] = [
+  { id: 'distrust', title: '信任危機', good: false, enter: '民眾對政府失去耐心，政策方向開始引發民意反彈，施政效果打折。', exit: '民眾對政府的信任慢慢回來了。',
+    on: st => st.trust < 38, off: st => st.trust >= 46 },
+  { id: 'unity', title: '民心凝聚', good: true, enter: '民眾信任政府，政策更容易推動，出手的效果加成。', exit: '民眾的信任開始鬆動，施政加成消失。',
+    on: st => st.trust >= 66, off: st => st.trust < 60 },
+  { id: 'unrest', title: '動盪螺旋', good: false, enter: '社會失序開始拖累經濟與政府信任，不處理會越陷越深。', exit: '社會秩序逐漸恢復，動盪不再擴散。',
+    on: st => st.stability < 35, off: st => st.stability >= 40 },
+  { id: 'drain', title: '人才外流', good: false, enter: '經濟低迷，年輕人與工程師開始出走，人口與科技受到拖累。', exit: '經濟回穩，人才外流趨緩。',
+    on: st => st.gdp < 40, off: st => st.gdp >= 48 },
+  { id: 'spotlight', title: '國際焦點', good: true, enter: '國際關注帶來合作與投資，科技產業跟著受惠。', exit: '國際的目光漸漸移開，投資熱潮退去。',
+    on: st => st.intl >= 85, off: st => st.intl < 80 },
+];
+export const CHAIN_LIST: ChainState[] = CHAINS.map(({ id, title, good, enter, exit }) => ({ id, title, good, enter, exit }));
 
 export interface Milestone { id: string; title: string; desc: string }
 
@@ -240,6 +264,7 @@ export class Engine {
   private static migrate(s: GameState, defs: Map<string, EventDef>) {
     s.hidden.dep ??= 40;
     s.policies ??= [];
+    s.chains ??= [];
     s.interventions ??= s.log.filter(l => l.intervened).length;
     s.achieved ??= [];
     s.streak ??= {};
@@ -284,7 +309,7 @@ export class Engine {
         govLean: clamp(rng.normal() * 5, -100, 100), popLean: 0, intl: 60, gdp: 62, wealth: 0, stability: 0,
         tension: 45, trust: 50, defense: 45, tech: 80, demo: 40,
       },
-      counties, hidden: { econ: 0, stance: 0, identity: 0, mood: 0, dep: 40 }, policies: [], divine: 5,
+      counties, hidden: { econ: 0, stance: 0, identity: 0, mood: 0, dep: 40 }, policies: [], chains: [], divine: 5,
       interventions: 0, achieved: [], streak: {}, reviews: 0, eggs: [],
       cooldown: {}, once: [], ongoing: [], scheduled: [], pending: [], history: [], log: [], uid: 1,
       lowStab: 0, lowEcon: 0, ended: null,
@@ -401,6 +426,7 @@ export class Engine {
     }
 
     this.systemChecks();
+    this.checkChains();
     this.checkMilestones();
 
     if (s.day % 30 === 0) s.history.push({ day: s.day, s: STAT_ORDER.map(k => +s.stats[k].toFixed(1)) });
@@ -499,6 +525,15 @@ export class Engine {
       for (const k of COUNTY_KEYS) sum[k] += c[k] * c.pop;
     }
     for (const k of COUNTY_KEYS) s.stats[k] = sum[k] / tp;
+  }
+
+  private checkChains() {
+    const s = this.s, st = s.stats;
+    for (const c of CHAINS) {
+      const active = s.chains.includes(c.id);
+      if (!active && c.on(st)) { s.chains.push(c.id); this.hooks.chain?.(c, true); }
+      else if (active && c.off(st)) { s.chains = s.chains.filter(x => x !== c.id); this.hooks.chain?.(c, false); }
+    }
   }
 
   private systemChecks() {
@@ -676,10 +711,10 @@ export class Engine {
     return e;
   }
 
-  /** 出手偏移目前的權重：前段全額，最後一年線性淡出 */
+  /** 出手偏移目前的權重：前段全額，最後 HAND.fade 天線性淡出 */
   private handWeight(p: { until: number }) {
     const left = p.until - this.s.day;
-    return left >= 365 ? 1 : Math.max(0, left / 365);
+    return left >= HAND.fade ? 1 : Math.max(0, left / HAND.fade);
   }
 
   /** 主動出手：把立即效果的一部分轉成平衡點偏移 */

@@ -4,7 +4,7 @@ import { MapScene } from './render/mapScene';
 import { COUNTIES, loadRaster } from './map/mapData';
 import { lonLatToKm } from './map/projection';
 import {
-  Engine, DAY_MS, DIVINE_MAX, STAT_ORDER, MAX_PENDING, REVIEW_DAYS, MILESTONE_LIST, describeLean,
+  Engine, DAY_MS, DIVINE_MAX, STAT_ORDER, MAX_PENDING, REVIEW_DAYS, MILESTONE_LIST, CHAIN_LIST, describeLean,
   type GameState, type LogEntry, type Pending, type Ending,
 } from './sim/engine';
 import { NAMED_POINTS } from './sim/countyData';
@@ -333,7 +333,7 @@ function refreshTop() {
 const statEls = new Map<StatKey, { root: HTMLElement; val: HTMLElement; tr: HTMLElement; fill: HTMLElement; mark?: HTMLElement }>();
 function buildStats() {
   const root = $('stats');
-  root.innerHTML = '';
+  root.innerHTML = '<div id="chains"></div>';
   shownVals = {};
   miniReset();
   for (const k of STAT_ORDER) {
@@ -410,6 +410,10 @@ function refreshStats() {
   if (w) w.innerHTML = weatherHtml(e);
 
   miniLive();
+  const chains = CHAIN_LIST.filter(c => e.s.chains.includes(c.id));
+  const box = $('chains');
+  const html = chains.map(c => `<span class="chain ${c.good ? 'good' : 'bad'}" title="${esc(c.enter)}">${c.good ? '✦' : '⚠'} ${c.title}</span>`).join('');
+  if (box.innerHTML !== html) box.innerHTML = html;
 }
 
 function statText(k: StatKey, v: number) {
@@ -783,6 +787,14 @@ function attachHooks(e: Engine) {
       setTimeout(() => {
         if (e === eng && openUid === null && !historyOpen && !reviewOpen && e.s.pending.some(q => q.uid === p.uid)) openModal(p.uid);
       }, settings.cam === 'off' ? 300 : d.egg ? 2400 : 1300);
+    },
+    chain: (c, on) => {
+      if (phase !== 'play') return;
+      const color = c.good ? '#ffd36b' : '#ff7a6a';
+      if (on) {
+        toast(`<div class="t">⚡ 連鎖反應：${c.title}</div><div>${esc(c.enter)}</div>`, color, 6000);
+        if (!c.good) sfx.play('warn');
+      } else toast(`<div class="t">${c.title}解除</div><div>${esc(c.exit)}</div>`, '#9fb3c4', 4500);
     },
     resolved: (l, p) => {
       removeBubble(p.uid);
