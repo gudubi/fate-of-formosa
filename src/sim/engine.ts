@@ -185,6 +185,24 @@ const MILESTONES: (Milestone & { days: number; check: (e: Engine) => boolean })[
 ];
 export const MILESTONE_LIST: Milestone[] = MILESTONES.map(({ id, title, desc }) => ({ id, title, desc }));
 
+/** 一般十年局的終局平均與標準差（不干預 500 局），結局保底稱號用來判斷這局哪裡最不一樣 */
+const TYPICAL: Partial<Record<StatKey, [number, number]>> = {
+  intl: [78.6, 10.4], gdp: [48.8, 14.3], wealth: [49.2, 11.7], stability: [52.9, 14.4], tension: [39.6, 18.4],
+  trust: [46.2, 13.0], defense: [56.2, 10.5], tech: [82.2, 10.5], demo: [33.6, 6.7],
+};
+/** 保底稱號：[偏高稱號, 偏低稱號, 偏高描述, 偏低描述] */
+const FALLBACK: Record<string, [string, string, string, string]> = {
+  intl: ['被看見的十年', '被遺忘的十年', '島嶼的名字越來越常出現在國際新聞裡。', '世界的目光漸漸移開，島嶼在國際上越來越安靜。'],
+  gdp: ['經濟起飛的十年', '經濟下滑的十年', '產業與投資接連到位，經濟走出一條上坡路。', '訂單與投資一點一點流失，經濟走得越來越吃力。'],
+  wealth: ['荷包飽滿的十年', '勒緊褲帶的十年', '薪水與存款都多了一些，日子過得比以前寬裕。', '物價追著薪水跑，家家戶戶都在精打細算。'],
+  stability: ['安居的十年', '不安的十年', '街頭少了衝突，多數人能安心過日子。', '社會的情緒越來越緊繃，小事也容易引爆衝突。'],
+  tension: ['緊繃的十年', '和緩的十年', '海峽兩岸的緊張一路升高，演習與警告成了日常。', '海峽兩岸的緊張慢慢降溫，日子少了些提心吊膽。'],
+  trust: ['信任的十年', '疑慮的十年', '人們願意給政府多一點耐心，施政推得比較順。', '人們對政府的每句話都打上問號。'],
+  defense: ['整軍的十年', '鬆懈的十年', '國防一年比一年紮實，島嶼的防衛更有底氣。', '國防投入節節後退，防衛的缺口越來越大。'],
+  tech: ['科技躍進的十年', '科技停滯的十年', '新的技術與公司一個接一個誕生，島嶼站上浪頭。', '產業升級卡關，島嶼在科技競賽裡慢了下來。'],
+  demo: ['年輕的十年', '老去的十年', '新生兒與年輕人回來了，城鎮重新熱鬧起來。', '學校併校、街上長者越來越多，島嶼一年比一年老。'],
+};
+
 /** 成果指數：結局評分與即時顯示共用；緊張與依賴是對稱的兩種外部風險 */
 export function guardianScore(st: Record<StatKey, number>, dep: number): number {
   return Math.round((st.stability + st.wealth + st.gdp + st.trust + st.intl) / 5
@@ -413,7 +431,12 @@ export class Engine {
     const gap = Math.abs(st.govLean - st.popLean);
     s.policies = s.policies.filter(p => p.until > s.day);
     // 政策移動平衡點；多項政策可疊加，但效果打折避免長期一路墊高。出手留下的偏移另外計算
-    const pol = (k: StatKey) => s.policies.reduce((a, p) => (p.stat !== k ? a : a + (p.hand ? this.handWeight(p) : POLICY_IMPACT) * p.shift), 0);
+    // 民心是施政的槓桿：信任 0 時政策只剩 0.6 倍效果，信任 100 時 1.4 倍
+    const lever = 0.6 + 0.8 * st.trust / 100;
+    const pol = (k: StatKey) => lever * s.policies.reduce((a, p) => (p.stat !== k ? a : a + (p.hand ? this.handWeight(p) : POLICY_IMPACT) * p.shift), 0);
+    // 門檻型的惡性循環：社會動盪拖垮經濟與信任、經濟低迷造成人才外流
+    const unrest = Math.max(0, 35 - st.stability);
+    const drain = Math.max(0, 40 - st.gdp);
 
     // 隱藏因子（AR(1) 隨機漫步）：全球景氣、對岸態度、世代認同趨勢、社會氛圍
     h.econ = clamp(h.econ * 0.998 + r.normal() * 0.032, -1, 1);
@@ -427,20 +450,23 @@ export class Engine {
       - (st.tech - 80) * 0.05 - (st.intl - 50) * 0.05 - h.dep) * 0.004, 0, 100);
 
     relax('gdp', 0.3 * st.tech + 0.15 * st.intl + 0.15 * st.stability + 0.15 * (100 - st.tension)
-      - 0.15 * (h.dep - 40) + 0.1 * st.demo + 0.15 * st.trust + h.econ * 22 - 4 + pol('gdp'), 0.0025);
-    relax('trust', 20 + 0.25 * st.stability + 0.25 * st.wealth - gap * 0.25 + pol('trust'), 0.003);
+      - 0.15 * (h.dep - 40) + 0.1 * st.demo + 0.15 * st.trust + h.econ * 22 - 4 - unrest * 0.4 + pol('gdp'), 0.0025);
+    relax('trust', 15 + 0.25 * st.stability + 0.25 * st.wealth + 0.1 * st.gdp - gap * 0.25 - unrest * 0.3 + pol('trust'), 0.003);
     relax('tension', 40 + st.govLean * 0.4 + st.popLean * 0.1 + h.stance * 30
       - (st.defense - 50) * 0.05 - (st.intl - 50) * 0.05 + pol('tension'), 0.004);
     // 國際關注隨任一種外部風險升高（緊張或依賴）
     relax('intl', 10 + 0.4 * st.tech + 0.2 * st.gdp + 0.2 * Math.max(st.tension, h.dep) + Math.abs(st.govLean) * 0.05
       + pol('intl'), 0.002);
-    relax('defense', 10 + 0.25 * st.gdp + 0.35 * st.tension + 0.1 * st.intl + pol('defense'), 0.0012);
-    relax('tech', 25 + 0.3 * st.gdp + 0.15 * st.intl + 0.15 * st.demo + 0.1 * st.stability + pol('tech'), 0.0008);
-    relax('demo', 10 + 0.25 * st.wealth + 0.15 * st.stability + 0.05 * st.trust - elapsed * 0.6 + pol('demo'), 0.0006);
+    relax('defense', -2 + 0.25 * st.gdp + 0.35 * st.tension + 0.1 * st.intl + 0.15 * st.tech + pol('defense'), 0.0012);
+    relax('tech', 25 + 0.3 * st.gdp + 0.15 * st.intl + 0.15 * st.demo + 0.1 * st.stability
+      + Math.max(0, st.intl - 70) * 0.15 - drain * 0.2 + pol('tech'), 0.0008);
+    relax('demo', 5 + 0.3 * st.wealth + 0.2 * st.stability + 0.05 * st.trust - elapsed * 0.6 - drain * 0.2 + pol('demo'), 0.0006);
     // 政府逐步回應民意（信任越高越穩定、越不需要急轉）
     relax('govLean', st.popLean, 0.0005);
 
     const shared = r.normal() * 0.1 + h.identity * 0.035;
+    // 信任 45 以上，民意慢慢跟著政府走；低於 45 則往遠離政府立場的方向反彈
+    const follow = 0.0012 * (st.trust - 45) / 50;
     const cs = s.counties;
     const avgOf = (c: County, k: CountyStatKey) =>
       c.links.length ? c.links.reduce((a, j) => a + cs[j][k], 0) / c.links.length : c[k];
@@ -448,7 +474,7 @@ export class Engine {
       popLean: c.popLean
         + (avgOf(c, 'popLean') - c.popLean) * 0.003
         + (st.popLean - c.popLean) * 0.002
-        + (st.govLean - c.popLean) * 0.0003
+        + (st.govLean - c.popLean) * follow
         - c.popLean * 0.0003
         + shared + r.normal() * 0.12,
       stability: c.stability
@@ -813,29 +839,58 @@ export class Engine {
           + (st.intl >= 70 ? '國際社會高度關注這項歷史性的變局。' : '國際社會對此反應平淡。');
         break;
       case 'timeup': {
-        const r = (k: StatKey) => st[k];
-        // 門檻依十年局的終局分布校準（tools/simulate.ts）
-        if (r('stability') >= 64 && r('wealth') >= 58 && r('gdp') >= 58) title = '繁榮之島';
-        else if (r('tech') >= 90 && r('intl') >= 80) title = '矽之盾';
-        else if (r('tension') >= 80 || s.hidden.dep >= 80) title = '臨界之島';
-        else if (r('stability') < 32) title = '風雨飄搖';
-        else if (r('demo') < 29 && r('gdp') < 44) title = '沉睡之島';
-        else if (Math.abs(r('govLean')) < 15) title = '現狀的十年';
-        else title = '平凡的日子';
+        // 依這一局最突出的特徵命名：每個特徵算出「超過門檻多少」，取最大者；都沒超過時，取和一般局相比最突出的數值
+        const dep = s.hidden.dep, gap = Math.abs(st.govLean - st.popLean);
+        const scores: [string, number][] = [
+          ['繁榮之島', Math.min(st.stability - 60, st.wealth - 54, st.gdp - 55) / 6],
+          ['矽之盾', Math.min(st.tech - 91, st.intl - 84) / 5],
+          ['臨界之島', (Math.max(st.tension, dep) - 66) / 8],
+          ['風雨飄搖', (38 - st.stability) / 6],
+          ['沉睡之島', Math.min(32 - st.demo, 47 - st.gdp) / 5],
+          ['撕裂之島', (gap - 11) / 4],
+          ['失信之島', (34 - st.trust) / 6],
+          ['焦慮的富島', Math.min(st.wealth - 54, 48 - st.stability) / 5],
+          ['世界的朋友', (st.intl - 92) / 4],
+          ['鐵壁之島', (st.defense - 70) / 5],
+          ['民心所向', Math.min(st.trust - 58, st.stability - 58) / 5],
+          ['失落的十年', (35 - st.gdp) / 5],
+          // 統獨方向兩端對稱
+          ['漸行漸遠', (st.govLean - 28) / 8],
+          ['漸行漸近', (-st.govLean - 28) / 8],
+        ];
+        const [best, bestV] = scores.reduce((a, b) => (b[1] > a[1] ? b : a));
         const flavor: Record<string, string> = {
           繁榮之島: '富足與安穩並存，這是許多世代夢想中的模樣。',
           矽之盾: '晶片與技術成了島嶼最堅實的護盾，全世界都無法忽視它。',
-          臨界之島: s.hidden.dep >= 80 && st.tension < 80
+          臨界之島: dep >= st.tension
             ? '島嶼的經濟命脈繫於單一市場，任何風吹草動都牽動全局。'
             : '和平仍在，但海峽的弦繃得前所未有地緊。',
           風雨飄搖: '島嶼撐了下來，卻是在一次次的動盪之中勉強站穩。',
           沉睡之島: '人口老去、經濟停滯，島嶼在安靜中慢慢沉睡。',
-          現狀的十年: '十年來，島嶼始終在兩端之間找到平衡。',
-          平凡的日子: '沒有奇蹟，也沒有崩塌，日子就這樣一天天過去。',
+          撕裂之島: '政府往一邊走，民意往另一邊去，這座島從未如此分歧。',
+          失信之島: '人們不再相信政府說的話，每一項政策都在懷疑中推行。',
+          焦慮的富島: '口袋滿了，心卻不安，富裕沒有換來平靜。',
+          世界的朋友: '這座島成了國際社會不可或缺的夥伴，到哪裡都有人認得它。',
+          鐵壁之島: '島嶼把自己武裝成一座堡壘，沒有人敢輕易靠近。',
+          民心所向: '政府與人民站在一起，這是一座彼此信任的島。',
+          失落的十年: '經濟一路下滑，整整十年，島嶼都在找回失去的東西。',
+          漸行漸遠: '十年間，島嶼一步步走向自己的路，與對岸的距離越拉越遠。',
+          漸行漸近: '十年間，兩岸的往來越來越密，距離一點一點縮短。',
         };
+        if (bestV >= 0) title = best;
+        else {
+          // 保底：和一般十年局（不干預 500 局的終局平均與標準差）相比，偏離最多的數值
+          const zOf = (k: StatKey) => (st[k] - TYPICAL[k]![0]) / TYPICAL[k]![1];
+          const keys = Object.keys(TYPICAL) as StatKey[];
+          const k = keys.reduce((a, b) => (Math.abs(zOf(b)) > Math.abs(zOf(a)) ? b : a));
+          const [hiTitle, loTitle, hiText, loText] = FALLBACK[k];
+          const hi = zOf(k) > 0;
+          title = hi ? hiTitle : loTitle;
+          flavor[title] = hi ? hiText : loText;
+        }
         text = `${flavor[title]}十年過去，你陪著這座島嶼走到了今天。政府路線${leanDesc}，`
           + `社會${st.stability >= 60 ? '安穩' : st.stability >= 35 ? '時有波瀾' : '動盪不安'}，`
-          + `人民${st.wealth >= 60 ? '富足' : st.wealth >= 40 ? '小康' : '困頓'}。`;
+          + `人民${st.wealth >= 54 ? '富足' : st.wealth >= 40 ? '小康' : '困頓'}。`;
         break;
       }
     }
