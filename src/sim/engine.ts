@@ -24,8 +24,11 @@ export const MAX_PENDING = 5;
 export const EGG_CAP = 3;
 /** 彩蛋每年平均發生次數（不和一般事件搶同一個抽籤池，稀有度才穩定） */
 const EGG_RATE = 0.13;
-/** 每五年一次回顧（一局十年，第 5 年回顧一次） */
-export const REVIEW_DAYS = 1826;
+/** 局中回顧的時間點（一局十年，第 4、7 年各回顧一次） */
+export const REVIEW_YEARS = [4, 7];
+export const REVIEW_AT = REVIEW_YEARS.map(y => Math.round(y * 365.25));
+/** 到第幾天為止已經過了幾個回顧點 */
+export const reviewsDue = (day: number) => REVIEW_AT.filter(d => day >= d).length;
 /** 事件選項的影響倍率：讓每個選擇的後果更明顯（快訊不受影響） */
 export const OPTION_IMPACT = 1.5;
 /** 長期政策移動平衡點的倍率 */
@@ -141,7 +144,7 @@ export interface GameState {
   /** 已達成的里程碑與其連續天數計數 */
   achieved: string[];
   streak: Record<string, number>;
-  /** 已完成的五年回顧次數 */
+  /** 已完成的局中回顧次數 */
   reviews: number;
   /** 本局遇到的彩蛋事件 id（依發生順序，含後續事件） */
   eggs: string[];
@@ -268,7 +271,7 @@ export class Engine {
     s.interventions ??= s.log.filter(l => l.intervened).length;
     s.achieved ??= [];
     s.streak ??= {};
-    s.reviews ??= Math.floor(s.day / REVIEW_DAYS);
+    s.reviews ??= reviewsDue(s.day);
     s.eggs ??= [];
     s.pending = s.pending.filter(p => defs.has(p.eventId));
     for (const p of s.pending) p.expiresDay = Infinity;

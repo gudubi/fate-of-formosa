@@ -4,7 +4,7 @@ import { MapScene } from './render/mapScene';
 import { COUNTIES, loadRaster } from './map/mapData';
 import { lonLatToKm } from './map/projection';
 import {
-  Engine, DAY_MS, DIVINE_MAX, STAT_ORDER, MAX_PENDING, REVIEW_DAYS, MILESTONE_LIST, CHAIN_LIST, describeLean,
+  Engine, DAY_MS, DIVINE_MAX, STAT_ORDER, MAX_PENDING, REVIEW_AT, REVIEW_YEARS, reviewsDue,MILESTONE_LIST, CHAIN_LIST, describeLean,
   type GameState, type LogEntry, type Pending, type Ending,
 } from './sim/engine';
 import { NAMED_POINTS } from './sim/countyData';
@@ -240,8 +240,8 @@ function advance(dt: number) {
   }
   if (e.blocking() || e.s.ended) gameTw = Math.min(gameTw, e.dateTw(e.s.day + 1) - 1);
   if (e.s.day - lastSaveDay >= 60) { lastSaveDay = e.s.day; save(); }
-  // 每五年回顧一次（重大事件處理完之後）
-  if (phase === 'play' && !e.blocking() && !e.s.ended && Math.floor(e.s.day / REVIEW_DAYS) > e.s.reviews) openReview();
+  // 第 4、7 年各回顧一次（重大事件處理完之後）
+  if (phase === 'play' && !e.blocking() && !e.s.ended && reviewsDue(e.s.day) > e.s.reviews) openReview();
 }
 
 /** 滴答聲：每跨過一天一聲，加速後受最短間隔限制，形成由慢而快再放慢的節奏 */
@@ -1034,13 +1034,17 @@ function interveneFx(card: HTMLElement, i: number, cost: number, p: Pending, don
   }
 }
 
-// ---------- 五年回顧 ----------
+// ---------- 局中回顧 ----------
+const CN_NUM = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
 function openReview() {
   const e = eng!;
-  e.s.reviews = Math.floor(e.s.day / REVIEW_DAYS);
+  // 跳過的回顧點不補開，只回顧最近一個；除錯呼叫時以最近經過的回顧點為準
+  const idx = Math.max(0, reviewsDue(e.s.day) - 1);
+  e.s.reviews = reviewsDue(e.s.day);
   reviewOpen = true;
   sfx.play('politics');
-  const from = Math.max(0, e.s.day - REVIEW_DAYS);
+  const from = idx > 0 ? REVIEW_AT[idx - 1] : 0;
+  const span = CN_NUM[REVIEW_YEARS[idx] - (idx > 0 ? REVIEW_YEARS[idx - 1] : 0)];
   const h = e.s.history;
   const then = [...h].reverse().find(x => x.day <= from) ?? h[0];
   const events = e.s.log.filter(l => l.day > from && l.tier !== 'news');
@@ -1048,17 +1052,17 @@ function openReview() {
   const acted = events.filter(l => l.intervened).length;
   const card = $('reviewDlg').querySelector('.card') as HTMLElement;
   card.innerHTML = `
-    <div class="end-kicker">第 ${e.s.reviews * 5} 年回顧・${shortDate(from)} → ${shortDate(e.s.day)}</div>
-    <h2>五年過去了</h2>
+    <div class="end-kicker">第 ${REVIEW_YEARS[idx]} 年回顧・${shortDate(from)} → ${shortDate(e.s.day)}</div>
+    <h2>${idx > 0 ? `又過了${span}年` : `${span}年過去了`}</h2>
     <div class="rv-grid">${STAT_ORDER.map((k, i) => {
       const a = then.s[i], b = e.s.stats[k], d = b - a, m = STAT_META[k];
       const good = m.lean ? 'l' : (m.danger === 'high' ? d < 0 : d > 0) ? 'p' : 'n';
       const fmtV = (v: number) => (m.lean ? `${v > 0 ? '+' : ''}${Math.round(v)}` : String(Math.round(v)));
       return `<div><span>${m.label}</span><b>${fmtV(a)} → ${fmtV(b)}</b>${Math.abs(d) >= 1 ? `<i class="${good}">${d > 0 ? '▲' : '▼'}${Math.abs(Math.round(d))}</i>` : ''}</div>`;
     }).join('')}</div>
-    <p class="rv-line">這五年發生 ${events.length} 件事件，你出手干預了 <b>${acted}</b> 次，成果指數目前 <b>${e.score()}</b>。</p>
+    <p class="rv-line">這${span}年發生 ${events.length} 件事件，你出手干預了 <b>${acted}</b> 次，成果指數目前 <b>${e.score()}</b>。</p>
     ${handVsBaseline(e)}
-    ${majors.length ? `<div class="rv-major"><div class="w-title">這五年的重大事件</div>${majors.map(l =>
+    ${majors.length ? `<div class="rv-major"><div class="w-title">這${span}年的重大事件</div>${majors.map(l =>
       `<div>${shortDate(l.day)}・${esc(l.title)}・<span>${esc(l.optionText ?? '')}</span>${l.intervened ? '<span class="tag-int">✋</span>' : ''}</div>`).join('')}</div>` : ''}
     <div class="menu-btns"><button class="btn primary" id="rvOk">繼續前進</button></div>`;
   $('reviewDlg').hidden = false;
